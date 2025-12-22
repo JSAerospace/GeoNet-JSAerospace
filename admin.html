@@ -4,41 +4,42 @@
 <meta charset="UTF-8">
 <title>Admin | GeoNet</title>
 <style>
-  body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
-  header{background:#11172a;padding:20px;text-align:center;}
-  section{max-width:500px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
-  label{display:block;margin-top:10px;}
-  input, button{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:none;}
-  button{margin-top:15px;background:#4da3ff;font-weight:bold;cursor:pointer;}
-  button:hover{background:#6bb5ff;}
-  .hidden{display:none;}
-  ul{padding-left:20px;}
+body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
+header{background:#11172a;padding:20px;text-align:center;}
+section{max-width:500px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
+label{display:block;margin-top:10px;}
+input, button{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:none;}
+button{margin-top:15px;background:#4da3ff;font-weight:bold;cursor:pointer;}
+button:hover{background:#6bb5ff;}
+.hidden{display:none;}
+ul{padding-left:20px;}
+li button{margin-left:10px;}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Panel Admin GeoNet</h1>
+<h1>Panel Admin GeoNet</h1>
 </header>
 
 <section id="login">
-  <label>Usuario</label><input type="email" id="user">
-  <label>Contraseña</label><input type="password" id="pass">
-  <button onclick="login()">Entrar</button>
+<label>Usuario</label><input type="email" id="user">
+<label>Contraseña</label><input type="password" id="pass">
+<button onclick="login()">Entrar</button>
 </section>
 
 <section id="panel" class="hidden">
-  <h2>Editar Satélites</h2>
-  <input type="number" id="editSats">
-  <button onclick="guardarSats()">Guardar Satélites</button>
+<h2>Editar Satélites</h2>
+<input type="number" id="editSats">
+<button onclick="guardarSats()">Guardar Satélites</button>
 
-  <h2>Lanzamientos</h2>
-  <ul id="launchList"></ul>
+<h2>Lanzamientos</h2>
+<ul id="launchList"></ul>
 
-  <h3>Agregar nuevo lanzamiento</h3>
-  <label>Nombre</label><input type="text" id="newName">
-  <label>Fecha (UTC o NET)</label><input type="text" id="newDate">
-  <button onclick="addLaunch()">Agregar lanzamiento</button>
+<h3>Agregar nuevo lanzamiento</h3>
+<label>Nombre</label><input type="text" id="newName">
+<label>Fecha (UTC o NET)</label><input type="text" id="newDate">
+<button onclick="addLaunch()">Agregar lanzamiento</button>
 </section>
 
 <script type="module">
@@ -61,17 +62,17 @@ const db = getFirestore(app);
 const USER = "olanoagus@gmail.com";
 const PASS = "Simba2011";
 
-const panel = document.getElementById("panel");
-const loginSec = document.getElementById("login");
-const editSatsInput = document.getElementById("editSats");
-const launchList = document.getElementById("launchList");
-const newName = document.getElementById("newName");
-const newDate = document.getElementById("newDate");
+const panel=document.getElementById("panel");
+const loginSec=document.getElementById("login");
+const editSatsInput=document.getElementById("editSats");
+const launchList=document.getElementById("launchList");
+const newName=document.getElementById("newName");
+const newDate=document.getElementById("newDate");
 
-function login() {
-  const u = document.getElementById("user").value;
-  const p = document.getElementById("pass").value;
-  if(u === USER && p === PASS){
+function login(){
+  const u=document.getElementById("user").value;
+  const p=document.getElementById("pass").value;
+  if(u===USER && p===PASS){
     loginSec.classList.add("hidden");
     panel.classList.remove("hidden");
     loadData();
@@ -81,35 +82,33 @@ function login() {
 }
 
 // Satélites
-const statsDoc = doc(db, "system", "stats");
+const statsDoc = doc(db,"system","stats");
 async function guardarSats(){
-  await setDoc(statsDoc, {sats: Number(editSatsInput.value)});
+  await setDoc(statsDoc,{sats:Number(editSatsInput.value)});
   alert("Satélites actualizados");
 }
 
 // Lanzamientos
-const launchesCol = collection(db, "launches");
+const launchesCol = collection(db,"launches");
 async function addLaunch(){
   if(!newName.value) return alert("Nombre requerido");
-  await addDoc(launchesCol, {name:newName.value,date:newDate.value||"NET"});
+  await addDoc(launchesCol,{name:newName.value,date:newDate.value||"NET"});
   newName.value=""; newDate.value="";
 }
 
 function loadData(){
-  onSnapshot(statsDoc, snap => {
+  onSnapshot(statsDoc, snap=>{
     if(snap.exists()) editSatsInput.value = snap.data().sats || 0;
   });
 
-  onSnapshot(launchesCol, snap => {
+  onSnapshot(launchesCol, snap=>{
     launchList.innerHTML="";
     snap.docs.forEach(docSnap=>{
-      const li = document.createElement("li");
-      li.textContent = `${docSnap.data().name} – ${docSnap.data().date||"NET"}`;
-      // Botón borrar
-      const btn = document.createElement("button");
+      const li=document.createElement("li");
+      li.textContent=`${docSnap.data().name} – ${docSnap.data().date||"NET"}`;
+      const btn=document.createElement("button");
       btn.textContent="Borrar";
-      btn.style.marginLeft="10px";
-      btn.onclick = async ()=>{ await deleteDoc(doc(db,"launches",docSnap.id)); };
+      btn.onclick=async()=>{await deleteDoc(doc(db,"launches",docSnap.id));};
       li.appendChild(btn);
       launchList.appendChild(li);
     });

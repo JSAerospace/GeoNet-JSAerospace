@@ -4,74 +4,72 @@
 <meta charset="UTF-8">
 <title>GeoNet | JS Aerospace</title>
 <style>
-  body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
-  header{background:#11172a;padding:20px;text-align:center;}
-  section{max-width:600px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
-  h1,h2{margin:0 0 10px;}
-  p{margin:5px 0;}
-  footer{text-align:center;opacity:0.6;padding:15px;}
-  ul{padding-left:20px;}
+body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
+header{background:#11172a;padding:20px;text-align:center;}
+section{max-width:600px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
+h1,h2{margin:0 0 10px;}
+p{margin:5px 0;}
+footer{text-align:center;opacity:0.6;padding:15px;}
+ul{padding-left:20px;}
+button{margin-left:10px;}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>GeoNet</h1>
-  <p>Constelación GNSS – JS Aerospace</p>
+<h1>GeoNet</h1>
+<p>Constelación GNSS – JS Aerospace</p>
 </header>
 
 <section>
-  <h2>Estado del sistema</h2>
-  <p><strong>Satélites activos:</strong> <span id="sats">0</span></p>
+<h2>Estado del sistema</h2>
+<p><strong>Satélites activos:</strong> <span id="sats">0</span></p>
 </section>
 
 <section>
-  <h2>Lanzamientos</h2>
-  <ul id="launchList"></ul>
+<h2>Lanzamientos</h2>
+<ul id="launchList"></ul>
 </section>
 
 <footer>© JS Aerospace</footer>
 
 <script type="module">
-  // Firebase config
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
-    authDomain: "geonet-js-aerospace.firebaseapp.com",
-    projectId: "geonet-js-aerospace",
-    storageBucket: "geonet-js-aerospace.appspot.com",
-    messagingSenderId: "651364423254",
-    appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
-    measurementId: "G-X44HFVLSQ8"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+  authDomain: "geonet-js-aerospace.firebaseapp.com",
+  projectId: "geonet-js-aerospace",
+  storageBucket: "geonet-js-aerospace.appspot.com",
+  messagingSenderId: "651364423254",
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
+  measurementId: "G-X44HFVLSQ8"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  const satsEl = document.getElementById("sats");
-  const launchList = document.getElementById("launchList");
-
-  // Satélites
-  const satsCol = collection(db, "system");
-  onSnapshot(satsCol, (snap) => {
-    snap.docs.forEach(doc => {
-      if(doc.id === "stats") satsEl.textContent = doc.data().sats;
-    });
+// Satélites
+const satsEl = document.getElementById("sats");
+const satsDoc = collection(db, "system");
+onSnapshot(satsDoc, snap => {
+  snap.docs.forEach(doc => {
+    if(doc.id==="stats") satsEl.textContent = doc.data().sats || 0;
   });
+});
 
-  // Lanzamientos
-  const launchesCol = collection(db, "launches");
-  onSnapshot(launchesCol, (snap) => {
-    launchList.innerHTML = "";
-    snap.docs.forEach(doc => {
-      const li = document.createElement("li");
-      const d = doc.data().date || "NET";
-      li.textContent = `${doc.data().name} – ${d}`;
-      launchList.appendChild(li);
-    });
+// Lanzamientos
+const launchesCol = collection(db,"launches");
+const launchList = document.getElementById("launchList");
+onSnapshot(launchesCol, snap=>{
+  launchList.innerHTML="";
+  snap.docs.forEach(doc=>{
+    const li=document.createElement("li");
+    li.textContent=`${doc.data().name} – ${doc.data().date||"NET"}`;
+    launchList.appendChild(li);
   });
+});
 </script>
 
 </body>
