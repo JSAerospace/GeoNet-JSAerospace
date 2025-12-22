@@ -27,7 +27,7 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 <section id="login">
 <label>Usuario</label><input type="email" id="user">
 <label>Contraseña</label><input type="password" id="pass">
-<button onclick="login()">Entrar</button>
+<button id="btnLogin">Entrar</button>
 </section>
 
 <section id="panel" class="hidden">
@@ -36,7 +36,7 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 <label>Satélites</label><input type="number" id="confSatsInput">
 <label>Planos Orbitales</label><input type="number" id="confPlanesInput">
 <label>Lanzamientos</label><input type="number" id="confLaunchInput">
-<button onclick="guardarConfig()">Guardar Config</button>
+<button id="saveConfigBtn">Guardar Config</button>
 
 <h2>Satélites</h2>
 <ul id="satList"></ul>
@@ -45,7 +45,7 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 <label>Cliente</label><input type="text" id="newSatClient">
 <label>Masa</label><input type="number" id="newSatMass">
 <label>Estado</label><input type="text" id="newSatState">
-<button onclick="addSat()">Agregar Satélite</button>
+<button id="addSatBtn">Agregar Satélite</button>
 
 <h2>Planos Orbitales</h2>
 <ul id="planeList"></ul>
@@ -53,7 +53,7 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 <label>Nombre</label><input type="text" id="newPlaneName">
 <label>Altitud</label><input type="number" id="newPlaneAlt">
 <label>Inclinación</label><input type="number" id="newPlaneInc">
-<button onclick="addPlane()">Agregar Plano</button>
+<button id="addPlaneBtn">Agregar Plano</button>
 
 <h2>Lanzamientos</h2>
 <ul id="launchList"></ul>
@@ -62,7 +62,7 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 <label>Carga</label><input type="text" id="newLaunchCargo">
 <label>Estado</label><input type="text" id="newLaunchState">
 <label>Fecha (UTC o NET)</label><input type="text" id="newLaunchDate">
-<button onclick="addLaunch()">Agregar Lanzamiento</button>
+<button id="addLaunchBtn">Agregar Lanzamiento</button>
 
 </section>
 
@@ -83,18 +83,25 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Usuario y contraseña
 const USER="olanoagus@gmail.com";
 const PASS="Simba2011";
 
 const panel=document.getElementById("panel");
 const loginSec=document.getElementById("login");
 
-function login(){
-  const u=document.getElementById("user").value;
-  const p=document.getElementById("pass").value;
-  if(u===USER && p===PASS){loginSec.classList.add("hidden"); panel.classList.remove("hidden"); loadData();}
-  else alert("Usuario o contraseña incorrectos");
-}
+// ---------------- LOGIN ----------------
+document.getElementById("btnLogin").addEventListener("click", ()=>{
+  const u = document.getElementById("user").value;
+  const p = document.getElementById("pass").value;
+  if(u===USER && p===PASS){
+    loginSec.classList.add("hidden");
+    panel.classList.remove("hidden");
+    loadData();
+  } else {
+    alert("Usuario o contraseña incorrectos");
+  }
+});
 
 // ---------------- CONFIGURACIÓN ----------------
 const confDoc = doc(db,"Config","Config");
@@ -102,14 +109,14 @@ const confSatsInput = document.getElementById("confSatsInput");
 const confPlanesInput = document.getElementById("confPlanesInput");
 const confLaunchInput = document.getElementById("confLaunchInput");
 
-async function guardarConfig(){
+document.getElementById("saveConfigBtn").addEventListener("click", async ()=>{
   await setDoc(confDoc,{
     satelites:Number(confSatsInput.value||0),
     planos_orbitales:Number(confPlanesInput.value||0),
     lanzamientos:Number(confLaunchInput.value||0)
   });
   alert("Configuración guardada");
-}
+});
 
 // ---------------- SATÉLITES ----------------
 const satCol = collection(db,"Setelites");
@@ -119,11 +126,11 @@ const newSatClient=document.getElementById("newSatClient");
 const newSatMass=document.getElementById("newSatMass");
 const newSatState=document.getElementById("newSatState");
 
-async function addSat(){
+document.getElementById("addSatBtn").addEventListener("click", async ()=>{
   if(!newSatName.value) return alert("Nombre requerido");
   await addDoc(satCol,{Nombre:newSatName.value,Cliente:newSatClient.value,Masa:Number(newSatMass.value),Estado:newSatState.value});
   newSatName.value=""; newSatClient.value=""; newSatMass.value=""; newSatState.value="";
-}
+});
 
 // ---------------- PLANOS ORBITALES ----------------
 const planeCol=collection(db,"Planes Orbitales");
@@ -132,11 +139,11 @@ const newPlaneName=document.getElementById("newPlaneName");
 const newPlaneAlt=document.getElementById("newPlaneAlt");
 const newPlaneInc=document.getElementById("newPlaneInc");
 
-async function addPlane(){
+document.getElementById("addPlaneBtn").addEventListener("click", async ()=>{
   if(!newPlaneName.value) return alert("Nombre requerido");
   await addDoc(planeCol,{Nombre:newPlaneName.value,Altitud:Number(newPlaneAlt.value),Inclinación:Number(newPlaneInc.value)});
   newPlaneName.value=""; newPlaneAlt.value=""; newPlaneInc.value="";
-}
+});
 
 // ---------------- LANZAMIENTOS ----------------
 const launchCol=collection(db,"launches");
@@ -146,11 +153,11 @@ const newLaunchCargo=document.getElementById("newLaunchCargo");
 const newLaunchState=document.getElementById("newLaunchState");
 const newLaunchDate=document.getElementById("newLaunchDate");
 
-async function addLaunch(){
+document.getElementById("addLaunchBtn").addEventListener("click", async ()=>{
   if(!newLaunchName.value) return alert("Nombre requerido");
   await addDoc(launchCol,{nombre:newLaunchName.value,carga:newLaunchCargo.value,estado:newLaunchState.value,fecha:newLaunchDate.value||"NET"});
   newLaunchName.value=""; newLaunchCargo.value=""; newLaunchState.value=""; newLaunchDate.value="";
-}
+});
 
 // ---------------- CARGAR DATOS ----------------
 async function loadData(){
