@@ -6,7 +6,7 @@
 <style>
 body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
 header{background:#11172a;padding:20px;text-align:center;}
-section{max-width:700px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
+section{max-width:800px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
 label{display:block;margin-top:10px;}
 input, button, select{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:none;}
 button{margin-top:15px;background:#4da3ff;font-weight:bold;cursor:pointer;}
@@ -16,6 +16,7 @@ ul{padding-left:20px;}
 li{margin-bottom:8px;}
 li button{margin-left:10px;}
 h2,h3{margin-top:20px;margin-bottom:10px;}
+.version{position:absolute;right:10px;bottom:5px;font-size:0.9em;opacity:0.8;}
 </style>
 </head>
 <body>
@@ -32,43 +33,43 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 
 <section id="panel" class="hidden">
 
-<h2>Configuración</h2>
-<label>Satélites</label><input type="number" id="confSatsInput">
+<h2>Información</h2>
 <label>Planos Orbitales</label><input type="number" id="confPlanesInput">
 <label>Lanzamientos</label><input type="number" id="confLaunchInput">
-<button id="saveConfigBtn">Guardar Config</button>
-
-<h2>Satélites</h2>
-<ul id="satList"></ul>
-<h3>Agregar Satélite</h3>
-<label>Nombre</label><input type="text" id="newSatName">
-<label>Cliente</label><input type="text" id="newSatClient">
-<label>Masa</label><input type="number" id="newSatMass">
-<label>Estado</label><input type="text" id="newSatState">
-<button id="addSatBtn">Agregar Satélite</button>
-
-<h2>Planos Orbitales</h2>
-<ul id="planeList"></ul>
-<h3>Agregar Plano Orbital</h3>
-<label>Nombre</label><input type="text" id="newPlaneName">
-<label>Altitud</label><input type="number" id="newPlaneAlt">
-<label>Inclinación</label><input type="number" id="newPlaneInc">
-<button id="addPlaneBtn">Agregar Plano</button>
+<button id="saveConfigBtn">Guardar Información</button>
 
 <h2>Lanzamientos</h2>
 <ul id="launchList"></ul>
 <h3>Agregar Lanzamiento</h3>
 <label>Nombre</label><input type="text" id="newLaunchName">
-<label>Carga</label><input type="text" id="newLaunchCargo">
-<label>Estado</label><input type="text" id="newLaunchState">
-<label>Fecha (UTC o NET)</label><input type="text" id="newLaunchDate">
+<label>Estado</label>
+<select id="newLaunchState">
+  <option value="Planeado">Planeado</option>
+  <option value="En progreso">En progreso</option>
+  <option value="Exitoso">Exitoso</option>
+  <option value="Fallido">Fallido</option>
+</select>
+<label>Fecha UTC o NET</label><input type="text" id="newLaunchDate">
+<label>Links (separar con comas)</label><input type="text" id="newLaunchLinks">
 <button id="addLaunchBtn">Agregar Lanzamiento</button>
+
+<h2>Galería</h2>
+<ul id="galleryList"></ul>
+<h3>Agregar Imagen/Video</h3>
+<label>Título</label><input type="text" id="newGalleryTitle">
+<label>Link</label><input type="text" id="newGalleryLink">
+<button id="addGalleryBtn">Agregar</button>
 
 </section>
 
+<footer>
+  © JS Aerospace
+  <span class="version" id="webVersion">V1</span>
+</footer>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, doc, addDoc, onSnapshot, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
@@ -83,120 +84,72 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Usuario y contraseña
+// ---------------- VERSION ----------------
+const versionElement = document.getElementById("webVersion");
+let webVersion="V1"; // Cambiar manualmente
+versionElement.textContent=webVersion;
+
+// ---------------- LOGIN ----------------
 const USER="olanoagus@gmail.com";
 const PASS="Simba2011";
-
 const panel=document.getElementById("panel");
 const loginSec=document.getElementById("login");
 
-// ---------------- LOGIN ----------------
 document.getElementById("btnLogin").addEventListener("click", ()=>{
   const u = document.getElementById("user").value;
   const p = document.getElementById("pass").value;
-  if(u===USER && p===PASS){
-    loginSec.classList.add("hidden");
-    panel.classList.remove("hidden");
-    loadData();
-  } else {
-    alert("Usuario o contraseña incorrectos");
-  }
+  if(u===USER && p===PASS){loginSec.classList.add("hidden");panel.classList.remove("hidden");loadData();}
+  else alert("Usuario o contraseña incorrectos");
 });
 
-// ---------------- CONFIGURACIÓN ----------------
+// ---------------- INFORMACIÓN ----------------
 const confDoc = doc(db,"Config","Config");
-const confSatsInput = document.getElementById("confSatsInput");
-const confPlanesInput = document.getElementById("confPlanesInput");
-const confLaunchInput = document.getElementById("confLaunchInput");
+const confPlanesInput=document.getElementById("confPlanesInput");
+const confLaunchInput=document.getElementById("confLaunchInput");
 
 document.getElementById("saveConfigBtn").addEventListener("click", async ()=>{
-  await setDoc(confDoc,{
-    satelites:Number(confSatsInput.value||0),
-    planos_orbitales:Number(confPlanesInput.value||0),
-    lanzamientos:Number(confLaunchInput.value||0)
-  });
-  alert("Configuración guardada");
-});
-
-// ---------------- SATÉLITES ----------------
-const satCol = collection(db,"Setelites");
-const satList = document.getElementById("satList");
-const newSatName=document.getElementById("newSatName");
-const newSatClient=document.getElementById("newSatClient");
-const newSatMass=document.getElementById("newSatMass");
-const newSatState=document.getElementById("newSatState");
-
-document.getElementById("addSatBtn").addEventListener("click", async ()=>{
-  if(!newSatName.value) return alert("Nombre requerido");
-  await addDoc(satCol,{Nombre:newSatName.value,Cliente:newSatClient.value,Masa:Number(newSatMass.value),Estado:newSatState.value});
-  newSatName.value=""; newSatClient.value=""; newSatMass.value=""; newSatState.value="";
-});
-
-// ---------------- PLANOS ORBITALES ----------------
-const planeCol=collection(db,"Planes Orbitales");
-const planeList=document.getElementById("planeList");
-const newPlaneName=document.getElementById("newPlaneName");
-const newPlaneAlt=document.getElementById("newPlaneAlt");
-const newPlaneInc=document.getElementById("newPlaneInc");
-
-document.getElementById("addPlaneBtn").addEventListener("click", async ()=>{
-  if(!newPlaneName.value) return alert("Nombre requerido");
-  await addDoc(planeCol,{Nombre:newPlaneName.value,Altitud:Number(newPlaneAlt.value),Inclinación:Number(newPlaneInc.value)});
-  newPlaneName.value=""; newPlaneAlt.value=""; newPlaneInc.value="";
+  await setDoc(confDoc,{planos_orbitales:Number(confPlanesInput.value||0),lanzamientos:Number(confLaunchInput.value||0)});
+  alert("Información guardada");
 });
 
 // ---------------- LANZAMIENTOS ----------------
-const launchCol=collection(db,"launches");
-const launchList=document.getElementById("launchList");
+const launchCol = collection(db,"launches");
+const launchList = document.getElementById("launchList");
+
 const newLaunchName=document.getElementById("newLaunchName");
-const newLaunchCargo=document.getElementById("newLaunchCargo");
 const newLaunchState=document.getElementById("newLaunchState");
 const newLaunchDate=document.getElementById("newLaunchDate");
+const newLaunchLinks=document.getElementById("newLaunchLinks");
 
 document.getElementById("addLaunchBtn").addEventListener("click", async ()=>{
   if(!newLaunchName.value) return alert("Nombre requerido");
-  await addDoc(launchCol,{nombre:newLaunchName.value,carga:newLaunchCargo.value,estado:newLaunchState.value,fecha:newLaunchDate.value||"NET"});
-  newLaunchName.value=""; newLaunchCargo.value=""; newLaunchState.value=""; newLaunchDate.value="";
+  let links = newLaunchLinks.value.split(",").map(l=>l.trim()).filter(l=>l);
+  await addDoc(launchCol,{nombre:newLaunchName.value,estado:newLaunchState.value,fecha:newLaunchDate.value||"NET",links});
+  newLaunchName.value=""; newLaunchDate.value=""; newLaunchLinks.value=""; newLaunchState.value="Planeado";
+});
+
+// ---------------- GALERÍA ----------------
+const galleryCol = collection(db,"Gallery");
+const galleryList = document.getElementById("galleryList");
+const newGalleryTitle=document.getElementById("newGalleryTitle");
+const newGalleryLink=document.getElementById("newGalleryLink");
+
+document.getElementById("addGalleryBtn").addEventListener("click", async ()=>{
+  if(!newGalleryLink.value) return alert("Link requerido");
+  await addDoc(galleryCol,{title:newGalleryTitle.value,newGalleryLink:newGalleryLink.value});
+  newGalleryTitle.value=""; newGalleryLink.value="";
 });
 
 // ---------------- CARGAR DATOS ----------------
 async function loadData(){
   // Config
   const snapConfig = await getDoc(confDoc);
-  if(snapConfig.exists()){
+  if(!snapConfig.exists()) await setDoc(confDoc,{planos_orbitales:0,lanzamientos:0});
+  else{
     const data=snapConfig.data();
-    confSatsInput.value=data.satelites||0;
     confPlanesInput.value=data.planos_orbitales||0;
     confLaunchInput.value=data.lanzamientos||0;
-  } else {
-    await setDoc(confDoc,{satelites:0,planos_orbitales:0,lanzamientos:0});
   }
-
-  // Satélites
-  onSnapshot(satCol, snap=>{
-    satList.innerHTML="";
-    snap.docs.forEach(d=>{
-      const dat=d.data();
-      const li=document.createElement("li");
-      li.textContent=`${dat.Nombre} | Cliente: ${dat.Cliente} | Masa: ${dat.Masa} | Estado: ${dat.Estado}`;
-      const btn=document.createElement("button"); btn.textContent="Borrar";
-      btn.onclick=async()=>{await deleteDoc(doc(db,"Setelites",d.id));};
-      li.appendChild(btn); satList.appendChild(li);
-    });
-  });
-
-  // Planos Orbitales
-  onSnapshot(planeCol, snap=>{
-    planeList.innerHTML="";
-    snap.docs.forEach(d=>{
-      const dat=d.data();
-      const li=document.createElement("li");
-      li.textContent=`${dat.Nombre} | Altitud: ${dat.Altitud} | Inclinación: ${dat.Inclinación}`;
-      const btn=document.createElement("button"); btn.textContent="Borrar";
-      btn.onclick=async()=>{await deleteDoc(doc(db,"Planes Orbitales",d.id));};
-      li.appendChild(btn); planeList.appendChild(li);
-    });
-  });
 
   // Lanzamientos
   onSnapshot(launchCol, snap=>{
@@ -204,10 +157,21 @@ async function loadData(){
     snap.docs.forEach(d=>{
       const dat=d.data();
       const li=document.createElement("li");
-      li.textContent=`${dat.nombre} | Carga: ${dat.carga} | Estado: ${dat.estado} | Fecha: ${dat.fecha||"NET"}`;
-      const btn=document.createElement("button"); btn.textContent="Borrar";
-      btn.onclick=async()=>{await deleteDoc(doc(db,"launches",d.id));};
-      li.appendChild(btn); launchList.appendChild(li);
+      let linksHtml="";
+      if(dat.links && dat.links.length>0) linksHtml="<br>"+dat.links.map(l=>`<a href='${l}' target='_blank'>Ver</a>`).join(" ");
+      li.innerHTML=`${dat.nombre||'Sin nombre'} | Estado: ${dat.estado||'N/A'} | Fecha: ${dat.fecha||'NET'} ${linksHtml}`;
+      launchList.appendChild(li);
+    });
+  });
+
+  // Galería
+  onSnapshot(galleryCol, snap=>{
+    galleryList.innerHTML="";
+    snap.docs.forEach(d=>{
+      const dat=d.data();
+      const li=document.createElement("li");
+      li.innerHTML=`<a href="${dat.link}" target="_blank">${dat.title||dat.link}</a>`;
+      galleryList.appendChild(li);
     });
   });
 }

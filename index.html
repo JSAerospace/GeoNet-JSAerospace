@@ -10,49 +10,30 @@ body {
   background:#0b0f1a;
   color:white;
 }
-
 header {
   background:#11172a;
   padding:20px;
   text-align:center;
 }
-
-h1, h2 {
-  margin:0 0 10px;
-}
-
-.container {
-  max-width:900px;
-  margin:20px auto;
-  display:grid;
-  gap:20px;
-}
-
+h1,h2 {margin:0 0 10px;}
+.container {max-width:900px;margin:20px auto;display:grid;gap:20px;}
 .card {
   background:#1a2140;
   padding:20px;
   border-radius:12px;
   box-shadow:0 4px 8px rgba(0,0,0,0.3);
 }
-
-ul { padding-left:20px; }
-
-li { margin-bottom:8px; }
-
+ul {padding-left:20px;}
+li {margin-bottom:8px;}
 footer {
   position:relative;
   text-align:center;
   opacity:0.6;
   padding:15px;
 }
-
-.version {
-  position:absolute;
-  right:10px;
-  bottom:5px;
-  font-size:0.9em;
-  opacity:0.8;
-}
+.version {position:absolute;right:10px;bottom:5px;font-size:0.9em;opacity:0.8;}
+a {color:#4da3ff;text-decoration:none;}
+a:hover {text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -64,25 +45,19 @@ footer {
 
 <div class="container">
   <div class="card">
-    <h2>Configuración</h2>
-    <p><strong>Satélites:</strong> <span id="confSats">0</span></p>
+    <h2>Información</h2>
     <p><strong>Planos Orbitales:</strong> <span id="confPlanes">0</span></p>
     <p><strong>Lanzamientos:</strong> <span id="confLaunch">0</span></p>
   </div>
 
   <div class="card">
-    <h2>Satélites</h2>
-    <ul id="satList"></ul>
-  </div>
-
-  <div class="card">
-    <h2>Planos Orbitales</h2>
-    <ul id="planeList"></ul>
-  </div>
-
-  <div class="card">
     <h2>Lanzamientos</h2>
     <ul id="launchList"></ul>
+  </div>
+
+  <div class="card">
+    <h2>Galería</h2>
+    <ul id="galleryList"></ul>
   </div>
 </div>
 
@@ -93,7 +68,7 @@ footer {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
@@ -108,76 +83,61 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ---------------- CONFIGURACIÓN ----------------
+// ---------------- VERSION ----------------
+const versionElement = document.getElementById("webVersion");
+let webVersion = "V1"; // Cambiar manualmente al subir nueva versión
+versionElement.textContent = webVersion;
+
+// ---------------- INFORMACIÓN ----------------
 const confDoc = doc(db,"Config","Config");
-const confSats = document.getElementById("confSats");
 const confPlanes = document.getElementById("confPlanes");
 const confLaunch = document.getElementById("confLaunch");
-
-async function initConfig(){
-  const snap = await getDoc(confDoc);
-  if(!snap.exists()){
-    await setDoc(confDoc,{satelites:0,planos_orbitales:0,lanzamientos:0});
-  }
-}
-initConfig();
 
 onSnapshot(confDoc, snap=>{
   if(snap.exists()){
     const data = snap.data();
-    confSats.textContent = data.satelites||0;
     confPlanes.textContent = data.planos_orbitales||0;
     confLaunch.textContent = data.lanzamientos||0;
   }
-});
-
-// ---------------- SATÉLITES ----------------
-const satCol = collection(db,"Setelites");
-const satList = document.getElementById("satList");
-
-onSnapshot(satCol, snap=>{
-  satList.innerHTML="";
-  snap.docs.forEach(d=>{
-    const dat=d.data();
-    const li=document.createElement("li");
-    li.textContent=`${dat.Nombre || 'Sin nombre'} | Cliente: ${dat.Cliente || 'N/A'} | Masa: ${dat.Masa || 0} | Estado: ${dat.Estado || 'N/A'}`;
-    satList.appendChild(li);
-  });
-});
-
-// ---------------- PLANOS ORBITALES ----------------
-const planeCol = collection(db,"Planes Orbitales");
-const planeList = document.getElementById("planeList");
-
-onSnapshot(planeCol, snap=>{
-  planeList.innerHTML="";
-  snap.docs.forEach(d=>{
-    const dat=d.data();
-    const li=document.createElement("li");
-    li.textContent=`${dat.Nombre || 'Sin nombre'} | Altitud: ${dat.Altitud || 0} | Inclinación: ${dat.Inclinación || 0}`;
-    planeList.appendChild(li);
-  });
 });
 
 // ---------------- LANZAMIENTOS ----------------
 const launchCol = collection(db,"launches");
 const launchList = document.getElementById("launchList");
 
+function formatDateUTCtoLocal(utc){
+  if(!utc || utc.toUpperCase()==="NET") return "NET";
+  const d = new Date(utc+"Z"); // Forzar UTC
+  return d.toLocaleString();
+}
+
 onSnapshot(launchCol, snap=>{
   launchList.innerHTML="";
   snap.docs.forEach(d=>{
-    const dat=d.data();
-    const li=document.createElement("li");
-    li.textContent=`${dat.nombre || 'Sin nombre'} | Carga: ${dat.carga || 'N/A'} | Estado: ${dat.estado || 'N/A'} | Fecha: ${dat.fecha || 'NET'}`;
+    const dat = d.data();
+    let linksHtml = "";
+    if(dat.links && dat.links.length>0){
+      linksHtml = "<br>"+dat.links.map(l=>`<a href="${l}" target="_blank">Ver</a>`).join(" ");
+    }
+    const li = document.createElement("li");
+    li.innerHTML = `<strong>${dat.nombre||'Sin nombre'}</strong> | Estado: ${dat.estado||'N/A'} | Fecha: ${formatDateUTCtoLocal(dat.fecha||'NET')} ${linksHtml}`;
     launchList.appendChild(li);
   });
 });
 
-// ---------------- VERSION ----------------
-const versionElement = document.getElementById("webVersion");
-// Cambia esta variable manualmente cada vez que subas nueva versión
-let webVersion = "V1";
-versionElement.textContent = webVersion;
+// ---------------- GALERÍA ----------------
+const galleryCol = collection(db,"Gallery");
+const galleryList = document.getElementById("galleryList");
+
+onSnapshot(galleryCol, snap=>{
+  galleryList.innerHTML="";
+  snap.docs.forEach(d=>{
+    const dat = d.data();
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="${dat.link}" target="_blank">${dat.title||dat.link}</a>`;
+    galleryList.appendChild(li);
+  });
+});
 </script>
 
 </body>
