@@ -4,13 +4,55 @@
 <meta charset="UTF-8">
 <title>GeoNet | JS Aerospace</title>
 <style>
-body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
-header{background:#11172a;padding:20px;text-align:center;}
-section{max-width:700px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
-h1,h2{margin:0 0 10px;}
-p,li{margin:5px 0;}
-ul{padding-left:20px;}
-footer{text-align:center;opacity:0.6;padding:15px;}
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#0b0f1a;
+  color:white;
+}
+
+header {
+  background:#11172a;
+  padding:20px;
+  text-align:center;
+}
+
+h1, h2 {
+  margin:0 0 10px;
+}
+
+.container {
+  max-width:900px;
+  margin:20px auto;
+  display:grid;
+  gap:20px;
+}
+
+.card {
+  background:#1a2140;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 4px 8px rgba(0,0,0,0.3);
+}
+
+ul { padding-left:20px; }
+
+li { margin-bottom:8px; }
+
+footer {
+  position:relative;
+  text-align:center;
+  opacity:0.6;
+  padding:15px;
+}
+
+.version {
+  position:absolute;
+  right:10px;
+  bottom:5px;
+  font-size:0.9em;
+  opacity:0.8;
+}
 </style>
 </head>
 <body>
@@ -20,29 +62,34 @@ footer{text-align:center;opacity:0.6;padding:15px;}
 <p>Constelación GNSS – JS Aerospace</p>
 </header>
 
-<section>
-<h2>Configuración</h2>
-<p><strong>Satélites:</strong> <span id="confSats">0</span></p>
-<p><strong>Planos Orbitales:</strong> <span id="confPlanes">0</span></p>
-<p><strong>Lanzamientos:</strong> <span id="confLaunch">0</span></p>
-</section>
+<div class="container">
+  <div class="card">
+    <h2>Configuración</h2>
+    <p><strong>Satélites:</strong> <span id="confSats">0</span></p>
+    <p><strong>Planos Orbitales:</strong> <span id="confPlanes">0</span></p>
+    <p><strong>Lanzamientos:</strong> <span id="confLaunch">0</span></p>
+  </div>
 
-<section>
-<h2>Satélites</h2>
-<ul id="satList"></ul>
-</section>
+  <div class="card">
+    <h2>Satélites</h2>
+    <ul id="satList"></ul>
+  </div>
 
-<section>
-<h2>Planos Orbitales</h2>
-<ul id="planeList"></ul>
-</section>
+  <div class="card">
+    <h2>Planos Orbitales</h2>
+    <ul id="planeList"></ul>
+  </div>
 
-<section>
-<h2>Lanzamientos</h2>
-<ul id="launchList"></ul>
-</section>
+  <div class="card">
+    <h2>Lanzamientos</h2>
+    <ul id="launchList"></ul>
+  </div>
+</div>
 
-<footer>© JS Aerospace</footer>
+<footer>
+  © JS Aerospace
+  <span class="version" id="webVersion">V1</span>
+</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -67,7 +114,6 @@ const confSats = document.getElementById("confSats");
 const confPlanes = document.getElementById("confPlanes");
 const confLaunch = document.getElementById("confLaunch");
 
-// Crear Config si no existe
 async function initConfig(){
   const snap = await getDoc(confDoc);
   if(!snap.exists()){
@@ -76,7 +122,6 @@ async function initConfig(){
 }
 initConfig();
 
-// Mostrar configuración en tiempo real
 onSnapshot(confDoc, snap=>{
   if(snap.exists()){
     const data = snap.data();
@@ -90,7 +135,6 @@ onSnapshot(confDoc, snap=>{
 const satCol = collection(db,"Setelites");
 const satList = document.getElementById("satList");
 
-// Crear colección satélites si no existe (Firestore crea automáticamente al agregar)
 onSnapshot(satCol, snap=>{
   satList.innerHTML="";
   snap.docs.forEach(d=>{
@@ -128,6 +172,12 @@ onSnapshot(launchCol, snap=>{
     launchList.appendChild(li);
   });
 });
+
+// ---------------- VERSION ----------------
+const versionElement = document.getElementById("webVersion");
+// Cambia esta variable manualmente cada vez que subas nueva versión
+let webVersion = "V1";
+versionElement.textContent = webVersion;
 </script>
 
 </body>
