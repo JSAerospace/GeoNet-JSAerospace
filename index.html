@@ -3,25 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <title>GeoNet | JS Aerospace</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0f1a;
+      color: white;
+    }
+
+    header {
+      background: #11172a;
+      padding: 20px;
+      text-align: center;
+    }
+
+    section {
+      max-width: 500px;
+      margin: 30px auto;
+      background: #1a2140;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    h1, h2 {
+      margin: 0 0 10px;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    footer {
+      text-align: center;
+      opacity: 0.6;
+      padding: 15px;
+    }
+  </style>
 </head>
 <body>
 
 <header>
   <h1>GeoNet</h1>
-  <p>Constelación GNSS – JS Aerospace</p>
+  <p>Constelación GNSS — JS Aerospace</p>
 </header>
 
-<section class="card">
+<section>
   <h2>Estado del sistema</h2>
   <p><strong>Satélites activos:</strong> <span id="sats">0</span></p>
-  <p><strong>Lanzamientos:</strong> <span id="launches">0</span></p>
+  <p><strong>Lanzamientos realizados:</strong> <span id="launches">0</span></p>
 </section>
 
 <footer>
   © JS Aerospace
 </footer>
 
-<script src="main.js"></script>
+<script>
+  // Leer datos guardados por el admin
+  const sats = localStorage.getItem("sats") || 0;
+  const launches = localStorage.getItem("launches") || 0;
+
+  document.getElementById("sats").textContent = sats;
+  document.getElementById("launches").textContent = launches;
+</script>
+
 </body>
 </html>

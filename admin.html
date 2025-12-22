@@ -3,36 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin | GeoNet</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0f1a;
+      color: white;
+    }
+
+    header {
+      background: #11172a;
+      padding: 20px;
+      text-align: center;
+    }
+
+    section {
+      max-width: 400px;
+      margin: 30px auto;
+      background: #1a2140;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      background: #4da3ff;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #6bb5ff;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
 <header>
-  <h1>Panel Admin</h1>
+  <h1>Panel Admin GeoNet</h1>
 </header>
 
-<section class="card">
+<section id="login">
   <label>Usuario</label>
-  <input id="user" type="email">
+  <input type="email" id="user">
 
   <label>Contraseña</label>
-  <input id="pass" type="password">
+  <input type="password" id="pass">
 
   <button onclick="login()">Entrar</button>
 </section>
 
-<section id="panel" class="card hidden">
+<section id="panel" class="hidden">
   <h2>Editar datos</h2>
 
   <label>Satélites activos</label>
-  <input id="editSats" type="number">
+  <input type="number" id="editSats">
 
-  <label>Lanzamientos</label>
-  <input id="editLaunches" type="number">
+  <label>Lanzamientos realizados</label>
+  <input type="number" id="editLaunches">
 
-  <button onclick="guardar()">Guardar</button>
+  <button onclick="guardar()">Guardar cambios</button>
 </section>
 
-<script src="admin.js"></script>
+<script>
+  const USER = "olanoagus@gmail.com";
+  const PASS = "Simba2011";
+
+  function login() {
+    const u = document.getElementById("user").value;
+    const p = document.getElementById("pass").value;
+
+    if (u === USER && p === PASS) {
+      document.getElementById("login").classList.add("hidden");
+      document.getElementById("panel").classList.remove("hidden");
+
+      // Cargar valores actuales
+      document.getElementById("editSats").value = localStorage.getItem("sats") || 0;
+      document.getElementById("editLaunches").value = localStorage.getItem("launches") || 0;
+    } else {
+      alert("Usuario o contraseña incorrectos");
+    }
+  }
+
+  function guardar() {
+    localStorage.setItem("sats", document.getElementById("editSats").value);
+    localStorage.setItem("launches", document.getElementById("editLaunches").value);
+
+    alert("Datos guardados correctamente");
+  }
+</script>
+
 </body>
 </html>
