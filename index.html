@@ -6,12 +6,11 @@
 <style>
 body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
 header{background:#11172a;padding:20px;text-align:center;}
-section{max-width:600px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
+section{max-width:700px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
 h1,h2{margin:0 0 10px;}
-p{margin:5px 0;}
+p,li{margin:5px 0;}
 footer{text-align:center;opacity:0.6;padding:15px;}
 ul{padding-left:20px;}
-button{margin-left:10px;}
 </style>
 </head>
 <body>
@@ -22,8 +21,20 @@ button{margin-left:10px;}
 </header>
 
 <section>
-<h2>Estado del sistema</h2>
-<p><strong>Satélites activos:</strong> <span id="sats">0</span></p>
+<h2>Configuración</h2>
+<p><strong>Satélites:</strong> <span id="confSats">0</span></p>
+<p><strong>Planos Orbitales:</strong> <span id="confPlanes">0</span></p>
+<p><strong>Lanzamientos:</strong> <span id="confLaunch">0</span></p>
+</section>
+
+<section>
+<h2>Satélites</h2>
+<ul id="satList"></ul>
+</section>
+
+<section>
+<h2>Planos Orbitales</h2>
+<ul id="planeList"></ul>
 </section>
 
 <section>
@@ -35,7 +46,7 @@ button{margin-left:10px;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, doc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
@@ -50,23 +61,55 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Config
+const confDoc = doc(db,"Config","Config");
+const confSats = document.getElementById("confSats");
+const confPlanes = document.getElementById("confPlanes");
+const confLaunch = document.getElementById("confLaunch");
+onSnapshot(confDoc, snap=>{
+  if(snap.exists()){
+    const data=snap.data();
+    confSats.textContent=data.satelites||0;
+    confPlanes.textContent=data.planos_orbitales||0;
+    confLaunch.textContent=data.lanzamientos||0;
+  }
+});
+
 // Satélites
-const satsEl = document.getElementById("sats");
-const satsDoc = collection(db, "system");
-onSnapshot(satsDoc, snap => {
-  snap.docs.forEach(doc => {
-    if(doc.id==="stats") satsEl.textContent = doc.data().sats || 0;
+const satCol = collection(db,"Setelites");
+const satList = document.getElementById("satList");
+onSnapshot(satCol, snap=>{
+  satList.innerHTML="";
+  snap.docs.forEach(d=>{
+    const li=document.createElement("li");
+    const dat=d.data();
+    li.textContent=`${dat.Nombre} | Cliente: ${dat.Cliente} | Masa: ${dat.Masa} | Estado: ${dat.Estado}`;
+    satList.appendChild(li);
+  });
+});
+
+// Planos Orbitales
+const planeCol = collection(db,"Planes Orbitales");
+const planeList = document.getElementById("planeList");
+onSnapshot(planeCol, snap=>{
+  planeList.innerHTML="";
+  snap.docs.forEach(d=>{
+    const dat=d.data();
+    const li=document.createElement("li");
+    li.textContent=`${dat.Nombre} | Altitud: ${dat.Altitud} | Inclinación: ${dat.Inclinación}`;
+    planeList.appendChild(li);
   });
 });
 
 // Lanzamientos
-const launchesCol = collection(db,"launches");
+const launchCol = collection(db,"launches");
 const launchList = document.getElementById("launchList");
-onSnapshot(launchesCol, snap=>{
+onSnapshot(launchCol, snap=>{
   launchList.innerHTML="";
-  snap.docs.forEach(doc=>{
+  snap.docs.forEach(d=>{
+    const dat=d.data();
     const li=document.createElement("li");
-    li.textContent=`${doc.data().name} – ${doc.data().date||"NET"}`;
+    li.textContent=`${dat.nombre} | Carga: ${dat.carga} | Estado: ${dat.estado} | Fecha: ${dat.fecha||"NET"}`;
     launchList.appendChild(li);
   });
 });
