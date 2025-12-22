@@ -49,8 +49,8 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
   <option value="Exitoso">Exitoso</option>
   <option value="Fallido">Fallido</option>
 </select>
-<label>Fecha UTC o NET</label><input type="text" id="newLaunchDate">
-<label>Links (separar con comas)</label><input type="text" id="newLaunchLinks">
+<label>Fecha UTC o NET</label><input type="text" id="newLaunchDate" placeholder="Ej: 2025-12-22T15:00 o NET">
+<label>Links (separar con comas)</label><input type="text" id="newLaunchLinks" placeholder="https://link1, https://link2">
 <button id="addLaunchBtn">Agregar Lanzamiento</button>
 
 <h2>Galería</h2>
@@ -86,7 +86,7 @@ const db = getFirestore(app);
 
 // ---------------- VERSION ----------------
 const versionElement = document.getElementById("webVersion");
-let webVersion="V1"; // Cambiar manualmente
+let webVersion="V1"; // Cambiar manualmente al subir nueva versión
 versionElement.textContent=webVersion;
 
 // ---------------- LOGIN ----------------
@@ -115,7 +115,6 @@ document.getElementById("saveConfigBtn").addEventListener("click", async ()=>{
 // ---------------- LANZAMIENTOS ----------------
 const launchCol = collection(db,"launches");
 const launchList = document.getElementById("launchList");
-
 const newLaunchName=document.getElementById("newLaunchName");
 const newLaunchState=document.getElementById("newLaunchState");
 const newLaunchDate=document.getElementById("newLaunchDate");
@@ -124,7 +123,12 @@ const newLaunchLinks=document.getElementById("newLaunchLinks");
 document.getElementById("addLaunchBtn").addEventListener("click", async ()=>{
   if(!newLaunchName.value) return alert("Nombre requerido");
   let links = newLaunchLinks.value.split(",").map(l=>l.trim()).filter(l=>l);
-  await addDoc(launchCol,{nombre:newLaunchName.value,estado:newLaunchState.value,fecha:newLaunchDate.value||"NET",links});
+  await addDoc(launchCol,{
+    nombre:newLaunchName.value,
+    estado:newLaunchState.value,
+    fecha:newLaunchDate.value||"NET",
+    links
+  });
   newLaunchName.value=""; newLaunchDate.value=""; newLaunchLinks.value=""; newLaunchState.value="Planeado";
 });
 
@@ -136,7 +140,7 @@ const newGalleryLink=document.getElementById("newGalleryLink");
 
 document.getElementById("addGalleryBtn").addEventListener("click", async ()=>{
   if(!newGalleryLink.value) return alert("Link requerido");
-  await addDoc(galleryCol,{title:newGalleryTitle.value,newGalleryLink:newGalleryLink.value});
+  await addDoc(galleryCol,{title:newGalleryTitle.value,link:newGalleryLink.value});
   newGalleryTitle.value=""; newGalleryLink.value="";
 });
 
@@ -159,7 +163,13 @@ async function loadData(){
       const li=document.createElement("li");
       let linksHtml="";
       if(dat.links && dat.links.length>0) linksHtml="<br>"+dat.links.map(l=>`<a href='${l}' target='_blank'>Ver</a>`).join(" ");
-      li.innerHTML=`${dat.nombre||'Sin nombre'} | Estado: ${dat.estado||'N/A'} | Fecha: ${dat.fecha||'NET'} ${linksHtml}`;
+      li.innerHTML=`${dat.nombre||'Sin nombre'} | Estado: 
+      <select disabled>
+        <option value="Planeado" ${dat.estado==='Planeado'?'selected':''}>Planeado</option>
+        <option value="En progreso" ${dat.estado==='En progreso'?'selected':''}>En progreso</option>
+        <option value="Exitoso" ${dat.estado==='Exitoso'?'selected':''}>Exitoso</option>
+        <option value="Fallido" ${dat.estado==='Fallido'?'selected':''}>Fallido</option>
+      </select> | Fecha: ${dat.fecha||'NET'} ${linksHtml}`;
       launchList.appendChild(li);
     });
   });
