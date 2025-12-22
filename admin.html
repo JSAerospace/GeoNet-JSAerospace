@@ -1,63 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin | GeoNet</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0f1a;
-      color: white;
-    }
-
-    header {
-      background: #11172a;
-      padding: 20px;
-      text-align: center;
-    }
-
-    section {
-      max-width: 400px;
-      margin: 30px auto;
-      background: #1a2140;
-      padding: 20px;
-      border-radius: 12px;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: none;
-    }
-
-    button {
-      margin-top: 15px;
-      width: 100%;
-      padding: 12px;
-      background: #4da3ff;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #6bb5ff;
-    }
-
-    .hidden {
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Admin | GeoNet</title>
+<style>
+  body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
+  header{background:#11172a;padding:20px;text-align:center;}
+  section{max-width:500px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
+  label{display:block;margin-top:10px;}
+  input, button{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:none;}
+  button{margin-top:15px;background:#4da3ff;font-weight:bold;cursor:pointer;}
+  button:hover{background:#6bb5ff;}
+  .hidden{display:none;}
+  ul{padding-left:20px;}
+</style>
 </head>
 <body>
 
@@ -66,53 +22,99 @@
 </header>
 
 <section id="login">
-  <label>Usuario</label>
-  <input type="email" id="user">
-
-  <label>Contraseña</label>
-  <input type="password" id="pass">
-
+  <label>Usuario</label><input type="email" id="user">
+  <label>Contraseña</label><input type="password" id="pass">
   <button onclick="login()">Entrar</button>
 </section>
 
 <section id="panel" class="hidden">
-  <h2>Editar datos</h2>
-
-  <label>Satélites activos</label>
+  <h2>Editar Satélites</h2>
   <input type="number" id="editSats">
+  <button onclick="guardarSats()">Guardar Satélites</button>
 
-  <label>Lanzamientos realizados</label>
-  <input type="number" id="editLaunches">
+  <h2>Lanzamientos</h2>
+  <ul id="launchList"></ul>
 
-  <button onclick="guardar()">Guardar cambios</button>
+  <h3>Agregar nuevo lanzamiento</h3>
+  <label>Nombre</label><input type="text" id="newName">
+  <label>Fecha (UTC o NET)</label><input type="text" id="newDate">
+  <button onclick="addLaunch()">Agregar lanzamiento</button>
 </section>
 
-<script>
-  const USER = "olanoagus@gmail.com";
-  const PASS = "Simba2011";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  function login() {
-    const u = document.getElementById("user").value;
-    const p = document.getElementById("pass").value;
+const firebaseConfig = {
+  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+  authDomain: "geonet-js-aerospace.firebaseapp.com",
+  projectId: "geonet-js-aerospace",
+  storageBucket: "geonet-js-aerospace.appspot.com",
+  messagingSenderId: "651364423254",
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
+  measurementId: "G-X44HFVLSQ8"
+};
 
-    if (u === USER && p === PASS) {
-      document.getElementById("login").classList.add("hidden");
-      document.getElementById("panel").classList.remove("hidden");
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-      // Cargar valores actuales
-      document.getElementById("editSats").value = localStorage.getItem("sats") || 0;
-      document.getElementById("editLaunches").value = localStorage.getItem("launches") || 0;
-    } else {
-      alert("Usuario o contraseña incorrectos");
-    }
+const USER = "olanoagus@gmail.com";
+const PASS = "Simba2011";
+
+const panel = document.getElementById("panel");
+const loginSec = document.getElementById("login");
+const editSatsInput = document.getElementById("editSats");
+const launchList = document.getElementById("launchList");
+const newName = document.getElementById("newName");
+const newDate = document.getElementById("newDate");
+
+function login() {
+  const u = document.getElementById("user").value;
+  const p = document.getElementById("pass").value;
+  if(u === USER && p === PASS){
+    loginSec.classList.add("hidden");
+    panel.classList.remove("hidden");
+    loadData();
+  } else {
+    alert("Usuario o contraseña incorrectos");
   }
+}
 
-  function guardar() {
-    localStorage.setItem("sats", document.getElementById("editSats").value);
-    localStorage.setItem("launches", document.getElementById("editLaunches").value);
+// Satélites
+const statsDoc = doc(db, "system", "stats");
+async function guardarSats(){
+  await setDoc(statsDoc, {sats: Number(editSatsInput.value)});
+  alert("Satélites actualizados");
+}
 
-    alert("Datos guardados correctamente");
-  }
+// Lanzamientos
+const launchesCol = collection(db, "launches");
+async function addLaunch(){
+  if(!newName.value) return alert("Nombre requerido");
+  await addDoc(launchesCol, {name:newName.value,date:newDate.value||"NET"});
+  newName.value=""; newDate.value="";
+}
+
+function loadData(){
+  onSnapshot(statsDoc, snap => {
+    if(snap.exists()) editSatsInput.value = snap.data().sats || 0;
+  });
+
+  onSnapshot(launchesCol, snap => {
+    launchList.innerHTML="";
+    snap.docs.forEach(docSnap=>{
+      const li = document.createElement("li");
+      li.textContent = `${docSnap.data().name} – ${docSnap.data().date||"NET"}`;
+      // Botón borrar
+      const btn = document.createElement("button");
+      btn.textContent="Borrar";
+      btn.style.marginLeft="10px";
+      btn.onclick = async ()=>{ await deleteDoc(doc(db,"launches",docSnap.id)); };
+      li.appendChild(btn);
+      launchList.appendChild(li);
+    });
+  });
+}
 </script>
 
 </body>

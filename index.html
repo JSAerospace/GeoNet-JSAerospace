@@ -1,70 +1,77 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>GeoNet | JS Aerospace</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0f1a;
-      color: white;
-    }
-
-    header {
-      background: #11172a;
-      padding: 20px;
-      text-align: center;
-    }
-
-    section {
-      max-width: 500px;
-      margin: 30px auto;
-      background: #1a2140;
-      padding: 20px;
-      border-radius: 12px;
-    }
-
-    h1, h2 {
-      margin: 0 0 10px;
-    }
-
-    p {
-      margin: 8px 0;
-    }
-
-    footer {
-      text-align: center;
-      opacity: 0.6;
-      padding: 15px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>GeoNet | JS Aerospace</title>
+<style>
+  body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
+  header{background:#11172a;padding:20px;text-align:center;}
+  section{max-width:600px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
+  h1,h2{margin:0 0 10px;}
+  p{margin:5px 0;}
+  footer{text-align:center;opacity:0.6;padding:15px;}
+  ul{padding-left:20px;}
+</style>
 </head>
 <body>
 
 <header>
   <h1>GeoNet</h1>
-  <p>Constelación GNSS — JS Aerospace</p>
+  <p>Constelación GNSS – JS Aerospace</p>
 </header>
 
 <section>
   <h2>Estado del sistema</h2>
   <p><strong>Satélites activos:</strong> <span id="sats">0</span></p>
-  <p><strong>Lanzamientos realizados:</strong> <span id="launches">0</span></p>
 </section>
 
-<footer>
-  © JS Aerospace
-</footer>
+<section>
+  <h2>Lanzamientos</h2>
+  <ul id="launchList"></ul>
+</section>
 
-<script>
-  // Leer datos guardados por el admin
-  const sats = localStorage.getItem("sats") || 0;
-  const launches = localStorage.getItem("launches") || 0;
+<footer>© JS Aerospace</footer>
 
-  document.getElementById("sats").textContent = sats;
-  document.getElementById("launches").textContent = launches;
+<script type="module">
+  // Firebase config
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+    authDomain: "geonet-js-aerospace.firebaseapp.com",
+    projectId: "geonet-js-aerospace",
+    storageBucket: "geonet-js-aerospace.appspot.com",
+    messagingSenderId: "651364423254",
+    appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
+    measurementId: "G-X44HFVLSQ8"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const satsEl = document.getElementById("sats");
+  const launchList = document.getElementById("launchList");
+
+  // Satélites
+  const satsCol = collection(db, "system");
+  onSnapshot(satsCol, (snap) => {
+    snap.docs.forEach(doc => {
+      if(doc.id === "stats") satsEl.textContent = doc.data().sats;
+    });
+  });
+
+  // Lanzamientos
+  const launchesCol = collection(db, "launches");
+  onSnapshot(launchesCol, (snap) => {
+    launchList.innerHTML = "";
+    snap.docs.forEach(doc => {
+      const li = document.createElement("li");
+      const d = doc.data().date || "NET";
+      li.textContent = `${doc.data().name} – ${d}`;
+      launchList.appendChild(li);
+    });
+  });
 </script>
 
 </body>
