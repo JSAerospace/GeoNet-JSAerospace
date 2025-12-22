@@ -6,14 +6,16 @@
 <style>
 body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
 header{background:#11172a;padding:20px;text-align:center;}
-section{max-width:600px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
+section{max-width:700px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
 label{display:block;margin-top:10px;}
 input, button, select{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:none;}
 button{margin-top:15px;background:#4da3ff;font-weight:bold;cursor:pointer;}
 button:hover{background:#6bb5ff;}
 .hidden{display:none;}
 ul{padding-left:20px;}
+li{margin-bottom:8px;}
 li button{margin-left:10px;}
+h2,h3{margin-top:20px;margin-bottom:10px;}
 </style>
 </head>
 <body>
@@ -94,11 +96,12 @@ function login(){
   else alert("Usuario o contraseña incorrectos");
 }
 
-// Config
+// ---------------- CONFIGURACIÓN ----------------
 const confDoc = doc(db,"Config","Config");
 const confSatsInput = document.getElementById("confSatsInput");
 const confPlanesInput = document.getElementById("confPlanesInput");
 const confLaunchInput = document.getElementById("confLaunchInput");
+
 async function guardarConfig(){
   await setDoc(confDoc,{
     satelites:Number(confSatsInput.value||0),
@@ -108,61 +111,66 @@ async function guardarConfig(){
   alert("Configuración guardada");
 }
 
-// Satélites
+// ---------------- SATÉLITES ----------------
 const satCol = collection(db,"Setelites");
 const satList = document.getElementById("satList");
 const newSatName=document.getElementById("newSatName");
 const newSatClient=document.getElementById("newSatClient");
 const newSatMass=document.getElementById("newSatMass");
 const newSatState=document.getElementById("newSatState");
+
 async function addSat(){
   if(!newSatName.value) return alert("Nombre requerido");
   await addDoc(satCol,{Nombre:newSatName.value,Cliente:newSatClient.value,Masa:Number(newSatMass.value),Estado:newSatState.value});
   newSatName.value=""; newSatClient.value=""; newSatMass.value=""; newSatState.value="";
 }
 
-// Planos Orbitales
+// ---------------- PLANOS ORBITALES ----------------
 const planeCol=collection(db,"Planes Orbitales");
 const planeList=document.getElementById("planeList");
 const newPlaneName=document.getElementById("newPlaneName");
 const newPlaneAlt=document.getElementById("newPlaneAlt");
 const newPlaneInc=document.getElementById("newPlaneInc");
+
 async function addPlane(){
   if(!newPlaneName.value) return alert("Nombre requerido");
   await addDoc(planeCol,{Nombre:newPlaneName.value,Altitud:Number(newPlaneAlt.value),Inclinación:Number(newPlaneInc.value)});
   newPlaneName.value=""; newPlaneAlt.value=""; newPlaneInc.value="";
 }
 
-// Lanzamientos
+// ---------------- LANZAMIENTOS ----------------
 const launchCol=collection(db,"launches");
 const launchList=document.getElementById("launchList");
 const newLaunchName=document.getElementById("newLaunchName");
 const newLaunchCargo=document.getElementById("newLaunchCargo");
 const newLaunchState=document.getElementById("newLaunchState");
 const newLaunchDate=document.getElementById("newLaunchDate");
+
 async function addLaunch(){
   if(!newLaunchName.value) return alert("Nombre requerido");
   await addDoc(launchCol,{nombre:newLaunchName.value,carga:newLaunchCargo.value,estado:newLaunchState.value,fecha:newLaunchDate.value||"NET"});
   newLaunchName.value=""; newLaunchCargo.value=""; newLaunchState.value=""; newLaunchDate.value="";
 }
 
-function loadData(){
+// ---------------- CARGAR DATOS ----------------
+async function loadData(){
   // Config
-  getDoc(confDoc).then(snap=>{
-    if(snap.exists()){
-      const data=snap.data();
-      confSatsInput.value=data.satelites||0;
-      confPlanesInput.value=data.planos_orbitales||0;
-      confLaunchInput.value=data.lanzamientos||0;
-    } else {setDoc(confDoc,{satelites:0,planos_orbitales:0,lanzamientos:0});}
-  });
+  const snapConfig = await getDoc(confDoc);
+  if(snapConfig.exists()){
+    const data=snapConfig.data();
+    confSatsInput.value=data.satelites||0;
+    confPlanesInput.value=data.planos_orbitales||0;
+    confLaunchInput.value=data.lanzamientos||0;
+  } else {
+    await setDoc(confDoc,{satelites:0,planos_orbitales:0,lanzamientos:0});
+  }
 
   // Satélites
   onSnapshot(satCol, snap=>{
     satList.innerHTML="";
     snap.docs.forEach(d=>{
-      const li=document.createElement("li");
       const dat=d.data();
+      const li=document.createElement("li");
       li.textContent=`${dat.Nombre} | Cliente: ${dat.Cliente} | Masa: ${dat.Masa} | Estado: ${dat.Estado}`;
       const btn=document.createElement("button"); btn.textContent="Borrar";
       btn.onclick=async()=>{await deleteDoc(doc(db,"Setelites",d.id));};
