@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Test Firebase</title>
+</head>
+<body>
+<h1>Test Firebase</h1>
+<div id="out"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+  authDomain: "geonet-js-aerospace.firebaseapp.com",
+  projectId: "geonet-js-aerospace",
+  storageBucket: "geonet-js-aerospace.appspot.com",
+  messagingSenderId: "651364423254",
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
+  measurementId: "G-X44HFVLSQ8"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const statsDoc = doc(db,"system","stats");
+getDoc(statsDoc).then(d=>{
+  document.getElementById("out").textContent = d.exists() ? JSON.stringify(d.data()) : "No hay datos";
+}).catch(e=>document.getElementById("out").textContent="Error: "+e);
+</script>
+</body>
+</html>
