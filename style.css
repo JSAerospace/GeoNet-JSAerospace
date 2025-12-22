@@ -1,60 +1,53 @@
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0e0e16;
-    color: white;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b0f1a;
+  color: white;
 }
 
 header {
-    background: #1b1b29;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 0 10px #0008;
-}
-
-h1, h2 {
-    margin: 0;
-}
-
-main {
-    padding: 20px;
+  padding: 20px;
+  background: #11172a;
+  text-align: center;
 }
 
 .card {
-    background: #1b1b29;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 12px #0009;
-    margin-bottom: 20px;
-}
-
-.card-list {
-    display: grid;
-    gap: 20px;
-}
-
-.btn {
-    background: #3e57ff;
-    padding: 10px 18px;
-    border-radius: 8px;
-    color: white;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.btn:hover {
-    background: #536dff;
+  background: #1a2140;
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 400px;
+  border-radius: 12px;
 }
 
 input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 6px;
-    margin-bottom: 16px;
-    border-radius: 6px;
-    border: none;
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #4da3ff;
+  color: black;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #6bb5ff;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  opacity: 0.6;
+}
+
+.hidden {
+  display: none;
 }

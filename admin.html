@@ -1,40 +1,38 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin — J.S Aerospace</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Admin | GeoNet</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <header>
-    <h1>Panel de Administración</h1>
+  <h1>Panel Admin</h1>
 </header>
 
-<main>
-    <form id="launchForm" class="card">
-        <h2 id="formTitle">Agregar lanzamiento</h2>
+<section class="card">
+  <label>Usuario</label>
+  <input id="user" type="email">
 
-        <label>Nombre de la misión</label>
-        <input type="text" id="name" required>
+  <label>Contraseña</label>
+  <input id="pass" type="password">
 
-        <label>Fecha (o escribir NET)</label>
-        <input type="text" id="date" placeholder="Ej: 2025-02-14 o NET">
+  <button onclick="login()">Entrar</button>
+</section>
 
-        <label>Cantidad de satélites</label>
-        <input type="number" id="sats" min="0" required>
+<section id="panel" class="card hidden">
+  <h2>Editar datos</h2>
 
-        <label>Link (video o imagen)</label>
-        <input type="text" id="link" placeholder="https://...">
+  <label>Satélites activos</label>
+  <input id="editSats" type="number">
 
-        <button class="btn" type="submit">Guardar</button>
-    </form>
+  <label>Lanzamientos</label>
+  <input id="editLaunches" type="number">
 
-    <h2 style="margin-top:40px;">Lanzamientos guardados</h2>
-    <div id="adminList" class="card-list"></div>
-</main>
+  <button onclick="guardar()">Guardar</button>
+</section>
 
 <script src="admin.js"></script>
-
 </body>
 </html>
