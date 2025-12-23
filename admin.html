@@ -40,6 +40,7 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 
 <h2>Lanzamientos</h2>
 <ul id="launchList"></ul>
+
 <h3>Agregar Lanzamiento</h3>
 <label>Nombre</label><input type="text" id="newLaunchName">
 <label>Estado</label>
@@ -49,8 +50,13 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
   <option value="Exitoso">Exitoso</option>
   <option value="Fallido">Fallido</option>
 </select>
-<label>Fecha UTC o NET</label><input type="text" id="newLaunchDate" placeholder="Ej: 2025-12-22T15:00 o NET">
-<label>Links (separar con comas)</label><input type="text" id="newLaunchLinks" placeholder="https://link1, https://link2">
+<label>Fecha</label>
+<select id="newLaunchDate">
+  <option value="NET">NET</option>
+  <option value="2025-12-22T15:00">2025-12-22 15:00 UTC</option>
+  <option value="2025-12-25T12:00">2025-12-25 12:00 UTC</option>
+</select>
+<label>Links (separar con comas)</label><input type="text" id="newLaunchLinks">
 <button id="addLaunchBtn">Agregar Lanzamiento</button>
 
 <h2>Galería</h2>
@@ -69,7 +75,7 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, onSnapshot, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, doc, addDoc, onSnapshot, setDoc, deleteDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
@@ -86,7 +92,7 @@ const db = getFirestore(app);
 
 // ---------------- VERSION ----------------
 const versionElement = document.getElementById("webVersion");
-let webVersion="V1"; // Cambiar manualmente al subir nueva versión
+let webVersion="V1"; // Cambiar manualmente
 versionElement.textContent=webVersion;
 
 // ---------------- LOGIN ----------------
@@ -126,10 +132,10 @@ document.getElementById("addLaunchBtn").addEventListener("click", async ()=>{
   await addDoc(launchCol,{
     nombre:newLaunchName.value,
     estado:newLaunchState.value,
-    fecha:newLaunchDate.value||"NET",
+    fecha:newLaunchDate.value,
     links
   });
-  newLaunchName.value=""; newLaunchDate.value=""; newLaunchLinks.value=""; newLaunchState.value="Planeado";
+  newLaunchName.value=""; newLaunchDate.value="NET"; newLaunchLinks.value=""; newLaunchState.value="Planeado";
 });
 
 // ---------------- GALERÍA ----------------
@@ -163,14 +169,44 @@ async function loadData(){
       const li=document.createElement("li");
       let linksHtml="";
       if(dat.links && dat.links.length>0) linksHtml="<br>"+dat.links.map(l=>`<a href='${l}' target='_blank'>Ver</a>`).join(" ");
-      li.innerHTML=`${dat.nombre||'Sin nombre'} | Estado: 
-      <select disabled>
+      // Menú desplegable de estado editable
+      li.innerHTML=`
+      <input type="text" value="${dat.nombre}" style="width:40%;margin-right:5px;" class="editName">
+      <select class="editState">
         <option value="Planeado" ${dat.estado==='Planeado'?'selected':''}>Planeado</option>
         <option value="En progreso" ${dat.estado==='En progreso'?'selected':''}>En progreso</option>
         <option value="Exitoso" ${dat.estado==='Exitoso'?'selected':''}>Exitoso</option>
         <option value="Fallido" ${dat.estado==='Fallido'?'selected':''}>Fallido</option>
-      </select> | Fecha: ${dat.fecha||'NET'} ${linksHtml}`;
+      </select>
+      <select class="editDate">
+        <option value="NET" ${dat.fecha==='NET'?'selected':''}>NET</option>
+        <option value="2025-12-22T15:00" ${dat.fecha==='2025-12-22T15:00'?'selected':''}>2025-12-22 15:00 UTC</option>
+        <option value="2025-12-25T12:00" ${dat.fecha==='2025-12-25T12:00'?'selected':''}>2025-12-25 12:00 UTC</option>
+      </select>
+      ${linksHtml}
+      <button class="saveLaunchBtn">Guardar</button>
+      <button class="delLaunchBtn">Eliminar</button>
+      `;
       launchList.appendChild(li);
+
+      const saveBtn = li.querySelector(".saveLaunchBtn");
+      const delBtn = li.querySelector(".delLaunchBtn");
+      const nameInput = li.querySelector(".editName");
+      const stateSelect = li.querySelector(".editState");
+      const dateSelect = li.querySelector(".editDate");
+
+      saveBtn.addEventListener("click", async ()=>{
+        await updateDoc(d.ref,{
+          nombre:nameInput.value,
+          estado:stateSelect.value,
+          fecha:dateSelect.value
+        });
+        alert("Lanzamiento actualizado");
+      });
+
+      delBtn.addEventListener("click", async ()=>{
+        if(confirm("Eliminar este lanzamiento?")) await deleteDoc(d.ref);
+      });
     });
   });
 
@@ -180,8 +216,12 @@ async function loadData(){
     snap.docs.forEach(d=>{
       const dat=d.data();
       const li=document.createElement("li");
-      li.innerHTML=`<a href="${dat.link}" target="_blank">${dat.title||dat.link}</a>`;
+      li.innerHTML=`${dat.title||dat.link} <a href="${dat.link}" target="_blank">Ver</a> <button class="delGalBtn">Eliminar</button>`;
       galleryList.appendChild(li);
+      const delBtn = li.querySelector(".delGalBtn");
+      delBtn.addEventListener("click", async ()=>{
+        if(confirm("Eliminar este item de galería?")) await deleteDoc(d.ref);
+      });
     });
   });
 }
