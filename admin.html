@@ -8,10 +8,12 @@
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
 section{padding:20px}
 input,select,button{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:none}
-button{background:#1e90ff;color:#fff;font-weight:bold}
-.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px}
+button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
+.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 0 10px rgba(0,0,0,.4)}
 .hidden{display:none}
 .version{position:fixed;bottom:10px;right:10px;font-size:12px;opacity:.6}
+.card button{width:48%;margin:2px 1%;background:#28a745;color:#fff;font-weight:bold}
+.card button.delete{background:#dc3545}
 </style>
 </head>
 <body>
@@ -51,6 +53,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold}
 <input id="gUrl" placeholder="URL imagen o video">
 <button onclick="addGallery()">Agregar</button>
 
+<h2>Lanzamientos Existentes</h2>
 <div id="launchList"></div>
 
 </section>
@@ -68,90 +71,113 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-window.login=()=>{
- if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
-  login.classList.add("hidden");
-  panel.classList.remove("hidden");
+const loginForm = document.getElementById("login");
+const panel = document.getElementById("panel");
+const user = document.getElementById("user");
+const pass = document.getElementById("pass");
+
+// Login simple
+window.login = () => {
+  if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
+    loginForm.classList.add("hidden");
+    panel.classList.remove("hidden");
+    loadLaunches();
+  } else {
+    alert("Usuario o contraseña incorrecta");
+  }
+};
+
+// Guardar Información
+window.saveInfo = async () => {
+  if(!infoNombre.value || !infoValor.value) return alert("Completa ambos campos");
+  await setDoc(doc(db,"Config","info"),{
+    [infoNombre.value]: infoValor.value
+  },{merge:true});
+  infoNombre.value="";
+  infoValor.value="";
+};
+
+// Guardar / Actualizar lanzamiento
+window.saveLaunch = async () => {
+  if(!lNombre.value) return alert("Debe poner un nombre de misión");
+  let data;
+  if(lTipo.value==="NET"){
+    data={
+      nombre:lNombre.value,
+      estado:lEstado.value,
+      tipo:"NET",
+      net:lNet.value,
+      carga:lCarga.value
+    };
+  } else {
+    data={
+      nombre:lNombre.value,
+      estado:lEstado.value,
+      tipo:"FECHA",
+      fecha:lFecha.value,
+      carga:lCarga.value
+    };
+  }
+  await addDoc(collection(db,"launches"), data);
+  lNombre.value="";
+  lEstado.value="PLANNED";
+  lTipo.value="FECHA";
+  lFecha.value="";
+  lNet.value="";
+  lCarga.value="";
   loadLaunches();
- }
-}
+};
 
-// Información
-window.saveInfo=()=>{
- setDoc(doc(db,"Config","info"),{
-  [infoNombre.value]:infoValor.value
- },{merge:true});
-}
+// Agregar a galería
+window.addGallery = async () => {
+  if(!gUrl.value) return alert("Ingrese URL");
+  await addDoc(collection(db,"Gallery"),{url:gUrl.value});
+  gUrl.value="";
+};
 
-// Lanzamientos
-window.saveLaunch=async()=>{
- if(lNombre.value==="") return alert("Debe poner un nombre");
- if(lTipo.value==="NET"){
-   await addDoc(collection(db,"launches"),{
-     nombre:lNombre.value,
-     estado:lEstado.value,
-     tipo:"NET",
-     net:lNet.value,
-     carga:lCarga.value
-   });
- } else {
-   await addDoc(collection(db,"launches"),{
-     nombre:lNombre.value,
-     estado:lEstado.value,
-     tipo:"FECHA",
-     fecha:lFecha.value,
-     carga:lCarga.value
-   });
- }
- loadLaunches();
-}
-
-// Galería
-window.addGallery=()=>{
- addDoc(collection(db,"Gallery"),{url:gUrl.value});
-}
-
-// Listar lanzamientos para editar/borrar
+// Cargar lanzamientos existentes
 async function loadLaunches(){
- const listDiv=document.getElementById("launchList");
- listDiv.innerHTML="";
- const snaps = await getDocs(collection(db,"launches"));
- snaps.forEach(d=>{
-   const data=d.data();
-   const id=d.id;
-   listDiv.innerHTML+=`
-   <div class="card">
-     <strong>${data.nombre}</strong> - ${data.estado} - ${data.tipo==="NET"?data.net:new Date(data.fecha).toLocaleString()}
-     <button onclick="editLaunch('${id}')">Editar</button>
-     <button onclick="deleteLaunch('${id}')">Borrar</button>
-   </div>`;
- });
+  const listDiv = document.getElementById("launchList");
+  listDiv.innerHTML="";
+  const snaps = await getDocs(collection(db,"launches"));
+  snaps.forEach(d=>{
+    const data=d.data();
+    const id=d.id;
+    let dateDisplay = data.tipo==="NET"?data.net:new Date(data.fecha).toLocaleString();
+    listDiv.innerHTML += `
+    <div class="card">
+      <strong>${data.nombre}</strong> - ${data.estado} - ${dateDisplay}
+      <button onclick="editLaunch('${id}')">Editar</button>
+      <button class="delete" onclick="deleteLaunch('${id}')">Borrar</button>
+    </div>`;
+  });
 }
 
-// Editar
-window.editLaunch=async(id)=>{
- const docRef=doc(db,"launches",id);
- const docSnap=await getDocs(collection(db,"launches"));
- docSnap.forEach(d=>{
-   if(d.id===id){
-     const data=d.data();
-     lNombre.value=data.nombre;
-     lEstado.value=data.estado;
-     lTipo.value=data.tipo;
-     lFecha.value=data.fecha || "";
-     lNet.value=data.net || "";
-     lCarga.value=data.carga;
-   }
- });
- await deleteDoc(docRef); // borramos el original, se guardará al presionar guardar
-}
+// Editar lanzamiento
+window.editLaunch = async (id) => {
+  const docRef = doc(db,"launches",id);
+  const docSnap = await getDocs(collection(db,"launches"));
+  docSnap.forEach(d=>{
+    if(d.id===id){
+      const data=d.data();
+      lNombre.value=data.nombre;
+      lEstado.value=data.estado;
+      lTipo.value=data.tipo;
+      lFecha.value=data.fecha || "";
+      lNet.value=data.net || "";
+      lCarga.value=data.carga;
+    }
+  });
+  await deleteDoc(docRef);
+};
 
-// Borrar
-window.deleteLaunch=async(id)=>{
- if(!confirm("¿Seguro que quieres borrar este lanzamiento?")) return;
- await deleteDoc(doc(db,"launches",id));
- loadLaunches();
-}
+// Borrar lanzamiento
+window.deleteLaunch = async (id) => {
+  if(!confirm("¿Seguro que quieres borrar este lanzamiento?")) return;
+  await deleteDoc(doc(db,"launches",id));
+  loadLaunches();
+};
 </script>
+
 </body>
 </html>
