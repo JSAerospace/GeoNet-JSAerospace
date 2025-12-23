@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin GeoNet V5.0</title>
+<title>Admin GeoNet V5.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -20,6 +20,7 @@ h2{margin-top:25px;margin-bottom:10px}
 #loginBox input{width:100%;margin-bottom:15px}
 #loginBox button{width:100%}
 .hidden{display:none}
+label{font-weight:bold}
 </style>
 </head>
 <body>
@@ -50,8 +51,12 @@ h2{margin-top:25px;margin-bottom:10px}
 <section class="hidden" id="lanzamientosSection">
 <h2>Agregar/Editar Lanzamiento</h2>
 <div class="card">
-<label>Nombre:</label><input type="text" id="inputNombre">
-<label>Vehículo:</label><input type="text" id="inputVehiculo">
+<label>Nombre:</label>
+<input type="text" id="inputNombre">
+
+<label>Vehículo:</label>
+<input type="text" id="inputVehiculo">
+
 <label>Estado:</label>
 <select id="inputEstado">
   <option value="Éxito">Éxito</option>
@@ -59,6 +64,7 @@ h2{margin-top:25px;margin-bottom:10px}
   <option value="Planeado">Planeado</option>
   <option value="En Vuelo">En Vuelo</option>
 </select>
+
 <label>Tipo de Fecha:</label>
 <select id="inputTipoFecha">
   <option value="FECHA">Fecha Exacta</option>
@@ -66,33 +72,52 @@ h2{margin-top:25px;margin-bottom:10px}
 </select>
 
 <div id="fechaExacta">
-<label>Fecha Exacta:</label>
-<input type="datetime-local" id="inputFecha">
+  <label>Fecha Exacta:</label>
+  <input type="datetime-local" id="inputFecha">
 </div>
 
 <div id="netInputs" style="display:none">
-<label>Tipo NET:</label>
-<select id="netTipo">
-  <option value="YEAR">NET Año</option>
-  <option value="MONTH">NET Mes/Año</option>
-  <option value="DAY">NET Día/Mes/Año</option>
-</select>
-<div id="netYear" style="display:none">
-  <input type="number" id="netInputYear" placeholder="Año">
-</div>
-<div id="netMonth" style="display:none">
-  <input type="number" id="netInputMonth" placeholder="Mes">
-  <input type="number" id="netInputYear2" placeholder="Año">
-</div>
-<div id="netDay" style="display:none">
-  <input type="number" id="netInputDay" placeholder="Día">
-  <input type="number" id="netInputMonth2" placeholder="Mes">
-  <input type="number" id="netInputYear3" placeholder="Año">
-</div>
+  <label>Tipo NET:</label>
+  <select id="netTipo">
+    <option value="YEAR">NET Año</option>
+    <option value="MONTH">NET Mes/Año</option>
+    <option value="DAY">NET Día/Mes/Año</option>
+  </select>
+
+  <div id="netYear" style="margin-top:5px;">
+    <input type="number" id="netInputYear" placeholder="Año">
+  </div>
+
+  <div id="netMonth" style="display:none;margin-top:5px;">
+    <label>Mes:</label>
+    <select id="netSelectMonth">
+      <option value="1">Enero</option>
+      <option value="2">Febrero</option>
+      <option value="3">Marzo</option>
+      <option value="4">Abril</option>
+      <option value="5">Mayo</option>
+      <option value="6">Junio</option>
+      <option value="7">Julio</option>
+      <option value="8">Agosto</option>
+      <option value="9">Septiembre</option>
+      <option value="10">Octubre</option>
+      <option value="11">Noviembre</option>
+      <option value="12">Diciembre</option>
+    </select>
+  </div>
+
+  <div id="netDay" style="display:none;margin-top:5px;">
+    <label>Día:</label>
+    <select id="netSelectDay"></select>
+  </div>
 </div>
 
-<label>Carga:</label><input type="text" id="inputCarga">
-<label>Galería (separar por comas):</label><input type="text" id="inputGaleria">
+<label>Carga:</label>
+<input type="text" id="inputCarga">
+
+<label>Galería (separar por comas):</label>
+<input type="text" id="inputGaleria">
+
 <button id="btnAgregarLanzamiento">Agregar/Editar Lanzamiento</button>
 </div>
 </section>
@@ -166,6 +191,7 @@ btnLogin.addEventListener("click",()=>{
 const tipoFecha = document.getElementById("inputTipoFecha");
 const fechaExactaDiv = document.getElementById("fechaExacta");
 const netDiv = document.getElementById("netInputs");
+
 tipoFecha.addEventListener("change",()=>{
   if(tipoFecha.value==="NET"){
     fechaExactaDiv.style.display="none";
@@ -182,13 +208,29 @@ const netMonthDiv = document.getElementById("netMonth");
 const netDayDiv = document.getElementById("netDay");
 
 netTipo.addEventListener("change",()=>{
-  netYearDiv.style.display="none";
+  netYearDiv.style.display="block"; // siempre mostrar año
   netMonthDiv.style.display="none";
   netDayDiv.style.display="none";
-  if(netTipo.value==="YEAR") netYearDiv.style.display="block";
+
   if(netTipo.value==="MONTH") netMonthDiv.style.display="block";
-  if(netTipo.value==="DAY") netDayDiv.style.display="block";
+  if(netTipo.value==="DAY") {netMonthDiv.style.display="block";netDayDiv.style.display="block";}
 });
+
+// Rellenar días automáticamente según mes
+const netSelectDay = document.getElementById("netSelectDay");
+const netSelectMonth = document.getElementById("netSelectMonth");
+function fillDays(month){
+  netSelectDay.innerHTML="";
+  const daysInMonth = new Date(2025, month, 0).getDate();
+  for(let i=1;i<=daysInMonth;i++){
+    const opt = document.createElement("option");
+    opt.value=i;
+    opt.text=i;
+    netSelectDay.appendChild(opt);
+  }
+}
+netSelectMonth.addEventListener("change",()=>fillDays(parseInt(netSelectMonth.value)));
+fillDays(parseInt(netSelectMonth.value));
 
 // Cambiar Información
 document.getElementById("btnCambiarInfo").addEventListener("click",async()=>{
@@ -231,8 +273,8 @@ document.getElementById("btnAgregarLanzamiento").addEventListener("click",async(
   else{
     const tipoNet=netTipo.value;
     if(tipoNet==="YEAR") net=`NET ${document.getElementById("netInputYear").value}`;
-    if(tipoNet==="MONTH") net=`NET ${document.getElementById("netInputMonth2")?.value || document.getElementById("netInputMonth")?.value}/${document.getElementById("netInputYear2")?.value || document.getElementById("netInputYear")?.value}`;
-    if(tipoNet==="DAY") net=`NET ${document.getElementById("netInputDay").value}/${document.getElementById("netInputMonth2").value}/${document.getElementById("netInputYear3").value}`;
+    if(tipoNet==="MONTH") net=`NET ${document.getElementById("netSelectMonth").value}/${document.getElementById("netInputYear").value}`;
+    if(tipoNet==="DAY") net=`NET ${document.getElementById("netSelectDay").value}/${document.getElementById("netSelectMonth").value}/${document.getElementById("netInputYear").value}`;
   }
   const carga = document.getElementById("inputCarga").value;
   const galeria = document.getElementById("inputGaleria").value.split(",").map(x=>x.trim()).filter(x=>x);
@@ -250,7 +292,6 @@ document.getElementById("btnAgregarLanzamiento").addEventListener("click",async(
   document.getElementById("inputCarga").value="";
   document.getElementById("inputGaleria").value="";
   document.getElementById("inputFecha").value="";
-  document.getElementById("inputNet").value="";
   loadLaunchesAdmin();
 });
 
@@ -290,7 +331,18 @@ async function loadLaunchesAdmin(){
         document.getElementById("inputFecha").value = data.fecha || "";
       } else {
         fechaExactaDiv.style.display="none"; netDiv.style.display="block";
-        document.getElementById("inputNet").value = data.net || "";
+        // rellenar NET según tipo
+        if(data.net){
+          if(data.net.startsWith("NET ")){
+            const parts = data.net.slice(4).split("/");
+            if(parts.length===1) {netTipo.value="YEAR"; document.getElementById("netInputYear").value=parts[0];}
+            if(parts.length===2) {netTipo.value="MONTH"; document.getElementById("netInputYear").value=parts[1]; netSelectMonth.value=parts[0];}
+            if(parts.length===3) {netTipo.value="DAY"; document.getElementById("netInputYear").value=parts[2]; netSelectMonth.value=parts[1]; netSelectDay.value=parts[0];}
+          }
+        }
+        netYearDiv.style.display="block";
+        netMonthDiv.style.display=(netTipo.value!=="YEAR")?"block":"none";
+        netDayDiv.style.display=(netTipo.value==="DAY")?"block":"none";
       }
       document.getElementById("inputCarga").value = data.carga || "";
       document.getElementById("inputGaleria").value = data.galeria?.join(",") || "";
