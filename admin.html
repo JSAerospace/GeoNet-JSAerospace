@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V4.2</title>
+<title>GeoNet Admin V4.3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -107,9 +107,16 @@ h2{margin-top:25px;margin-bottom:10px}
 <h2>Lanzamientos Existentes</h2>
 <div id="launchList"></div>
 
+<h2>Galería</h2>
+<div id="galeria" class="card">
+<input id="imgUrl" placeholder="URL de imagen/video">
+<button onclick="addGallery()">Agregar a Galería</button>
+<div id="galleryList" style="margin-top:10px;"></div>
+</div>
+
 </section>
 
-<div class="version">v4.2</div>
+<div class="version">v4.3</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -122,25 +129,24 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
+// Login
 const loginForm = document.getElementById("login");
 const panel = document.getElementById("panel");
 const user = document.getElementById("user");
 const pass = document.getElementById("pass");
-
 window.addEventListener("load",()=>{
   if(localStorage.getItem("loggedIn")==="true"){
     loginForm.classList.add("hidden");
     panel.classList.remove("hidden");
-    loadInfo(); loadLaunches();
+    loadInfo(); loadLaunches(); loadGallery();
   }
 });
-
 window.login = () => {
   if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
     localStorage.setItem("loggedIn","true");
     loginForm.classList.add("hidden");
     panel.classList.remove("hidden");
-    loadInfo(); loadLaunches();
+    loadInfo(); loadLaunches(); loadGallery();
   } else alert("Usuario o contraseña incorrecta");
 };
 window.logout = () => { localStorage.removeItem("loggedIn"); panel.classList.add("hidden"); loginForm.classList.remove("hidden"); };
@@ -176,6 +182,7 @@ const netMonth = document.getElementById("netMonth");
 const netDay = document.getElementById("netDay");
 const netMonthDiv = document.getElementById("netMonthDiv");
 const netDayDiv = document.getElementById("netDayDiv");
+const gUrl = document.getElementById("gUrl");
 
 for(let y=new Date().getFullYear();y<=new Date().getFullYear()+10;y++){netYear.innerHTML+=`<option value="${y}">${y}</option>`}
 
@@ -188,24 +195,31 @@ window.saveLaunch=async()=>{
   const nombre=document.getElementById("lNombre").value;
   const estado=document.getElementById("lEstado").value;
   const carga=document.getElementById("lCarga").value;
+  const galeria = gUrl.value ? [gUrl.value] : [];
   if(!nombre) return alert("Debe poner un nombre de misión");
+
   let data;
-  if(lTipo.value==="FECHA"){data={nombre,estado,tipo:"FECHA",fecha:lFecha.value,carga}}
+  if(lTipo.value==="FECHA"){data={nombre,estado,tipo:"FECHA",fecha:lFecha.value,carga,galeria}}
   else{
     let netText="NET"; const lvl=netLevel.value;
     if(lvl==="year") netText+=` ${netYear.value}`;
     if(lvl==="month") netText=`NET ${netMonth.value} ${netYear.value}`;
     if(lvl==="day") netText=`NET ${netDay.value} ${netMonth.value} ${netYear.value}`;
-    data={nombre,estado,tipo:"NET",net:netText,carga};
+    data={nombre,estado,tipo:"NET",net:netText,carga,galeria};
   }
+
   if(currentEditId){await setDoc(doc(db,"launches",currentEditId),data,{merge:true}); currentEditId=null;}
   else{await addDoc(collection(db,"launches"),data);}
-  document.getElementById("lNombre").value=""; document.getElementById("lEstado").value="Planeado";
-  lTipo.value="FECHA"; toggleTipoFecha(); lFecha.value=""; netYear.value=""; netMonth.value=""; netDay.value=""; document.getElementById("lCarga").value="";
+  
+  document.getElementById("lNombre").value="";
+  document.getElementById("lEstado").value="Planeado";
+  lTipo.value="FECHA"; toggleTipoFecha();
+  lFecha.value=""; netYear.value=""; netMonth.value=""; netDay.value=""; document.getElementById("lCarga").value="";
+  gUrl.value="";
+
   loadLaunches();
 };
 
-// Editar
 window.editLaunch=async(id)=>{
   const dSnap=await getDoc(doc(db,"launches",id));
   if(!dSnap.exists()) return alert("No encontrado");
@@ -221,13 +235,12 @@ window.editLaunch=async(id)=>{
     if(parts.length===4){netLevel.value="day"; netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; toggleNetLevel();}
   }
   document.getElementById("lCarga").value=data.carga||"";
+  gUrl.value=data.galeria?.[0]||"";
   currentEditId=id;
 };
 
-// Borrar
 window.deleteLaunch=async(id)=>{if(!confirm("¿Seguro?"))return; await deleteDoc(doc(db,"launches",id)); loadLaunches();}
 
-// Cargar lista
 async function loadLaunches(){
   const listDiv=document.getElementById("launchList"); listDiv.innerHTML="";
   const snaps=await getDocs(collection(db,"launches"));
@@ -239,7 +252,8 @@ async function loadLaunches(){
       <div><strong>Nombre:</strong> ${data.nombre}<br>
       <strong>Estado:</strong> ${data.estado}<br>
       <strong>Fecha/NET:</strong> ${fecha}<br>
-      <strong>Carga:</strong> ${data.carga}</div>
+      <strong>Carga:</strong> ${data.carga}<br>
+      <strong>Galería:</strong> ${data.galeria?.join(", ")||"-"}</div>
       <div class="flex" style="margin-top:10px;">
         <button onclick="editLaunch('${id}')">Editar</button>
         <button class="delete" onclick="deleteLaunch('${id}')">Borrar</button>
@@ -249,9 +263,33 @@ async function loadLaunches(){
   });
 }
 
-toggleTipoFecha(); toggleNetLevel();
-loadLaunches();
-</script>
+// Galería independiente
+async function loadGallery(){
+  const galleryDiv=document.getElementById("galleryList"); galleryDiv.innerHTML="";
+  const snaps=await getDocs(collection(db,"gallery"));
+  snaps.forEach(d=>{
+    const data=d.data(),id=d.id;
+    const card=document.createElement("div"); card.className="card";
+    card.innerHTML=`<div>${data.url}</div>
+      <div class="flex" style="margin-top:5px;">
+        <button class="delete" onclick="deleteGallery('${id}')">Borrar</button>
+      </div>`;
+    galleryDiv.appendChild(card);
+  });
+}
 
+window.addGallery=async()=>{
+  const url=document.getElementById("imgUrl").value;
+  if(!url) return alert("URL vacía");
+  await addDoc(collection(db,"gallery"),{url});
+  document.getElementById("imgUrl").value="";
+  loadGallery();
+}
+window.deleteGallery=async(id)=>{if(!confirm("¿Seguro?"))return; await deleteDoc(doc(db,"gallery",id)); loadGallery();}
+
+toggleTipoFecha(); toggleNetLevel();
+loadLaunches(); loadGallery();
+
+</script>
 </body>
 </html>
