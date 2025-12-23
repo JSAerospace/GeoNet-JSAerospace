@@ -2,19 +2,17 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V4.0</title>
+<title>GeoNet Admin V4.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
 section{padding:20px}
 input,select,button{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:none}
 button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
+button.delete{background:#dc3545;color:#fff}
 .card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 0 10px rgba(0,0,0,.4)}
 .hidden{display:none}
 .version{position:fixed;bottom:10px;right:10px;font-size:12px;opacity:.6}
-.card button{width:48%;margin:2px 1%;font-weight:bold}
-.card button.delete{background:#dc3545;color:#fff}
-.card button:not(.delete){background:#28a745;color:#fff}
 .flex{display:flex;gap:5px;flex-wrap:wrap}
 </style>
 </head>
@@ -47,6 +45,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 <button onclick="saveAllInfo()">Cambiar Información</button>
 
 <h2>Crear / Editar Lanzamiento</h2>
+<div class="card">
 <input id="lNombre" placeholder="Nombre misión">
 
 <select id="lEstado">
@@ -79,12 +78,9 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 <div id="netMonthDiv" class="hidden">
 <select id="netMonth">
 <option value="">Mes</option>
-<option value="Enero">Enero</option><option value="Febrero">Febrero</option>
-<option value="Marzo">Marzo</option><option value="Abril">Abril</option>
-<option value="Mayo">Mayo</option><option value="Junio">Junio</option>
-<option value="Julio">Julio</option><option value="Agosto">Agosto</option>
-<option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option>
-<option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option>
+<option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+<option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+<option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
 </select>
 </div>
 <div id="netDayDiv" class="hidden">
@@ -94,20 +90,21 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 </div>
 </div>
 
-<!-- Carga y Galería siempre visibles -->
 <input id="lCarga" placeholder="Carga">
+
 <h2>Galería</h2>
 <input id="gUrl" placeholder="URL imagen o video">
 <button onclick="addGallery()">Agregar</button>
 
 <button onclick="saveLaunch()">Guardar / Actualizar Lanzamiento</button>
+</div>
 
 <h2>Lanzamientos Existentes</h2>
 <div id="launchList"></div>
 
 </section>
 
-<div class="version">v4.0</div>
+<div class="version">v4.1</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -172,6 +169,8 @@ window.saveAllInfo=async()=>{
 };
 
 // Lanzamientos
+let currentEditId = null;
+
 const lTipo = document.getElementById("lTipo");
 const lFecha = document.getElementById("lFecha");
 const netDiv = document.getElementById("netDiv");
@@ -206,12 +205,12 @@ function toggleNetLevel(){
 lTipo.addEventListener("change",toggleTipoFecha);
 netLevel.addEventListener("change",toggleNetLevel);
 
-// Guardar lanzamiento
 window.saveLaunch = async () => {
   const lNombreVal = document.getElementById("lNombre").value;
   const lEstadoVal = document.getElementById("lEstado").value;
   const lCargaVal = document.getElementById("lCarga").value;
   if(!lNombreVal) return alert("Debe poner un nombre de misión");
+
   let data;
   if(lTipo.value==="FECHA"){
     data={nombre:lNombreVal,estado:lEstadoVal,tipo:"FECHA",fecha:lFecha.value,carga:lCargaVal};
@@ -223,13 +222,21 @@ window.saveLaunch = async () => {
     if(level==="day") netText=`NET ${netDay.value} ${netMonth.value} ${netYear.value}`;
     data={nombre:lNombreVal,estado:lEstadoVal,tipo:"NET",net:netText,carga:lCargaVal};
   }
-  await addDoc(collection(db,"launches"),data);
+
+  if(currentEditId){ 
+    await setDoc(doc(db,"launches",currentEditId), data, {merge:true});
+    currentEditId=null;
+  } else {
+    await addDoc(collection(db,"launches"), data);
+  }
+
   document.getElementById("lNombre").value="";
   document.getElementById("lEstado").value="Planeado";
   lTipo.value="FECHA"; toggleTipoFecha();
   lFecha.value=""; netYear.value=""; netMonth.value=""; netDay.value=""; document.getElementById("lCarga").value="";
+  
   loadLaunches();
-};
+}
 
 // Galería
 window.addGallery = async () => { 
@@ -242,13 +249,11 @@ window.addGallery = async () => {
 // Listar lanzamientos
 async function loadLaunches(){
   const listDiv=document.getElementById("launchList");
-  if(!listDiv) return;
   listDiv.innerHTML="";
   const snaps=await getDocs(collection(db,"launches"));
   snaps.forEach(d=>{
     const data=d.data(); const id=d.id;
     const dateDisplay=data.tipo==="NET"?data.net:new Date(data.fecha).toLocaleString();
-
     const card=document.createElement("div");
     card.className="card";
     card.innerHTML=`
@@ -286,8 +291,7 @@ window.editLaunch=async(id)=>{
     if(parts.length===4){netLevel.value="day"; netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; toggleNetLevel();}
   }
   document.getElementById("lCarga").value=data.carga || "";
-
-  await deleteDoc(dRef);
+  currentEditId = id; // ID para actualizar en lugar de crear
 };
 
 // Borrar lanzamiento
