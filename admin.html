@@ -27,11 +27,14 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 <section id="panel" class="hidden">
 
+<!-- SECCIÓN DE INFORMACIÓN MEJORADA -->
 <h2>Información</h2>
+<div id="infoList"></div>
 <input id="infoNombre" placeholder="Nombre">
 <input id="infoValor" placeholder="Valor">
 <button onclick="saveInfo()">Guardar</button>
 
+<!-- SECCIÓN DE LANZAMIENTOS -->
 <h2>Lanzamiento</h2>
 <input id="lNombre" placeholder="Nombre misión">
 <select id="lEstado">
@@ -62,7 +65,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,doc,setDoc,collection,addDoc,getDocs,updateDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,doc,setDoc,collection,addDoc,getDocs,updateDoc,deleteDoc,getDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey: "TU_API_KEY",
@@ -81,23 +84,65 @@ window.login = () => {
   if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
     loginForm.classList.add("hidden");
     panel.classList.remove("hidden");
+    loadInfo();
     loadLaunches();
   } else {
     alert("Usuario o contraseña incorrecta");
   }
 };
 
-// Guardar Información
-window.saveInfo = async () => {
+// ---------- SECCIÓN DE INFORMACIÓN ----------
+async function loadInfo(){
+  const infoList=document.getElementById("infoList");
+  infoList.innerHTML="";
+  const docRef=doc(db,"Config","info");
+  const docSnap = await getDoc(docRef);
+  if(docSnap.exists()){
+    const data=docSnap.data();
+    
+    // Mostrar lanzamientos y planos orbitales primero
+    const keysOrder=["lanzamientos","planos_orbitales"];
+    keysOrder.forEach(k=>{
+      if(data[k]!==undefined){
+        infoList.innerHTML += `
+        <div class="card">
+          <strong>${k}</strong>: ${data[k]}
+          <button onclick="editInfo('${k}','${data[k]}')">Editar</button>
+        </div>`;
+      }
+    });
+
+    // Mostrar los demás campos
+    for(const key in data){
+      if(!keysOrder.includes(key)){
+        infoList.innerHTML += `
+        <div class="card">
+          <strong>${key}</strong>: ${data[key]}
+          <button onclick="editInfo('${key}','${data[key]}')">Editar</button>
+        </div>`;
+      }
+    }
+  }
+}
+
+// Guardar o actualizar Información
+window.saveInfo=async()=>{
   if(!infoNombre.value || !infoValor.value) return alert("Completa ambos campos");
   await setDoc(doc(db,"Config","info"),{
-    [infoNombre.value]: infoValor.value
+    [infoNombre.value]:infoValor.value
   },{merge:true});
   infoNombre.value="";
   infoValor.value="";
+  loadInfo();
 };
 
-// Guardar / Actualizar lanzamiento
+// Editar información existente
+window.editInfo=(key,value)=>{
+  infoNombre.value=key;
+  infoValor.value=value;
+};
+
+// ---------- SECCIÓN DE LANZAMIENTOS ----------
 window.saveLaunch = async () => {
   if(!lNombre.value) return alert("Debe poner un nombre de misión");
   let data;
@@ -128,14 +173,14 @@ window.saveLaunch = async () => {
   loadLaunches();
 };
 
-// Agregar a galería
+// ---------- GALERÍA ----------
 window.addGallery = async () => {
   if(!gUrl.value) return alert("Ingrese URL");
   await addDoc(collection(db,"Gallery"),{url:gUrl.value});
   gUrl.value="";
 };
 
-// Cargar lanzamientos existentes
+// ---------- LISTAR LANZAMIENTOS EXISTENTES ----------
 async function loadLaunches(){
   const listDiv = document.getElementById("launchList");
   listDiv.innerHTML="";
