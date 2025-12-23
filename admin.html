@@ -217,6 +217,7 @@ netPrecision.onchange = () => {
 
 // Lanzamientos
 const launches = collection(db,"launches");
+let editId = null;
 
 const addLaunchFn = async() => {
   let fecha;
@@ -227,12 +228,24 @@ const addLaunchFn = async() => {
     fecha={ tipo:"NET", precision:netPrecision.value, valor:vals.join("-") };
   }
 
-  await addDoc(launches,{
-    nombre:lnName.value,
-    estado:lnState.value,
-    fecha,
-    links: lnLinks.value.split(",").map(l=>l.trim()).filter(l=>l)
-  });
+  if(editId){
+    const d = doc(db,"launches",editId);
+    await updateDoc(d,{
+      nombre:lnName.value,
+      estado:lnState.value,
+      fecha,
+      links: lnLinks.value.split(",").map(l=>l.trim()).filter(l=>l)
+    });
+    editId = null;
+    addLaunch.innerText="Guardar lanzamiento";
+  } else {
+    await addDoc(launches,{
+      nombre:lnName.value,
+      estado:lnState.value,
+      fecha,
+      links: lnLinks.value.split(",").map(l=>l.trim()).filter(l=>l)
+    });
+  }
 
   lnName.value=""; lnLinks.value=""; exactDate.value="";
 };
@@ -247,9 +260,37 @@ const loadLaunches = ()=>{
       const data=d.data();
       li.innerHTML=`
         <b>${data.nombre}</b> (${data.estado}) 
+        <button class="smallBtn">Editar</button>
         <button class="smallBtn">Eliminar</button>
       `;
-      li.querySelector("button").onclick=()=>deleteDoc(d.ref);
+      const [editBtn, delBtn] = li.querySelectorAll("button");
+
+      delBtn.onclick=()=>deleteDoc(d.ref);
+
+      editBtn.onclick=()=>{
+        editId = d.id;
+        lnName.value = data.nombre;
+        lnState.value = data.estado;
+        if(data.fecha.tipo==="EXACTA"){
+          dateType.value="EXACTA";
+          exactDateBox.classList.remove("hidden");
+          netBox.classList.add("hidden");
+          exactDate.disabled = false;
+          exactDate.value = data.fecha.valor;
+        } else {
+          dateType.value="NET";
+          exactDateBox.classList.add("hidden");
+          netBox.classList.remove("hidden");
+          exactDate.disabled = true;
+          netPrecision.value = data.fecha.precision;
+          netPrecision.dispatchEvent(new Event("change"));
+          const vals = data.fecha.valor.split("-");
+          [...netInputs.querySelectorAll("input")].forEach((i, idx)=>{ i.value=vals[idx]||""; });
+        }
+        lnLinks.value = data.links.join(", ");
+        addLaunch.innerText="Guardar cambios";
+      };
+
       launchList.appendChild(li);
     });
   });
