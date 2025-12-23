@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V3.4</title>
+<title>GeoNet Admin V3.5</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -31,7 +31,6 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 <button onclick="logout()" style="margin-bottom:15px;background:#dc3545;">Cerrar sesión</button>
 
-<!-- SECCIÓN DE INFORMACIÓN -->
 <h2>Información</h2>
 <div class="card">
   <label>Lanzamientos:</label>
@@ -47,7 +46,6 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 </div>
 <button onclick="saveAllInfo()">Cambiar Información</button>
 
-<!-- SECCIÓN DE LANZAMIENTOS -->
 <h2>Lanzamiento</h2>
 <input id="lNombre" placeholder="Nombre misión">
 
@@ -57,20 +55,18 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 <option>CANCELLED</option>
 </select>
 
-<select id="lTipo" onchange="toggleTipoFecha()">
+<select id="lTipo">
 <option value="FECHA">Fecha Exacta</option>
 <option value="NET">NET</option>
 </select>
 
-<!-- Fecha exacta -->
 <div id="fechaDiv">
 <input id="lFecha" type="datetime-local">
 </div>
 
-<!-- NET dinámico -->
 <div id="netDiv" class="hidden">
 <label>Precisión NET:</label>
-<select id="netLevel" onchange="toggleNetLevel()">
+<select id="netLevel">
 <option value="year">Solo Año</option>
 <option value="month">Mes y Año</option>
 <option value="day">Día, Mes y Año</option>
@@ -108,7 +104,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 </section>
 
-<div class="version">v3.4</div>
+<div class="version">v3.5</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -169,94 +165,112 @@ window.saveAllInfo=async()=>{
 };
 
 // Lanzamientos
+const lTipo = document.getElementById("lTipo");
+const lFecha = document.getElementById("lFecha");
+const netDiv = document.getElementById("netDiv");
+const fechaDiv = document.getElementById("fechaDiv");
+const netLevel = document.getElementById("netLevel");
+const netYear = document.getElementById("netYear");
+const netMonth = document.getElementById("netMonth");
+const netDay = document.getElementById("netDay");
+const netMonthDiv = document.getElementById("netMonthDiv");
+const netDayDiv = document.getElementById("netDayDiv");
+
+for(let y=new Date().getFullYear();y<=new Date().getFullYear()+10;y++){
+  netYear.innerHTML += `<option value="${y}">${y}</option>`;
+}
+for(let d=1;d<=31;d++) netDay.innerHTML += `<option value="${d}">${d}</option>`;
+
 function toggleTipoFecha(){
-  if(lTipo.value==="FECHA"){ 
-    document.getElementById("fechaDiv").classList.remove("hidden");
-    document.getElementById("netDiv").classList.add("hidden");
+  if(lTipo.value==="FECHA"){
+    fechaDiv.classList.remove("hidden");
+    netDiv.classList.add("hidden");
   } else {
-    document.getElementById("fechaDiv").classList.add("hidden");
-    document.getElementById("netDiv").classList.remove("hidden");
+    fechaDiv.classList.add("hidden");
+    netDiv.classList.remove("hidden");
     toggleNetLevel();
   }
 }
 
-// NET dinámico
-const currentYear = new Date().getFullYear();
-const netYear = document.getElementById("netYear");
-for(let y=currentYear;y<=currentYear+10;y++) netYear.innerHTML += `<option value="${y}">${y}</option>`;
-
-const netDay = document.getElementById("netDay");
-for(let d=1;d<=31;d++) netDay.innerHTML += `<option value="${d}">${d}</option>`;
-
 function toggleNetLevel(){
-  const level = document.getElementById("netLevel").value;
-  document.getElementById("netMonthDiv").classList.toggle("hidden",level==="year");
-  document.getElementById("netDayDiv").classList.toggle("hidden",level!=="day");
+  const level = netLevel.value;
+  netMonthDiv.classList.toggle("hidden",level==="year");
+  netDayDiv.classList.toggle("hidden",level!=="day");
 }
+
+lTipo.addEventListener("change",toggleTipoFecha);
+netLevel.addEventListener("change",toggleNetLevel);
 
 // Guardar lanzamiento
 window.saveLaunch = async () => {
-  if(!lNombre.value) return alert("Debe poner un nombre de misión");
+  const lNombreVal = document.getElementById("lNombre").value;
+  const lEstadoVal = document.getElementById("lEstado").value;
+  const lCargaVal = document.getElementById("lCarga").value;
+  if(!lNombreVal) return alert("Debe poner un nombre de misión");
   let data;
   if(lTipo.value==="FECHA"){
-    data = {nombre:lNombre.value,estado:lEstado.value,tipo:"FECHA",fecha:lFecha.value,carga:lCarga.value};
+    data={nombre:lNombreVal,estado:lEstadoVal,tipo:"FECHA",fecha:lFecha.value,carga:lCargaVal};
   } else {
-    let level = document.getElementById("netLevel").value;
-    let netText = "NET";
-    if(level==="year") netText += ` ${netYear.value}`;
-    if(level==="month") netText = `NET ${netMonth.value} ${netYear.value}`;
-    if(level==="day") netText = `NET ${netDay.value} ${netMonth.value} ${netYear.value}`;
-    data = {nombre:lNombre.value,estado:lEstado.value,tipo:"NET",net:netText,carga:lCarga.value};
+    let netText="NET";
+    const level=netLevel.value;
+    if(level==="year") netText+=` ${netYear.value}`;
+    if(level==="month") netText=`NET ${netMonth.value} ${netYear.value}`;
+    if(level==="day") netText=`NET ${netDay.value} ${netMonth.value} ${netYear.value}`;
+    data={nombre:lNombreVal,estado:lEstadoVal,tipo:"NET",net:netText,carga:lCargaVal};
   }
   await addDoc(collection(db,"launches"),data);
-  lNombre.value=""; lEstado.value="PLANNED"; lTipo.value="FECHA"; lFecha.value=""; netYear.value=""; netMonth.value=""; netDay.value=""; lCarga.value="";
-  toggleTipoFecha();
+  document.getElementById("lNombre").value="";
+  document.getElementById("lEstado").value="PLANNED";
+  lTipo.value="FECHA"; toggleTipoFecha();
+  lFecha.value=""; netYear.value=""; netMonth.value=""; netDay.value=""; document.getElementById("lCarga").value="";
   loadLaunches();
 };
 
 // Galería
 window.addGallery = async () => { 
-  if(!gUrl.value) return; 
-  await addDoc(collection(db,"Gallery"),{url:gUrl.value}); 
-  gUrl.value=""; 
+  const url=document.getElementById("gUrl").value;
+  if(!url) return; 
+  await addDoc(collection(db,"Gallery"),{url}); 
+  document.getElementById("gUrl").value="";
 };
 
 // Listar lanzamientos
 async function loadLaunches(){
-  const listDiv = document.getElementById("launchList");
+  const listDiv=document.getElementById("launchList");
   listDiv.innerHTML="";
-  const snaps = await getDocs(collection(db,"launches"));
+  const snaps=await getDocs(collection(db,"launches"));
   snaps.forEach(d=>{
     const data=d.data(); const id=d.id;
-    let dateDisplay = data.tipo==="NET"?data.net:new Date(data.fecha).toLocaleString();
-    listDiv.innerHTML += `<div class="card"><strong>${data.nombre}</strong> - ${data.estado} - ${dateDisplay}<button onclick="editLaunch('${id}')">Editar</button><button class="delete" onclick="deleteLaunch('${id}')">Borrar</button></div>`;
+    const dateDisplay=data.tipo==="NET"?data.net:new Date(data.fecha).toLocaleString();
+    listDiv.innerHTML+=`<div class="card"><strong>${data.nombre}</strong> - ${data.estado} - ${dateDisplay}<button onclick="editLaunch('${id}')">Editar</button><button class="delete" onclick="deleteLaunch('${id}')">Borrar</button></div>`;
   });
 }
 
 // Editar lanzamiento
-window.editLaunch = async (id) => {
-  const docRef = doc(db,"launches",id);
-  const docSnap = await getDocs(collection(db,"launches"));
-  docSnap.forEach(d=>{
+window.editLaunch=async(id)=>{
+  const snaps=await getDocs(collection(db,"launches"));
+  snaps.forEach(d=>{
     if(d.id===id){
       const data=d.data();
-      lNombre.value=data.nombre; lEstado.value=data.estado; lTipo.value=data.tipo;
-      if(data.tipo==="FECHA"){ lFecha.value=data.fecha; toggleTipoFecha(); }
-      else{
-        toggleTipoFecha();
-        const parts = data.net.split(" ");
-        if(parts.length===2){ netYear.value=parts[1]; netLevel.value="year"; toggleNetLevel(); }
-        else if(parts.length===3){ netMonth.value=parts[1]; netYear.value=parts[2]; netLevel.value="month"; toggleNetLevel(); }
-        else if(parts.length===4){ netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; netLevel.value="day"; toggleNetLevel(); }
+      document.getElementById("lNombre").value=data.nombre;
+      document.getElementById("lEstado").value=data.estado;
+      lTipo.value=data.tipo;
+      toggleTipoFecha();
+      if(data.tipo==="FECHA") lFecha.value=data.fecha;
+      else {
+        const parts=data.net.split(" ");
+        if(parts.length===2){netLevel.value="year"; netYear.value=parts[1]; toggleNetLevel();}
+        if(parts.length===3){netLevel.value="month"; netMonth.value=parts[1]; netYear.value=parts[2]; toggleNetLevel();}
+        if(parts.length===4){netLevel.value="day"; netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; toggleNetLevel();}
       }
-      lCarga.value=data.carga;
+      document.getElementById("lCarga").value=data.carga;
     }
   });
-  await deleteDoc(docRef);
+  await deleteDoc(doc(db,"launches",id));
 };
 
 // Borrar lanzamiento
-window.deleteLaunch = async (id) => {
+window.deleteLaunch=async(id)=>{
   if(!confirm("¿Seguro que quieres borrar este lanzamiento?")) return;
   await deleteDoc(doc(db,"launches",id));
   loadLaunches();
