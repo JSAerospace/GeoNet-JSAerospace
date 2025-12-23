@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin GeoNet V4.5</title>
+<title>Admin GeoNet V4.6</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -15,11 +15,26 @@ h2{margin-top:25px;margin-bottom:10px}
 .img-gallery img, .img-gallery video{max-width:100%;margin-top:10px;border-radius:8px}
 .card-launch{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
 .card-launch button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000}
+#loginContainer{position:fixed;top:0;left:0;width:100%;height:100%;background:#0b0f1a;display:flex;align-items:center;justify-content:center;z-index:1000}
+#loginBox{background:#141a2e;padding:30px;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,.5);width:300px;text-align:center}
+#loginBox input{width:100%;margin-bottom:15px}
+#loginBox button{width:100%}
+.hidden{display:none}
 </style>
 </head>
 <body>
 
-<section>
+<div id="loginContainer">
+  <div id="loginBox">
+    <h2>Login Admin</h2>
+    <input type="text" id="loginUser" placeholder="Usuario">
+    <input type="password" id="loginPass" placeholder="Contraseña">
+    <button id="btnLogin">Entrar</button>
+    <p style="color:#f55;margin-top:10px" id="loginError"></p>
+  </div>
+</div>
+
+<section class="hidden" id="adminContent">
 <h2>Información</h2>
 <div class="card">
 <label>Lanzamientos:</label>
@@ -32,7 +47,7 @@ h2{margin-top:25px;margin-bottom:10px}
 </div>
 </section>
 
-<section>
+<section class="hidden" id="lanzamientosSection">
 <h2>Agregar/Editar Lanzamiento</h2>
 <div class="card">
 <label>Nombre:</label><input type="text" id="inputNombre">
@@ -61,12 +76,12 @@ h2{margin-top:25px;margin-bottom:10px}
 </div>
 </section>
 
-<section>
+<section class="hidden" id="launchesExistSection">
 <h2>Lanzamientos Existentes</h2>
 <div id="launchesAdmin"></div>
 </section>
 
-<section>
+<section class="hidden" id="galeriaSection">
 <h2>Galería</h2>
 <div class="card">
 <label>URL Imagen/Video/Enlace:</label>
@@ -88,6 +103,44 @@ const app = initializeApp({
 const db = getFirestore(app);
 
 let editingId = null;
+
+// ----- LOGIN -----
+const loginUserInput = document.getElementById("loginUser");
+const loginPassInput = document.getElementById("loginPass");
+const btnLogin = document.getElementById("btnLogin");
+const loginError = document.getElementById("loginError");
+const loginContainer = document.getElementById("loginContainer");
+const adminContent = document.getElementById("adminContent");
+const lanzamientosSection = document.getElementById("lanzamientosSection");
+const launchesExistSection = document.getElementById("launchesExistSection");
+const galeriaSection = document.getElementById("galeriaSection");
+
+const USER = "olanoagus@gmail.com";
+const PASS = "Simba2011";
+
+// Verificar si ya está logueado
+if(localStorage.getItem("adminLogged") === "true"){
+  loginContainer.style.display="none";
+  adminContent.classList.remove("hidden");
+  lanzamientosSection.classList.remove("hidden");
+  launchesExistSection.classList.remove("hidden");
+  galeriaSection.classList.remove("hidden");
+}
+
+btnLogin.addEventListener("click",()=>{
+  const u = loginUserInput.value;
+  const p = loginPassInput.value;
+  if(u===USER && p===PASS){
+    localStorage.setItem("adminLogged","true");
+    loginContainer.style.display="none";
+    adminContent.classList.remove("hidden");
+    lanzamientosSection.classList.remove("hidden");
+    launchesExistSection.classList.remove("hidden");
+    galeriaSection.classList.remove("hidden");
+  } else {
+    loginError.textContent="Usuario o contraseña incorrectos";
+  }
+});
 
 // Mostrar/ocultar inputs NET
 const tipoFecha = document.getElementById("inputTipoFecha");
@@ -230,7 +283,6 @@ async function loadGaleriaAdmin(){
   });
 }
 loadGaleriaAdmin();
-
 </script>
 </body>
 </html>
