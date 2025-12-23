@@ -111,10 +111,21 @@ const ADMIN_EMAIL="olanoagus@gmail.com";
 const ADMIN_PASS="Simba2011";
 const loginContainer=document.getElementById("loginContainer");
 const adminContainer=document.getElementById("adminContainer");
+
+// Revisar sesión previa
+if(localStorage.getItem("loggedIn") === "true"){
+    loginContainer.style.display="none";
+    adminContainer.style.display="block";
+    loadInfo();
+    loadLaunches();
+    loadGallery();
+}
+
 document.getElementById("loginBtn").addEventListener("click",()=>{
   const email=document.getElementById("email").value;
   const pass=document.getElementById("password").value;
   if(email===ADMIN_EMAIL && pass===ADMIN_PASS){
+    localStorage.setItem("loggedIn","true");
     loginContainer.style.display="none";
     adminContainer.style.display="block";
     loadInfo();
@@ -188,7 +199,10 @@ async function loadLaunches(){
       document.getElementById("launchStatus").value=data.estado;
       document.getElementById("launchDateType").value=data.tipo;
       if(data.tipo==="FECHA"){ fechaExactaContainer.style.display="block"; netContainer.style.display="none"; document.getElementById("launchDate").value=data.fecha; }
-      else{ fechaExactaContainer.style.display="none"; netContainer.style.display="block"; document.getElementById("launchNET").value=data.net; }
+      else{
+        fechaExactaContainer.style.display="none"; netContainer.style.display="block";
+        // cargar NET en inputs
+      }
       document.getElementById("launchPayload").value=data.carga;
     });
     delBtn.addEventListener("click",async()=>{
