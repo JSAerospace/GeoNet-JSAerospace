@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V3.6</title>
+<title>GeoNet Admin V3.7</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -12,10 +12,10 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 .card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 0 10px rgba(0,0,0,.4)}
 .hidden{display:none}
 .version{position:fixed;bottom:10px;right:10px;font-size:12px;opacity:.6}
-.card button{width:48%;margin:2px 1%;background:#28a745;color:#fff;font-weight:bold}
-.card button.delete{background:#dc3545}
-.flex{display:flex;gap:5px}
-.flex select{width:32%}
+.card button{width:48%;margin:2px 1%;font-weight:bold}
+.card button.delete{background:#dc3545;color:#fff}
+.card button:not(.delete){background:#28a745;color:#fff}
+.flex{display:flex;gap:5px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -105,7 +105,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 </section>
 
-<div class="version">v3.6</div>
+<div class="version">v3.7</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -235,7 +235,7 @@ window.addGallery = async () => {
   document.getElementById("gUrl").value="";
 };
 
-// Listar lanzamientos
+// Listar lanzamientos mejorado
 async function loadLaunches(){
   const listDiv=document.getElementById("launchList");
   listDiv.innerHTML="";
@@ -243,7 +243,22 @@ async function loadLaunches(){
   snaps.forEach(d=>{
     const data=d.data(); const id=d.id;
     const dateDisplay=data.tipo==="NET"?data.net:new Date(data.fecha).toLocaleString();
-    listDiv.innerHTML+=`<div class="card"><strong>${data.nombre}</strong> - ${data.estado} - ${dateDisplay}<button onclick="editLaunch('${id}')">Editar</button><button class="delete" onclick="deleteLaunch('${id}')">Borrar</button></div>`;
+
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <strong>Nombre:</strong> ${data.nombre}
+        <strong>Estado:</strong> ${data.estado}
+        <strong>Fecha/NET:</strong> ${dateDisplay}
+        <strong>Carga:</strong> ${data.carga}
+      </div>
+      <div class="flex" style="margin-top:10px;">
+        <button onclick="editLaunch('${id}')">Editar</button>
+        <button class="delete" onclick="deleteLaunch('${id}')">Borrar</button>
+      </div>
+    `;
+    listDiv.appendChild(card);
   });
 }
 
