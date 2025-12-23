@@ -2,92 +2,112 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Test Información | GeoNet</title>
+<title>Test Admin GeoNet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body{
   margin:0;
-  font-family:Arial,Helvetica,sans-serif;
+  font-family:Arial, sans-serif;
   background:#0b0f1a;
-  color:white;
-}
-section{
-  max-width:600px;
-  margin:50px auto;
-  background:#1a2140;
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 0 10px rgba(0,0,0,.4);
-}
-h2{
-  border-bottom:1px solid #4da3ff;
-  padding-bottom:5px;
+  color:#fff;
 }
 .card{
-  background:#131a33;
-  padding:15px;
-  border-radius:10px;
-  margin-top:15px;
+  background:#141a2e;
+  padding:20px;
+  border-radius:12px;
+  max-width:400px;
+  margin:80px auto;
+  box-shadow:0 0 20px rgba(0,0,0,.6);
 }
+input,button{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  border:none;
+  font-size:16px;
+}
+button{
+  background:#0af;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{opacity:.85}
+h2{text-align:center;color:#0af}
+#adminContainer{display:none}
 </style>
 </head>
+
 <body>
 
-<section>
-<h2>Información</h2>
-<div class="card">
-<p><b>Lanzamientos:</b> <span id="infoLaunches">Cargando...</span></p>
-<p><b>Planos Orbitales:</b> <span id="infoPlanes">Cargando...</span></p>
-<p><b>Satélites:</b> <span id="infoSat">Cargando...</span></p>
+<!-- LOGIN -->
+<div id="loginContainer" class="card">
+  <h2>Iniciar sesión</h2>
+  <input id="user" placeholder="Usuario">
+  <input id="pass" type="password" placeholder="Contraseña">
+  <button onclick="login()">Entrar</button>
+  <p id="loginError" style="color:red;text-align:center"></p>
 </div>
-</section>
 
+<!-- ADMIN -->
+<div id="adminContainer" class="card">
+  <h2>Admin cargado ✔</h2>
+  <p>Si ves esto, el login funciona correctamente.</p>
+  <button onclick="logout()">Cerrar sesión</button>
+</div>
+
+<!-- LOGIN SCRIPT (SIN MODULE, SIN FIREBASE) -->
+<script>
+const USER = "olanoagus@gmail.com";
+const PASS = "Simba2011";
+
+// mantener sesión
+if (localStorage.getItem("adminLogin") === "true") {
+  mostrarAdmin();
+}
+
+function login(){
+  const u = document.getElementById("user").value;
+  const p = document.getElementById("pass").value;
+
+  if(u === USER && p === PASS){
+    localStorage.setItem("adminLogin","true");
+    mostrarAdmin();
+  }else{
+    document.getElementById("loginError").innerText =
+      "Usuario o contraseña incorrectos";
+  }
+}
+
+function mostrarAdmin(){
+  document.getElementById("loginContainer").style.display="none";
+  document.getElementById("adminContainer").style.display="block";
+}
+
+function logout(){
+  localStorage.removeItem("adminLogin");
+  location.reload();
+}
+</script>
+
+<!-- FIREBASE (DESPUÉS DEL LOGIN) -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } 
-from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+  apiKey: "TU_API_KEY",
   authDomain: "geonet-js-aerospace.firebaseapp.com",
-  projectId: "geonet-js-aerospace",
-  storageBucket: "geonet-js-aerospace.appspot.com",
-  messagingSenderId: "651364423254",
-  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
+  projectId: "geonet-js-aerospace"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Elementos
-const infoLaunches = document.getElementById("infoLaunches");
-const infoPlanes = document.getElementById("infoPlanes");
-const infoSat = document.getElementById("infoSat");
-
-// Documento info
-const infoDoc = doc(db,"Config","info");
-
-const loadInfo = async()=>{
-  const d = await getDoc(infoDoc);
-  if(d.exists()){
-    const data = d.data();
-    infoLaunches.textContent = data.lanzamientos || "No hay datos";
-    infoPlanes.textContent = data.planos_orbitales || "No hay datos";
-    infoSat.textContent = data.satelites || "No hay datos";
-  } else {
-    // Crear documento por defecto
-    await setDoc(infoDoc,{
-      lanzamientos: "0",
-      planos_orbitales: "0",
-      satelites: "Ninguno"
-    });
-    infoLaunches.textContent = "0";
-    infoPlanes.textContent = "0";
-    infoSat.textContent = "Ninguno";
-  }
-};
-
-loadInfo();
+// 🔹 Firebase está listo, pero NO bloquea el login
+console.log("Firebase cargado correctamente");
 </script>
 
 </body>
