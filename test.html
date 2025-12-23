@@ -2,32 +2,85 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Test Firebase</title>
+<title>Test Información | GeoNet</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#0b0f1a;
+  color:white;
+}
+section{
+  max-width:600px;
+  margin:50px auto;
+  background:#1a2140;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 0 10px rgba(0,0,0,.4);
+}
+h2{
+  border-bottom:1px solid #4da3ff;
+  padding-bottom:5px;
+}
+.card{
+  background:#131a33;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+}
+</style>
 </head>
 <body>
-<h1>Test Firebase</h1>
-<div id="out"></div>
+
+<section>
+<h2>Información</h2>
+<div class="card">
+<p><b>Lanzamientos:</b> <span id="infoLaunches">Cargando...</span></p>
+<p><b>Planos Orbitales:</b> <span id="infoPlanes">Cargando...</span></p>
+<p><b>Satélites:</b> <span id="infoSat">Cargando...</span></p>
+</div>
+</section>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
   authDomain: "geonet-js-aerospace.firebaseapp.com",
   projectId: "geonet-js-aerospace",
   storageBucket: "geonet-js-aerospace.appspot.com",
   messagingSenderId: "651364423254",
-  appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
-  measurementId: "G-X44HFVLSQ8"
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const statsDoc = doc(db,"system","stats");
-getDoc(statsDoc).then(d=>{
-  document.getElementById("out").textContent = d.exists() ? JSON.stringify(d.data()) : "No hay datos";
-}).catch(e=>document.getElementById("out").textContent="Error: "+e);
+// Cargar Información
+const infoDoc = doc(db,"Config","info");
+const infoLaunches = document.getElementById("infoLaunches");
+const infoPlanes = document.getElementById("infoPlanes");
+const infoSat = document.getElementById("infoSat");
+
+const loadInfo = async()=>{
+  const d = await getDoc(infoDoc);
+  if(d.exists()){
+    const data = d.data();
+    infoLaunches.textContent = data.lanzamientos || "No hay datos";
+    infoPlanes.textContent = data.planos_orbitales || "No hay datos";
+    infoSat.textContent = data.satelites || "No hay datos";
+  } else {
+    infoLaunches.textContent = "No hay datos";
+    infoPlanes.textContent = "No hay datos";
+    infoSat.textContent = "No hay datos";
+  }
+};
+
+loadInfo();
 </script>
+
 </body>
 </html>
