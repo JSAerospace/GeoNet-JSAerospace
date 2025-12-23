@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V3.8</title>
+<title>GeoNet Admin V3.9</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -46,7 +46,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 </div>
 <button onclick="saveAllInfo()">Cambiar Información</button>
 
-<h2>Crear/Editar Lanzamiento</h2>
+<h2>Crear / Editar Lanzamiento</h2>
 <input id="lNombre" placeholder="Nombre misión">
 
 <select id="lEstado">
@@ -105,7 +105,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 </section>
 
-<div class="version">v3.8</div>
+<div class="version">v3.9</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -269,25 +269,26 @@ async function loadLaunches(){
 
 // Editar lanzamiento
 window.editLaunch=async(id)=>{
-  const snaps=await getDocs(collection(db,"launches"));
-  snaps.forEach(d=>{
-    if(d.id===id){
-      const data=d.data();
-      document.getElementById("lNombre").value=data.nombre;
-      document.getElementById("lEstado").value=data.estado;
-      lTipo.value=data.tipo;
-      toggleTipoFecha();
-      if(data.tipo==="FECHA") lFecha.value=data.fecha;
-      else {
-        const parts=data.net.split(" ");
-        if(parts.length===2){netLevel.value="year"; netYear.value=parts[1]; toggleNetLevel();}
-        if(parts.length===3){netLevel.value="month"; netMonth.value=parts[1]; netYear.value=parts[2]; toggleNetLevel();}
-        if(parts.length===4){netLevel.value="day"; netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; toggleNetLevel();}
-      }
-      document.getElementById("lCarga").value=data.carga;
-    }
-  });
-  await deleteDoc(doc(db,"launches",id));
+  const dRef = doc(db,"launches",id);
+  const dSnap = await getDoc(dRef);
+  if(!dSnap.exists()) return alert("Lanzamiento no encontrado");
+  const data=dSnap.data();
+
+  document.getElementById("lNombre").value=data.nombre;
+  document.getElementById("lEstado").value=data.estado;
+  lTipo.value = data.tipo;
+  toggleTipoFecha();
+  if(data.tipo==="FECHA") lFecha.value=data.fecha;
+  else {
+    const parts=data.net.split(" ");
+    if(parts.length===2){netLevel.value="year"; netYear.value=parts[1]; toggleNetLevel();}
+    if(parts.length===3){netLevel.value="month"; netMonth.value=parts[1]; netYear.value=parts[2]; toggleNetLevel();}
+    if(parts.length===4){netLevel.value="day"; netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; toggleNetLevel();}
+  }
+  document.getElementById("lCarga").value=data.carga || "";
+
+  // Borrar el original para actualizar al guardar
+  await deleteDoc(dRef);
 };
 
 // Borrar lanzamiento
@@ -296,6 +297,9 @@ window.deleteLaunch=async(id)=>{
   await deleteDoc(doc(db,"launches",id));
   loadLaunches();
 };
+
+toggleTipoFecha(); // Inicializa correctamente al cargar
+toggleNetLevel();
 
 </script>
 
