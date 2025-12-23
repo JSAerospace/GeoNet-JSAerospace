@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V3 – Persistente</title>
+<title>GeoNet Admin V3.2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -14,6 +14,8 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 .version{position:fixed;bottom:10px;right:10px;font-size:12px;opacity:.6}
 .card button{width:48%;margin:2px 1%;background:#28a745;color:#fff;font-weight:bold}
 .card button.delete{background:#dc3545}
+.flex{display:flex;gap:5px}
+.flex select{width:32%}
 </style>
 </head>
 <body>
@@ -48,18 +50,47 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 <!-- SECCIÓN DE LANZAMIENTOS -->
 <h2>Lanzamiento</h2>
 <input id="lNombre" placeholder="Nombre misión">
+
 <select id="lEstado">
 <option>PLANNED</option>
 <option>NET</option>
 <option>LAUNCHED</option>
 <option>CANCELLED</option>
 </select>
-<select id="lTipo">
+
+<select id="lTipo" onchange="toggleFechaNet()">
 <option value="FECHA">Fecha exacta</option>
 <option value="NET">NET</option>
 </select>
+
+<div id="fechaDiv">
 <input id="lFecha" type="datetime-local">
-<input id="lNet" placeholder="NET Diciembre 2026">
+</div>
+
+<div id="netDiv" class="hidden">
+<div class="flex">
+<select id="netYear"></select>
+<select id="netMonth">
+<option value="">Mes</option>
+<option value="Enero">Enero</option>
+<option value="Febrero">Febrero</option>
+<option value="Marzo">Marzo</option>
+<option value="Abril">Abril</option>
+<option value="Mayo">Mayo</option>
+<option value="Junio">Junio</option>
+<option value="Julio">Julio</option>
+<option value="Agosto">Agosto</option>
+<option value="Septiembre">Septiembre</option>
+<option value="Octubre">Octubre</option>
+<option value="Noviembre">Noviembre</option>
+<option value="Diciembre">Diciembre</option>
+</select>
+<select id="netDay">
+<option value="">Día</option>
+</select>
+</div>
+</div>
+
 <input id="lCarga" placeholder="Carga">
 <button onclick="saveLaunch()">Guardar / Actualizar</button>
 
@@ -72,7 +103,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 </section>
 
-<div class="version">v3.1</div>
+<div class="version">v3.2</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -87,7 +118,7 @@ const panel = document.getElementById("panel");
 const user = document.getElementById("user");
 const pass = document.getElementById("pass");
 
-// Verificar login persistente al cargar
+// Verificar login persistente
 window.addEventListener("load",()=>{
   if(localStorage.getItem("loggedIn")==="true"){
     loginForm.classList.add("hidden");
@@ -97,10 +128,10 @@ window.addEventListener("load",()=>{
   }
 });
 
-// Iniciar sesión
+// Login
 window.login = () => {
   if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
-    localStorage.setItem("loggedIn","true"); // Guardar estado
+    localStorage.setItem("loggedIn","true");
     loginForm.classList.add("hidden");
     panel.classList.remove("hidden");
     loadInfo();
@@ -108,14 +139,14 @@ window.login = () => {
   } else alert("Usuario o contraseña incorrecta");
 };
 
-// Cerrar sesión
+// Logout
 window.logout = () => {
   localStorage.removeItem("loggedIn");
   panel.classList.add("hidden");
   loginForm.classList.remove("hidden");
 };
 
-// ---------------- SECCIÓN INFORMACIÓN ----------------
+// Información
 async function loadInfo(){
   const docRef=doc(db,"Config","info");
   const docSnap = await getDoc(docRef);
@@ -126,7 +157,6 @@ async function loadInfo(){
     infoSat.value = data.satelites || "";
   }
 }
-
 window.saveAllInfo=async()=>{
   await setDoc(doc(db,"Config","info"),{
     lanzamientos: parseInt(infoLanzamientos.value)||0,
@@ -136,25 +166,52 @@ window.saveAllInfo=async()=>{
   alert("Información actualizada!");
 };
 
-// ---------------- SECCIÓN LANZAMIENTOS ----------------
+// Lanzamientos
+function toggleFechaNet(){
+  if(lTipo.value==="FECHA"){ 
+    document.getElementById("fechaDiv").classList.remove("hidden");
+    document.getElementById("netDiv").classList.add("hidden");
+  } else {
+    document.getElementById("fechaDiv").classList.add("hidden");
+    document.getElementById("netDiv").classList.remove("hidden");
+  }
+}
+
+// Llenar NET años y días
+const currentYear = new Date().getFullYear();
+const netYear = document.getElementById("netYear");
+for(let y=currentYear;y<=currentYear+10;y++) netYear.innerHTML += `<option value="${y}">${y}</option>`;
+
+const netDay = document.getElementById("netDay");
+for(let d=1;d<=31;d++) netDay.innerHTML += `<option value="${d}">${d}</option>`;
+
+// Guardar lanzamiento
 window.saveLaunch = async () => {
   if(!lNombre.value) return alert("Debe poner un nombre de misión");
-  let data = (lTipo.value==="NET") ? 
-    {nombre:lNombre.value,estado:lEstado.value,tipo:"NET",net:lNet.value,carga:lCarga.value} :
-    {nombre:lNombre.value,estado:lEstado.value,tipo:"FECHA",fecha:lFecha.value,carga:lCarga.value};
+  let data;
+  if(lTipo.value==="FECHA"){
+    data = {nombre:lNombre.value,estado:lEstado.value,tipo:"FECHA",fecha:lFecha.value,carga:lCarga.value};
+  } else {
+    let netText = "NET";
+    if(netYear.value) netText += ` ${netYear.value}`;
+    if(netMonth.value) netText = `NET ${netMonth.value} ${netYear.value}`;
+    if(netDay.value) netText = `NET ${netDay.value} ${netMonth.value} ${netYear.value}`;
+    data = {nombre:lNombre.value,estado:lEstado.value,tipo:"NET",net:netText,carga:lCarga.value};
+  }
   await addDoc(collection(db,"launches"),data);
-  lNombre.value=""; lEstado.value="PLANNED"; lTipo.value="FECHA"; lFecha.value=""; lNet.value=""; lCarga.value="";
+  lNombre.value=""; lEstado.value="PLANNED"; lTipo.value="FECHA"; lFecha.value=""; netYear.value=""; netMonth.value=""; netDay.value=""; lCarga.value="";
+  toggleFechaNet();
   loadLaunches();
 };
 
-// ---------------- GALERÍA ----------------
+// Galería
 window.addGallery = async () => { 
   if(!gUrl.value) return; 
   await addDoc(collection(db,"Gallery"),{url:gUrl.value}); 
   gUrl.value=""; 
 };
 
-// ---------------- LISTAR LANZAMIENTOS ----------------
+// Listar lanzamientos
 async function loadLaunches(){
   const listDiv = document.getElementById("launchList");
   listDiv.innerHTML="";
@@ -173,7 +230,18 @@ window.editLaunch = async (id) => {
   docSnap.forEach(d=>{
     if(d.id===id){
       const data=d.data();
-      lNombre.value=data.nombre; lEstado.value=data.estado; lTipo.value=data.tipo; lFecha.value=data.fecha||""; lNet.value=data.net||""; lCarga.value=data.carga;
+      lNombre.value=data.nombre; lEstado.value=data.estado; lTipo.value=data.tipo;
+      if(data.tipo==="FECHA"){ lFecha.value=data.fecha; toggleFechaNet(); }
+      else{
+        toggleFechaNet();
+        if(data.net){
+          const parts = data.net.split(" ");
+          if(parts.length===2) netYear.value=parts[1];
+          else if(parts.length===3){ netMonth.value=parts[1]; netYear.value=parts[2]; }
+          else if(parts.length===4){ netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; }
+        }
+      }
+      lCarga.value=data.carga;
     }
   });
   await deleteDoc(docRef);
@@ -188,6 +256,7 @@ window.deleteLaunch = async (id) => {
 
 loadInfo();
 loadLaunches();
+toggleFechaNet();
 </script>
 
 </body>
