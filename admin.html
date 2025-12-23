@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V3.9</title>
+<title>GeoNet Admin V4.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -62,7 +62,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 </select>
 
 <div id="fechaDiv">
-<input id="lFecha" type="datetime-local">
+  <input id="lFecha" type="datetime-local">
 </div>
 
 <div id="netDiv" class="hidden">
@@ -92,20 +92,22 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 <option value="">Día</option>
 </select>
 </div>
+</div>
 
+<!-- Carga y Galería siempre visibles -->
 <input id="lCarga" placeholder="Carga">
-<button onclick="saveLaunch()">Guardar / Actualizar</button>
-
 <h2>Galería</h2>
 <input id="gUrl" placeholder="URL imagen o video">
 <button onclick="addGallery()">Agregar</button>
+
+<button onclick="saveLaunch()">Guardar / Actualizar Lanzamiento</button>
 
 <h2>Lanzamientos Existentes</h2>
 <div id="launchList"></div>
 
 </section>
 
-<div class="version">v3.9</div>
+<div class="version">v4.0</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -193,10 +195,8 @@ function toggleTipoFecha(){
   } else {
     fechaDiv.classList.add("hidden");
     netDiv.classList.remove("hidden");
-    toggleNetLevel();
   }
 }
-
 function toggleNetLevel(){
   const level = netLevel.value;
   netMonthDiv.classList.toggle("hidden",level==="year");
@@ -239,7 +239,7 @@ window.addGallery = async () => {
   document.getElementById("gUrl").value="";
 };
 
-// Listar lanzamientos mejorado
+// Listar lanzamientos
 async function loadLaunches(){
   const listDiv=document.getElementById("launchList");
   if(!listDiv) return;
@@ -287,7 +287,6 @@ window.editLaunch=async(id)=>{
   }
   document.getElementById("lCarga").value=data.carga || "";
 
-  // Borrar el original para actualizar al guardar
   await deleteDoc(dRef);
 };
 
@@ -298,7 +297,7 @@ window.deleteLaunch=async(id)=>{
   loadLaunches();
 };
 
-toggleTipoFecha(); // Inicializa correctamente al cargar
+toggleTipoFecha(); 
 toggleNetLevel();
 
 </script>
