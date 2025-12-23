@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet V4.4</title>
+<title>GeoNet V4.5</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -35,7 +35,7 @@ h2{margin-top:25px;margin-bottom:10px}
 <div id="gallery" class="img-gallery"></div>
 </section>
 
-<div class="version">v4.4</div>
+<div class="version">v4.5</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -60,6 +60,16 @@ async function loadInfo(){
 }
 loadInfo();
 
+// Función para mostrar enlaces embebibles o links
+function renderMedia(url){
+  if(url.includes("imgur.com") || url.match(/\.(jpg|jpeg|png|gif|mp4)$/i)){
+    if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
+    else return `<img src="${url}">`;
+  } else {
+    return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
+  }
+}
+
 // Cargar lanzamientos
 async function loadLaunches(){
   const listDiv = document.getElementById("launchList");
@@ -78,14 +88,10 @@ async function loadLaunches(){
       fechaDisplay = data.net;
     }
 
-    let galeriaHTML = "";
+    let galeriaHTML = "-";
     if(data.galeria?.length){
-      data.galeria.forEach(url=>{
-        if(url.includes("drive.google.com")) url = url.replace("/view?usp=sharing","").replace("/view?usp=drivesdk","").replace("file/d/","uc?export=view&id=");
-        if(url.match(/\.(mp4|webm|ogg)$/i)) galeriaHTML += `<video controls src="${url}"></video>`;
-        else galeriaHTML += `<img src="${url}">`;
-      });
-    } else galeriaHTML="-";
+      galeriaHTML = data.galeria.map(url=>renderMedia(url)).join("");
+    }
 
     card.innerHTML=`
       <strong>Nombre:</strong> ${data.nombre}<br>
@@ -106,10 +112,7 @@ async function loadGallery(){
   galleryDiv.innerHTML="";
   const snaps = await getDocs(collection(db,"gallery"));
   snaps.forEach(d=>{
-    let url = d.data().url;
-    if(url.includes("drive.google.com")) url = url.replace("/view?usp=sharing","").replace("/view?usp=drivesdk","").replace("file/d/","uc?export=view&id=");
-    const element = url.match(/\.(mp4|webm|ogg)$/i)?`<video controls src="${url}"></video>`:`<img src="${url}">`;
-    galleryDiv.innerHTML += element;
+    galleryDiv.innerHTML += renderMedia(d.data().url);
   });
 }
 loadGallery();
