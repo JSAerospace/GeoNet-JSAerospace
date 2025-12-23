@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin | GeoNet</title>
-
 <style>
 body{
   margin:0;
@@ -116,7 +115,6 @@ li{margin-bottom:15px;}
     <option value="month">NET Mes</option>
     <option value="day">NET Día</option>
   </select>
-
   <div id="netInputs"></div>
 </div>
 
@@ -135,7 +133,7 @@ li{margin-bottom:15px;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc } 
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc } 
 from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -161,19 +159,28 @@ loginBtn.onclick=()=>{
 };
 
 // NET / EXACTA
-dateType.onchange=()=>{
-  exactDateBox.classList.toggle("hidden",dateType.value==="NET");
-  netBox.classList.toggle("hidden",dateType.value!=="NET");
+dateType.onchange = () => {
+  if (dateType.value === "EXACTA") {
+    exactDateBox.classList.remove("hidden");
+    netBox.classList.add("hidden");
+    netInputs.innerHTML="";
+    exactDate.disabled = false;
+    exactDate.value = "";
+  }
+  if (dateType.value === "NET") {
+    exactDateBox.classList.add("hidden");
+    netBox.classList.remove("hidden");
+    exactDate.disabled = true;
+    netPrecision.value="none";
+    netPrecision.dispatchEvent(new Event("change"));
+  }
 };
 
-netPrecision.onchange=()=>{
-  netInputs.innerHTML="";
-  if(netPrecision.value==="year")
-    netInputs.innerHTML=`<input placeholder="Año (2026)">`;
-  if(netPrecision.value==="month")
-    netInputs.innerHTML=`<input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
-  if(netPrecision.value==="day")
-    netInputs.innerHTML=`<input placeholder="Día (25)"> <input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
+netPrecision.onchange = () => {
+  netInputs.innerHTML = "";
+  if (netPrecision.value === "year") netInputs.innerHTML=`<input placeholder="Año (2026)">`;
+  if (netPrecision.value === "month") netInputs.innerHTML=`<input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
+  if (netPrecision.value === "day") netInputs.innerHTML=`<input placeholder="Día (25)"> <input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
 };
 
 const launches = collection(db,"launches");
