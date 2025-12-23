@@ -2,340 +2,156 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin | GeoNet</title>
+<title>GeoNet Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#0b0f1a;
-  color:white;
-}
-header{
-  background:#11172a;
-  padding:20px;
-  text-align:center;
-}
-section{
-  max-width:900px;
-  margin:20px auto;
-  background:#1a2140;
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 0 10px rgba(0,0,0,.4);
-}
-label{
-  display:block;
-  margin-top:12px;
-}
-input,select,button,textarea{
-  width:100%;
-  padding:10px;
-  margin-top:5px;
-  border-radius:8px;
-  border:none;
-  font-size:15px;
-}
-button{
-  background:#4da3ff;
-  color:black;
-  font-weight:bold;
-  cursor:pointer;
-}
-button:hover{background:#6bb5ff;}
-.hidden{display:none;}
-ul{padding-left:20px;}
-li{margin-bottom:15px;}
-.smallBtn{
-  width:auto;
-  padding:6px 10px;
-  margin-left:5px;
-}
-.version{
-  position:fixed;
-  right:10px;
-  bottom:8px;
-  opacity:.6;
-  font-size:14px;
-}
-.card{
-  background:#131a33;
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:15px;
-}
-.gallery-item{
-  margin-bottom:10px;
-}
-.gallery-item input{
-  margin-bottom:5px;
-}
+body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
+section{padding:20px}
+input,select,button{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:none}
+button{background:#1e90ff;color:#fff;font-weight:bold}
+.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px}
+.hidden{display:none}
+.version{position:fixed;bottom:10px;right:10px;font-size:12px;opacity:.6}
 </style>
 </head>
-
 <body>
 
-<header>
-<h1>Admin GeoNet</h1>
-<p>JS Aerospace</p>
-</header>
-
 <section id="login">
-<label>Email</label>
-<input type="email" id="user">
-<label>Contraseña</label>
-<input type="password" id="pass">
-<button id="loginBtn">Entrar</button>
+<h2>Admin Login</h2>
+<input id="user" placeholder="Usuario">
+<input id="pass" type="password" placeholder="Contraseña">
+<button onclick="login()">Entrar</button>
 </section>
 
 <section id="panel" class="hidden">
 
-<!-- Lanzamientos -->
-<h2>Lanzamientos</h2>
-<div class="card">
-<label>Nombre</label>
-<input id="lnName">
-
-<label>Estado</label>
-<select id="lnState">
-  <option>Planeado</option>
-  <option>En progreso</option>
-  <option>Exitoso</option>
-  <option>Fallido</option>
-</select>
-
-<label>Tipo de fecha</label>
-<select id="dateType">
-  <option value="EXACTA">Fecha exacta</option>
-  <option value="NET">NET</option>
-</select>
-
-<div id="exactDateBox">
-  <label>Fecha y hora (UTC)</label>
-  <input type="datetime-local" id="exactDate">
-</div>
-
-<div id="netBox" class="hidden">
-  <label>Precisión NET</label>
-  <select id="netPrecision">
-    <option value="none">NET</option>
-    <option value="year">NET Año</option>
-    <option value="month">NET Mes</option>
-    <option value="day">NET Día</option>
-  </select>
-  <div id="netInputs"></div>
-</div>
-
-<label>Links (imágenes o videos, separados por coma)</label>
-<input id="lnLinks" placeholder="https://..., https://...">
-
-<button id="addLaunch">Guardar lanzamiento</button>
-</div>
-
-<h3>Listado de Lanzamientos</h3>
-<ul id="launchList"></ul>
-
-<!-- Información -->
 <h2>Información</h2>
-<div class="card">
-<label>Lanzamientos</label>
-<input id="infoLaunches">
-<label>Planos Orbitales</label>
-<input id="infoPlanes">
-<label>Satélites</label>
-<input id="infoSat">
-<button id="saveInfo">Guardar Información</button>
-</div>
+<input id="infoNombre" placeholder="Nombre">
+<input id="infoValor" placeholder="Valor">
+<button onclick="saveInfo()">Guardar</button>
 
-<!-- Galería -->
+<h2>Lanzamiento</h2>
+<input id="lNombre" placeholder="Nombre misión">
+<select id="lEstado">
+<option>PLANNED</option>
+<option>NET</option>
+<option>LAUNCHED</option>
+<option>CANCELLED</option>
+</select>
+<select id="lTipo">
+<option value="FECHA">Fecha exacta</option>
+<option value="NET">NET</option>
+</select>
+<input id="lFecha" type="datetime-local">
+<input id="lNet" placeholder="NET Diciembre 2026">
+<input id="lCarga" placeholder="Carga">
+<button onclick="saveLaunch()">Guardar / Actualizar</button>
+
 <h2>Galería</h2>
-<div class="card" id="galleryContainer">
-<label>Agregar imagen o video (URL)</label>
-<input id="newGalleryItem" placeholder="https://...">
-<button id="addGalleryBtn">Agregar a galería</button>
-<ul id="galleryList"></ul>
-</div>
+<input id="gUrl" placeholder="URL imagen o video">
+<button onclick="addGallery()">Agregar</button>
+
+<div id="launchList"></div>
 
 </section>
 
-<div class="version">V1.2</div>
+<div class="version">v1.5</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, getDoc } 
-from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore,doc,setDoc,collection,addDoc,getDocs,updateDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+const app = initializeApp({
+  apiKey: "TU_API_KEY",
   authDomain: "geonet-js-aerospace.firebaseapp.com",
-  projectId: "geonet-js-aerospace",
-  storageBucket: "geonet-js-aerospace.appspot.com",
-  messagingSenderId: "651364423254",
-  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
-};
-
-const app = initializeApp(firebaseConfig);
+  projectId: "geonet-js-aerospace"
+});
 const db = getFirestore(app);
 
-// LOGIN
-const USER="olanoagus@gmail.com";
-const PASS="Simba2011";
-loginBtn.onclick=()=>{
-  if(user.value===USER && pass.value===PASS){
-    login.classList.add("hidden");
-    panel.classList.remove("hidden");
-    loadLaunches();
-    loadInfo();
-    loadGallery();
-  } else alert("Datos incorrectos");
-};
-
-// NET / EXACTA
-dateType.onchange = () => {
-  if (dateType.value === "EXACTA") {
-    exactDateBox.classList.remove("hidden");
-    netBox.classList.add("hidden");
-    netInputs.innerHTML="";
-    exactDate.disabled = false;
-    exactDate.value = "";
-  }
-  if (dateType.value === "NET") {
-    exactDateBox.classList.add("hidden");
-    netBox.classList.remove("hidden");
-    exactDate.disabled = true;
-    netPrecision.value="none";
-    netPrecision.dispatchEvent(new Event("change"));
-  }
-};
-
-netPrecision.onchange = () => {
-  netInputs.innerHTML = "";
-  if (netPrecision.value === "year") netInputs.innerHTML=`<input placeholder="Año (2026)">`;
-  if (netPrecision.value === "month") netInputs.innerHTML=`<input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
-  if (netPrecision.value === "day") netInputs.innerHTML=`<input placeholder="Día (25)"> <input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
-};
-
-// Lanzamientos
-const launches = collection(db,"launches");
-let editId = null;
-
-const addLaunchFn = async() => {
-  let fecha;
-  if(dateType.value==="EXACTA"){
-    fecha={ tipo:"EXACTA", valor: exactDate.value };
-  }else{
-    const vals=[...netInputs.querySelectorAll("input")].map(i=>i.value);
-    fecha={ tipo:"NET", precision:netPrecision.value, valor:vals.join("-") };
-  }
-
-  if(editId){
-    const d = doc(db,"launches",editId);
-    await updateDoc(d,{
-      nombre:lnName.value,
-      estado:lnState.value,
-      fecha,
-      links: lnLinks.value.split(",").map(l=>l.trim()).filter(l=>l)
-    });
-    editId = null;
-    addLaunch.innerText="Guardar lanzamiento";
-  } else {
-    await addDoc(launches,{
-      nombre:lnName.value,
-      estado:lnState.value,
-      fecha,
-      links: lnLinks.value.split(",").map(l=>l.trim()).filter(l=>l)
-    });
-  }
-
-  lnName.value=""; lnLinks.value=""; exactDate.value="";
-};
-
-addLaunch.onclick=addLaunchFn;
-
-const loadLaunches = ()=>{
-  onSnapshot(launches,snap=>{
-    launchList.innerHTML="";
-    snap.forEach(d=>{
-      const li=document.createElement("li");
-      const data=d.data();
-      li.innerHTML=`
-        <b>${data.nombre}</b> (${data.estado}) 
-        <button class="smallBtn">Editar</button>
-        <button class="smallBtn">Eliminar</button>
-      `;
-      const [editBtn, delBtn] = li.querySelectorAll("button");
-
-      delBtn.onclick=()=>deleteDoc(d.ref);
-
-      editBtn.onclick=()=>{
-        editId = d.id;
-        lnName.value = data.nombre;
-        lnState.value = data.estado;
-        if(data.fecha.tipo==="EXACTA"){
-          dateType.value="EXACTA";
-          exactDateBox.classList.remove("hidden");
-          netBox.classList.add("hidden");
-          exactDate.disabled = false;
-          exactDate.value = data.fecha.valor;
-        } else {
-          dateType.value="NET";
-          exactDateBox.classList.add("hidden");
-          netBox.classList.remove("hidden");
-          exactDate.disabled = true;
-          netPrecision.value = data.fecha.precision;
-          netPrecision.dispatchEvent(new Event("change"));
-          const vals = data.fecha.valor.split("-");
-          [...netInputs.querySelectorAll("input")].forEach((i, idx)=>{ i.value=vals[idx]||""; });
-        }
-        lnLinks.value = data.links.join(", ");
-        addLaunch.innerText="Guardar cambios";
-      };
-
-      launchList.appendChild(li);
-    });
-  });
-};
+window.login=()=>{
+ if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
+  login.classList.add("hidden");
+  panel.classList.remove("hidden");
+  loadLaunches();
+ }
+}
 
 // Información
-const infoDoc = doc(db,"Config","info");
-saveInfo.onclick=async()=>{
-  await updateDoc(infoDoc,{
-    lanzamientos: infoLaunches.value,
-    planos_orbitales: infoPlanes.value,
-    satelites: infoSat.value
-  });
-};
-const loadInfo = async()=>{
-  const d = await getDoc(infoDoc);
-  if(d.exists()){
-    infoLaunches.value=d.data().lanzamientos;
-    infoPlanes.value=d.data().planos_orbitales;
-    infoSat.value=d.data().satelites;
-  }
-};
+window.saveInfo=()=>{
+ setDoc(doc(db,"Config","info"),{
+  [infoNombre.value]:infoValor.value
+ },{merge:true});
+}
+
+// Lanzamientos
+window.saveLaunch=async()=>{
+ if(lNombre.value==="") return alert("Debe poner un nombre");
+ if(lTipo.value==="NET"){
+   await addDoc(collection(db,"launches"),{
+     nombre:lNombre.value,
+     estado:lEstado.value,
+     tipo:"NET",
+     net:lNet.value,
+     carga:lCarga.value
+   });
+ } else {
+   await addDoc(collection(db,"launches"),{
+     nombre:lNombre.value,
+     estado:lEstado.value,
+     tipo:"FECHA",
+     fecha:lFecha.value,
+     carga:lCarga.value
+   });
+ }
+ loadLaunches();
+}
 
 // Galería
-const galleryCol = collection(db,"Gallery");
-addGalleryBtn.onclick=async()=>{
-  const val=newGalleryItem.value.trim();
-  if(!val) return;
-  await addDoc(galleryCol,{url:val});
-  newGalleryItem.value="";
-};
+window.addGallery=()=>{
+ addDoc(collection(db,"Gallery"),{url:gUrl.value});
+}
 
-const loadGallery = ()=>{
-  onSnapshot(galleryCol,snap=>{
-    galleryList.innerHTML="";
-    snap.forEach(d=>{
-      const li=document.createElement("li");
-      li.classList.add("gallery-item");
-      li.innerHTML=`${d.data().url} <button class="smallBtn">Eliminar</button>`;
-      li.querySelector("button").onclick=()=>deleteDoc(d.ref);
-      galleryList.appendChild(li);
-    });
-  });
-};
+// Listar lanzamientos para editar/borrar
+async function loadLaunches(){
+ const listDiv=document.getElementById("launchList");
+ listDiv.innerHTML="";
+ const snaps = await getDocs(collection(db,"launches"));
+ snaps.forEach(d=>{
+   const data=d.data();
+   const id=d.id;
+   listDiv.innerHTML+=`
+   <div class="card">
+     <strong>${data.nombre}</strong> - ${data.estado} - ${data.tipo==="NET"?data.net:new Date(data.fecha).toLocaleString()}
+     <button onclick="editLaunch('${id}')">Editar</button>
+     <button onclick="deleteLaunch('${id}')">Borrar</button>
+   </div>`;
+ });
+}
+
+// Editar
+window.editLaunch=async(id)=>{
+ const docRef=doc(db,"launches",id);
+ const docSnap=await getDocs(collection(db,"launches"));
+ docSnap.forEach(d=>{
+   if(d.id===id){
+     const data=d.data();
+     lNombre.value=data.nombre;
+     lEstado.value=data.estado;
+     lTipo.value=data.tipo;
+     lFecha.value=data.fecha || "";
+     lNet.value=data.net || "";
+     lCarga.value=data.carga;
+   }
+ });
+ await deleteDoc(docRef); // borramos el original, se guardará al presionar guardar
+}
+
+// Borrar
+window.deleteLaunch=async(id)=>{
+ if(!confirm("¿Seguro que quieres borrar este lanzamiento?")) return;
+ await deleteDoc(doc(db,"launches",id));
+ loadLaunches();
+}
 </script>
-
 </body>
 </html>
