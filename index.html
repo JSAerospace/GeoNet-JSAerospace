@@ -4,138 +4,162 @@
 <meta charset="UTF-8">
 <title>GeoNet | JS Aerospace</title>
 <style>
-body {
+body{
   margin:0;
-  font-family:Arial,sans-serif;
+  font-family:Arial,Helvetica,sans-serif;
   background:#0b0f1a;
   color:white;
 }
-header {
+header{
   background:#11172a;
   padding:20px;
   text-align:center;
 }
-h1,h2 {margin:0 0 10px;}
-.container {max-width:900px;margin:20px auto;display:grid;gap:20px;}
-.card {
+section{
+  max-width:900px;
+  margin:20px auto;
   background:#1a2140;
   padding:20px;
-  border-radius:12px;
-  box-shadow:0 4px 8px rgba(0,0,0,0.3);
+  border-radius:14px;
+  box-shadow:0 0 10px rgba(0,0,0,.4);
 }
-ul {padding-left:20px;}
-li {margin-bottom:8px;}
-footer {
-  position:relative;
-  text-align:center;
-  opacity:0.6;
+h2{
+  border-bottom:1px solid #4da3ff;
+  padding-bottom:5px;
+}
+.card{
+  background:#131a33;
   padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
 }
-.version {position:absolute;right:10px;bottom:5px;font-size:0.9em;opacity:0.8;}
-a {color:#4da3ff;text-decoration:none;}
-a:hover {text-decoration:underline;}
+ul{padding-left:20px;}
+li{margin-bottom:15px;}
+a{
+  color:#4da3ff;
+  text-decoration:none;
+}
+a:hover{color:#6bb5ff;}
+.version{
+  position:fixed;
+  right:10px;
+  bottom:8px;
+  opacity:.6;
+  font-size:14px;
+}
+.launch-time{
+  font-style:italic;
+  opacity:.8;
+}
 </style>
 </head>
 <body>
 
 <header>
-<h1>GeoNet</h1>
-<p>Constelación GNSS – JS Aerospace</p>
+<h1>GeoNet | JS Aerospace</h1>
+<p>Seguimiento de lanzamientos y misiones</p>
 </header>
 
-<div class="container">
-  <div class="card">
-    <h2>Información</h2>
-    <p><strong>Planos Orbitales:</strong> <span id="confPlanes">0</span></p>
-    <p><strong>Lanzamientos:</strong> <span id="confLaunch">0</span></p>
-  </div>
+<section id="launchesSection">
+<h2>Lanzamientos</h2>
+<ul id="launchList"></ul>
+</section>
 
-  <div class="card">
-    <h2>Lanzamientos</h2>
-    <ul id="launchList"></ul>
-  </div>
-
-  <div class="card">
-    <h2>Galería</h2>
-    <ul id="galleryList"></ul>
-  </div>
+<section id="infoSection">
+<h2>Información</h2>
+<div class="card">
+<p><b>Lanzamientos:</b> <span id="infoLaunches"></span></p>
+<p><b>Planos Orbitales:</b> <span id="infoPlanes"></span></p>
+<p><b>Satélites:</b> <span id="infoSat"></span></p>
 </div>
+</section>
 
-<footer>
-  © JS Aerospace
-  <span class="version" id="webVersion">V1</span>
-</footer>
+<section id="gallerySection">
+<h2>Galería</h2>
+<ul id="galleryList"></ul>
+</section>
+
+<div class="version">V1.2</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, getDoc, doc } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
   authDomain: "geonet-js-aerospace.firebaseapp.com",
   projectId: "geonet-js-aerospace",
   storageBucket: "geonet-js-aerospace.appspot.com",
   messagingSenderId: "651364423254",
-  appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
-  measurementId: "G-X44HFVLSQ8"
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ---------------- VERSION ----------------
-const versionElement = document.getElementById("webVersion");
-let webVersion = "V1"; // Cambiar manualmente al subir nueva versión
-versionElement.textContent = webVersion;
-
-// ---------------- INFORMACIÓN ----------------
-const confDoc = doc(db,"Config","Config");
-const confPlanes = document.getElementById("confPlanes");
-const confLaunch = document.getElementById("confLaunch");
-
-onSnapshot(confDoc, snap=>{
-  if(snap.exists()){
-    const data = snap.data();
-    confPlanes.textContent = data.planos_orbitales||0;
-    confLaunch.textContent = data.lanzamientos||0;
+// Información
+const infoDoc = doc(db,"Config","info");
+const loadInfo = async()=>{
+  const d = await getDoc(infoDoc);
+  if(d.exists()){
+    infoLaunches.textContent=d.data().lanzamientos;
+    infoPlanes.textContent=d.data().planos_orbitales;
+    infoSat.textContent=d.data().satelites;
   }
-});
+};
+loadInfo();
 
-// ---------------- LANZAMIENTOS ----------------
-const launchCol = collection(db,"launches");
-const launchList = document.getElementById("launchList");
-
-function formatDateUTCtoLocal(utc){
-  if(!utc || utc.toUpperCase()==="NET") return "NET";
-  const d = new Date(utc+"Z"); // Forzar UTC
-  return d.toLocaleString();
-}
-
-onSnapshot(launchCol, snap=>{
-  launchList.innerHTML="";
-  snap.docs.forEach(d=>{
-    const dat = d.data();
-    let linksHtml = "";
-    if(dat.links && dat.links.length>0){
-      linksHtml = "<br>"+dat.links.map(l=>`<a href="${l}" target="_blank">Ver</a>`).join(" ");
+// Galería
+const galleryCol = collection(db,"Gallery");
+onSnapshot(galleryCol,snap=>{
+  galleryList.innerHTML="";
+  snap.forEach(d=>{
+    const data=d.data();
+    const li=document.createElement("li");
+    let url = data.url;
+    if(url.match(/\.(jpg|jpeg|png|gif)$/i)){
+      li.innerHTML=`<img src="${url}" style="max-width:100%; border-radius:10px;">`;
+    } else {
+      li.innerHTML=`<a href="${url}" target="_blank">${url}</a>`;
     }
-    const li = document.createElement("li");
-    li.innerHTML = `<strong>${dat.nombre||'Sin nombre'}</strong> | Estado: ${dat.estado||'N/A'} | Fecha: ${formatDateUTCtoLocal(dat.fecha||'NET')} ${linksHtml}`;
-    launchList.appendChild(li);
+    galleryList.appendChild(li);
   });
 });
 
-// ---------------- GALERÍA ----------------
-const galleryCol = collection(db,"Gallery");
-const galleryList = document.getElementById("galleryList");
+// Lanzamientos
+const launches = collection(db,"launches");
 
-onSnapshot(galleryCol, snap=>{
-  galleryList.innerHTML="";
-  snap.docs.forEach(d=>{
-    const dat = d.data();
-    const li = document.createElement("li");
-    li.innerHTML = `<a href="${dat.link}" target="_blank">${dat.title||dat.link}</a>`;
-    galleryList.appendChild(li);
+const formatLaunchDate = (fechaObj) => {
+  if(fechaObj.tipo==="EXACTA"){
+    const d = new Date(fechaObj.valor);
+    return d.toLocaleString();
+  } else if(fechaObj.tipo==="NET"){
+    const vals = fechaObj.valor.split("-");
+    let str="NET ";
+    if(fechaObj.precision==="year") str+=vals[0];
+    if(fechaObj.precision==="month") str+=` ${vals[1]||""}/${vals[0]||""}`;
+    if(fechaObj.precision==="day") str+=` ${vals[2]||""}/${vals[1]||""}/${vals[0]||""}`;
+    return str;
+  }
+  return "";
+};
+
+onSnapshot(launches,snap=>{
+  launchList.innerHTML="";
+  snap.forEach(d=>{
+    const data=d.data();
+    const li=document.createElement("li");
+    li.classList.add("card");
+    li.innerHTML=`
+      <b>${data.nombre}</b> (${data.estado})<br>
+      <span class="launch-time">${formatLaunchDate(data.fecha)}</span><br>
+      ${data.links.map(l=>l.match(/\.(jpg|jpeg|png|gif)$/i)? 
+        `<img src="${l}" style="max-width:100%; border-radius:10px;">` : 
+        `<a href="${l}" target="_blank">${l}</a>`).join("<br>")}
+    `;
+    launchList.appendChild(li);
   });
 });
 </script>
