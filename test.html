@@ -43,7 +43,7 @@ h2{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, doc, getDoc } 
+import { getFirestore, doc, getDoc, setDoc } 
 from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 // Firebase
@@ -59,11 +59,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Cargar Información
-const infoDoc = doc(db,"Config","info");
+// Elementos
 const infoLaunches = document.getElementById("infoLaunches");
 const infoPlanes = document.getElementById("infoPlanes");
 const infoSat = document.getElementById("infoSat");
+
+// Documento info
+const infoDoc = doc(db,"Config","info");
 
 const loadInfo = async()=>{
   const d = await getDoc(infoDoc);
@@ -73,9 +75,15 @@ const loadInfo = async()=>{
     infoPlanes.textContent = data.planos_orbitales || "No hay datos";
     infoSat.textContent = data.satelites || "No hay datos";
   } else {
-    infoLaunches.textContent = "No hay datos";
-    infoPlanes.textContent = "No hay datos";
-    infoSat.textContent = "No hay datos";
+    // Crear documento por defecto
+    await setDoc(infoDoc,{
+      lanzamientos: "0",
+      planos_orbitales: "0",
+      satelites: "Ninguno"
+    });
+    infoLaunches.textContent = "0";
+    infoPlanes.textContent = "0";
+    infoSat.textContent = "Ninguno";
   }
 };
 
