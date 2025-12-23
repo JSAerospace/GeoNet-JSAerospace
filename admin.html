@@ -2,268 +2,286 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<title>Admin – J.S Aerospace</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin GeoNet J.S Aerospace</title>
+
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:#fff}
-header{padding:20px;background:#141a2e;text-align:center;font-size:28px;font-weight:bold;color:#0af}
-.container{padding:20px;max-width:900px;margin:auto}
-.card{background:#141a2e;border-radius:12px;padding:15px;box-shadow:0 0 15px rgba(0,0,0,.5);margin-bottom:20px}
-.card h2{margin-top:0;color:#0af;text-align:center}
-input,select,button{width:100%;padding:10px;margin:5px 0;border-radius:6px;border:none;font-size:16px}
-button{background:#0af;color:#000;font-weight:bold;cursor:pointer}
-button:hover{opacity:0.8}
-.flexRow{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.launchItem,.galleryItem{margin-bottom:15px;padding:10px;border-bottom:1px solid #0af;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap}
-img,video{max-width:100px;max-height:80px;border-radius:6px;margin-right:10px}
-small{color:#aaa}
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#0b0f1a;
+  color:white;
+}
+
+.hidden{display:none;}
+
+header{
+  background:#11162a;
+  padding:15px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+}
+
+section{
+  max-width:1000px;
+  margin:20px auto;
+  background:#141a33;
+  padding:20px;
+  border-radius:10px;
+}
+
+h2{
+  margin-top:0;
+  border-bottom:1px solid #2a3366;
+  padding-bottom:8px;
+}
+
+input, select, button{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:6px;
+  border:none;
+  font-size:14px;
+}
+
+button{
+  background:#3a6df0;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{opacity:.85;}
+
+.card{
+  background:#1c2347;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+
+.flex{
+  display:flex;
+  gap:10px;
+}
+
+.flex > *{flex:1;}
+
+.small-btn{
+  background:#e03b3b;
+  margin-top:6px;
+}
+.edit-btn{
+  background:#f0a93a;
+  margin-top:6px;
+}
 </style>
 </head>
+
 <body>
 
-<header>Admin GeoNet J.S Aerospace</header>
+<header>Admin – J.S Aerospace</header>
 
-<div class="container" id="loginContainer">
-  <div class="card">
-    <h2>Iniciar Sesión</h2>
-    <input type="email" id="email" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button id="loginBtn">Entrar</button>
-    <p id="loginError" style="color:red;text-align:center;"></p>
+<!-- LOGIN -->
+<section id="loginSection">
+  <h2>Iniciar Sesión</h2>
+  <input id="user" placeholder="Usuario">
+  <input id="pass" type="password" placeholder="Contraseña">
+  <button onclick="login()">Entrar</button>
+</section>
+
+<!-- ADMIN -->
+<section id="adminSection" class="hidden">
+
+<h2>Lanzamientos</h2>
+
+<input id="nombre" placeholder="Nombre del lanzamiento">
+<input id="vehiculo" placeholder="Vehículo de lanzamiento">
+
+<select id="tipoFecha" onchange="cambiarFecha()">
+  <option value="exacta">Fecha exacta</option>
+  <option value="net">NET</option>
+</select>
+
+<div id="fechaExacta">
+  <div class="flex">
+    <select id="dia"></select>
+    <select id="mes"></select>
+    <input id="anio" placeholder="Año">
   </div>
 </div>
 
-<div class="container" id="adminContainer" style="display:none;">
-
-<!-- Información -->
-<div class="card">
-  <h2>Información</h2>
-  <label>Lanzamientos:</label>
-  <input type="number" id="infoLanzamientos">
-  <label>Planos Orbitales:</label>
-  <input type="number" id="infoPlanos">
-  <label>N° de Satélites:</label>
-  <input type="number" id="infoSat">
-  <button id="saveInfo">Cambiar Información</button>
-</div>
-
-<!-- Lanzamientos -->
-<div class="card">
-  <h2>Lanzamientos Existentes</h2>
-  <div id="launchesList"></div>
-
-  <h2>Agregar/Editar Lanzamiento</h2>
-  <input type="text" id="launchName" placeholder="Nombre">
-  <input type="text" id="launchVehicle" placeholder="Vehículo">
-  <select id="launchStatus">
-    <option value="Planeado">Planeado</option>
-    <option value="En Vuelo">En Vuelo</option>
-    <option value="Éxito">Éxito</option>
-    <option value="Fallido">Fallido</option>
+<div id="fechaNET" class="hidden">
+  <select id="netTipo" onchange="cambiarNET()">
+    <option value="anio">NET Año</option>
+    <option value="mes">NET Mes y Año</option>
+    <option value="dia">NET Día, Mes y Año</option>
   </select>
 
-  <select id="launchDateType">
-    <option value="FECHA">Fecha Exacta</option>
-    <option value="NET">NET</option>
-  </select>
-
-  <div id="fechaExactaContainer">
-    <input type="datetime-local" id="launchDate">
+  <div id="netAnio">
+    <input id="netAnioInput" placeholder="Año">
   </div>
 
-  <div id="netContainer" style="display:none">
-    <select id="netTipo">
-      <option value="AÑO">NET Año</option>
-      <option value="MES_AÑO">NET Mes y Año</option>
-      <option value="DIA_MES_AÑO">NET Día, Mes y Año</option>
-    </select>
-    <div id="netInputs"></div>
+  <div id="netMes" class="hidden flex">
+    <select id="netMesSelect"></select>
+    <input id="netMesAnio" placeholder="Año">
   </div>
 
-  <input type="text" id="launchPayload" placeholder="Carga">
-  <button id="saveLaunch">Agregar/Editar Lanzamiento</button>
+  <div id="netDia" class="hidden flex">
+    <select id="netDiaSelect"></select>
+    <select id="netDiaMes"></select>
+    <input id="netDiaAnio" placeholder="Año">
+  </div>
 </div>
 
-<!-- Galería -->
-<div class="card">
-  <h2>Galería</h2>
-  <input type="text" id="galleryURL" placeholder="URL imagen/video">
-  <button id="addGallery">Agregar a Galería</button>
-  <div id="galleryList"></div>
-</div>
+<select id="estado">
+  <option>Planeado</option>
+  <option>En Vuelo</option>
+  <option>Éxito</option>
+  <option>Fallido</option>
+</select>
 
-</div>
+<input id="carga" placeholder="Carga útil">
 
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,doc,getDoc,setDoc,getDocs,collection,updateDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<button onclick="guardarLanzamiento()">Guardar / Editar Lanzamiento</button>
 
-const firebaseConfig = {
-  apiKey:"TU_API_KEY",
-  authDomain:"geonet-js-aerospace.firebaseapp.com",
-  projectId:"geonet-js-aerospace"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+<h2>Lanzamientos existentes</h2>
+<div id="lista"></div>
 
-// LOGIN
-const ADMIN_EMAIL="olanoagus@gmail.com";
-const ADMIN_PASS="Simba2011";
-const loginContainer=document.getElementById("loginContainer");
-const adminContainer=document.getElementById("adminContainer");
+<h2>Galería</h2>
+<input id="galeriaInput" placeholder="URL de imagen o enlace">
+<button onclick="agregarGaleria()">Agregar a galería</button>
+<div id="galeria"></div>
 
-// Revisar sesión previa
-if(localStorage.getItem("loggedIn") === "true"){
-    loginContainer.style.display="none";
-    adminContainer.style.display="block";
-    loadInfo();
-    loadLaunches();
-    loadGallery();
+</section>
+
+<script>
+const USER="admin";
+const PASS="1234";
+
+let editIndex=null;
+
+if(localStorage.getItem("login")==="true"){
+  mostrarAdmin();
 }
 
-document.getElementById("loginBtn").addEventListener("click",()=>{
-  const email=document.getElementById("email").value;
-  const pass=document.getElementById("password").value;
-  if(email===ADMIN_EMAIL && pass===ADMIN_PASS){
-    localStorage.setItem("loggedIn","true");
-    loginContainer.style.display="none";
-    adminContainer.style.display="block";
-    loadInfo();
-    loadLaunches();
-    loadGallery();
+function login(){
+  if(user.value===USER && pass.value===PASS){
+    localStorage.setItem("login","true");
+    mostrarAdmin();
   }else{
-    document.getElementById("loginError").textContent="Usuario o contraseña incorrectos";
-  }
-});
-
-// INFORMACIÓN
-async function loadInfo(){
-  const docSnap = await getDoc(doc(db,"Config","info"));
-  if(docSnap.exists()){
-    const data = docSnap.data();
-    document.getElementById("infoLanzamientos").value = data.lanzamientos ?? 0;
-    document.getElementById("infoPlanos").value = data.planos_orbitales ?? 0;
-    document.getElementById("infoSat").value = data.satelites ?? 0;
+    alert("Datos incorrectos");
   }
 }
-document.getElementById("saveInfo").addEventListener("click",async()=>{
-  await setDoc(doc(db,"Config","info"),{
-    lanzamientos:Number(document.getElementById("infoLanzamientos").value),
-    planos_orbitales:Number(document.getElementById("infoPlanos").value),
-    satelites:Number(document.getElementById("infoSat").value)
-  });
-  alert("Información actualizada!");
-});
 
-// LANZAMIENTOS
-let editingId=null;
-
-const fechaExactaContainer=document.getElementById("fechaExactaContainer");
-const netContainer=document.getElementById("netContainer");
-document.getElementById("launchDateType").addEventListener("change",()=>{
-  if(document.getElementById("launchDateType").value==="FECHA"){
-    fechaExactaContainer.style.display="block";
-    netContainer.style.display="none";
-  }else{
-    fechaExactaContainer.style.display="none";
-    netContainer.style.display="block";
-  }
-});
-
-// NET tipo
-document.getElementById("netTipo").addEventListener("change",()=>{
-  const tipo=document.getElementById("netTipo").value;
-  const netInputs=document.getElementById("netInputs");
-  netInputs.innerHTML="";
-  if(tipo==="AÑO") netInputs.innerHTML='<input type="number" id="netYear" placeholder="Año">';
-  if(tipo==="MES_AÑO") netInputs.innerHTML='<input type="number" id="netYear" placeholder="Año"><input type="number" id="netMonth" placeholder="Mes">';
-  if(tipo==="DIA_MES_AÑO") netInputs.innerHTML='<input type="number" id="netYear" placeholder="Año"><input type="number" id="netMonth" placeholder="Mes"><input type="number" id="netDay" placeholder="Día">';
-});
-
-async function loadLaunches(){
-  const list=document.getElementById("launchesList");
-  list.innerHTML="";
-  const snaps = await getDocs(collection(db,"launches"));
-  snaps.forEach(d=>{
-    const data=d.data();
-    const div=document.createElement("div");
-    div.className="launchItem flexRow";
-    let fechaDisplay=data.tipo==="FECHA"?data.fecha:data.net;
-    div.innerHTML=`<span><strong>${data.nombre}</strong> - ${data.estado} - ${data.vehiculo} - ${fechaDisplay}</span>`;
-    const editBtn=document.createElement("button"); editBtn.textContent="Editar";
-    const delBtn=document.createElement("button"); delBtn.textContent="Eliminar";
-    editBtn.addEventListener("click",()=>{
-      editingId=d.id;
-      document.getElementById("launchName").value=data.nombre;
-      document.getElementById("launchVehicle").value=data.vehiculo;
-      document.getElementById("launchStatus").value=data.estado;
-      document.getElementById("launchDateType").value=data.tipo;
-      if(data.tipo==="FECHA"){ fechaExactaContainer.style.display="block"; netContainer.style.display="none"; document.getElementById("launchDate").value=data.fecha; }
-      else{
-        fechaExactaContainer.style.display="none"; netContainer.style.display="block";
-        // cargar NET en inputs
-      }
-      document.getElementById("launchPayload").value=data.carga;
-    });
-    delBtn.addEventListener("click",async()=>{
-      if(confirm("Eliminar lanzamiento?")){ await deleteDoc(doc(db,"launches",d.id)); loadLaunches();}
-    });
-    div.appendChild(editBtn); div.appendChild(delBtn);
-    list.appendChild(div);
-  });
+function mostrarAdmin(){
+  loginSection.classList.add("hidden");
+  adminSection.classList.remove("hidden");
+  cargar();
 }
 
-document.getElementById("saveLaunch").addEventListener("click",async()=>{
-  const tipo=document.getElementById("launchDateType").value;
-  let netValue=null;
-  if(tipo==="NET"){
-    const netTipo=document.getElementById("netTipo").value;
-    if(netTipo==="AÑO") netValue=document.getElementById("netYear").value;
-    if(netTipo==="MES_AÑO") netValue=document.getElementById("netYear").value+"-"+document.getElementById("netMonth").value;
-    if(netTipo==="DIA_MES_AÑO") netValue=document.getElementById("netYear").value+"-"+document.getElementById("netMonth").value+"-"+document.getElementById("netDay").value;
-  }
+function cambiarFecha(){
+  fechaExacta.classList.toggle("hidden", tipoFecha.value==="net");
+  fechaNET.classList.toggle("hidden", tipoFecha.value!=="net");
+}
 
-  const payload={
-    nombre:document.getElementById("launchName").value,
-    vehiculo:document.getElementById("launchVehicle").value,
-    estado:document.getElementById("launchStatus").value,
-    tipo:tipo,
-    fecha:tipo==="FECHA"?document.getElementById("launchDate").value:null,
-    net:tipo==="NET"?netValue:null,
-    carga:document.getElementById("launchPayload").value
+function cambiarNET(){
+  netAnio.classList.add("hidden");
+  netMes.classList.add("hidden");
+  netDia.classList.add("hidden");
+
+  if(netTipo.value==="anio") netAnio.classList.remove("hidden");
+  if(netTipo.value==="mes") netMes.classList.remove("hidden");
+  if(netTipo.value==="dia") netDia.classList.remove("hidden");
+}
+
+function guardarLanzamiento(){
+  const data=JSON.parse(localStorage.getItem("lanzamientos")||"[]");
+
+  const obj={
+    nombre:nombre.value,
+    vehiculo:vehiculo.value,
+    tipoFecha:tipoFecha.value,
+    estado:estado.value,
+    carga:carga.value
   };
-  if(editingId){ await updateDoc(doc(db,"launches",editingId),payload); editingId=null; }
-  else{ await setDoc(doc(db,"launches",Date.now().toString()),payload); }
-  loadLaunches();
-  document.getElementById("launchName").value=""; document.getElementById("launchVehicle").value="";
-  document.getElementById("launchPayload").value=""; document.getElementById("launchDate").value="";
-  document.getElementById("netYear")?.value=""; document.getElementById("netMonth")?.value=""; document.getElementById("netDay")?.value="";
-});
 
-// GALERÍA
-async function loadGallery(){
-  const list=document.getElementById("galleryList");
-  list.innerHTML="";
-  const snaps=await getDocs(collection(db,"gallery"));
-  snaps.forEach(d=>{
-    const data=d.data();
-    const div=document.createElement("div");
-    div.className="galleryItem flexRow";
-    let media="";
-    if(data.url.match(/\.(jpg|jpeg|png|gif)$/i)) media=`<img src="${data.url}">`;
-    else if(data.url.match(/\.(mp4|webm|ogg)$/i)) media=`<video controls src="${data.url}"></video>`;
-    else media=`<a href="${data.url}" target="_blank">${data.url}</a>`;
-    div.innerHTML=media;
-    const delBtn=document.createElement("button"); delBtn.textContent="Eliminar";
-    delBtn.addEventListener("click",async()=>{ if(confirm("Eliminar elemento?")){ await deleteDoc(doc(db,"gallery",d.id)); loadGallery(); }});
-    div.appendChild(delBtn);
-    list.appendChild(div);
+  if(editIndex!==null){
+    data[editIndex]=obj;
+    editIndex=null;
+  }else{
+    data.push(obj);
+  }
+
+  localStorage.setItem("lanzamientos",JSON.stringify(data));
+  limpiar();
+  cargar();
+}
+
+function cargar(){
+  lista.innerHTML="";
+  const data=JSON.parse(localStorage.getItem("lanzamientos")||"[]");
+  data.forEach((l,i)=>{
+    lista.innerHTML+=`
+    <div class="card">
+      <b>${l.nombre}</b><br>
+      Vehículo: ${l.vehiculo}<br>
+      Estado: ${l.estado}
+      <button class="edit-btn" onclick="editar(${i})">Editar</button>
+      <button class="small-btn" onclick="eliminar(${i})">Eliminar</button>
+    </div>`;
+  });
+
+  galeria.innerHTML="";
+  const g=JSON.parse(localStorage.getItem("galeria")||"[]");
+  g.forEach((e,i)=>{
+    galeria.innerHTML+=`
+    <div class="card">
+      ${e.match(/\.(jpg|png|webp|jpeg)/i)?`<img src="${e}" style="max-width:100%">`:`<a href="${e}" target="_blank">${e}</a>`}
+      <button class="small-btn" onclick="borrarGaleria(${i})">Eliminar</button>
+    </div>`;
   });
 }
-document.getElementById("addGallery").addEventListener("click",async()=>{
-  const url=document.getElementById("galleryURL").value;
-  if(url) { await setDoc(doc(db,"gallery",Date.now().toString()),{url}); document.getElementById("galleryURL").value=""; loadGallery(); }
-});
+
+function editar(i){
+  const l=JSON.parse(localStorage.getItem("lanzamientos"))[i];
+  nombre.value=l.nombre;
+  vehiculo.value=l.vehiculo;
+  estado.value=l.estado;
+  carga.value=l.carga;
+  editIndex=i;
+}
+
+function eliminar(i){
+  const d=JSON.parse(localStorage.getItem("lanzamientos"));
+  d.splice(i,1);
+  localStorage.setItem("lanzamientos",JSON.stringify(d));
+  cargar();
+}
+
+function agregarGaleria(){
+  const g=JSON.parse(localStorage.getItem("galeria")||"[]");
+  g.push(galeriaInput.value);
+  localStorage.setItem("galeria",JSON.stringify(g));
+  galeriaInput.value="";
+  cargar();
+}
+
+function borrarGaleria(i){
+  const g=JSON.parse(localStorage.getItem("galeria"));
+  g.splice(i,1);
+  localStorage.setItem("galeria",JSON.stringify(g));
+  cargar();
+}
+
+function limpiar(){
+  nombre.value="";
+  vehiculo.value="";
+  carga.value="";
+}
 </script>
+
 </body>
 </html>
