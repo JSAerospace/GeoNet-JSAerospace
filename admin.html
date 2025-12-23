@@ -3,77 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin | GeoNet</title>
+
 <style>
-body {margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:white;}
-header{background:#11172a;padding:20px;text-align:center;}
-section{max-width:800px;margin:20px auto;background:#1a2140;padding:20px;border-radius:12px;}
-label{display:block;margin-top:10px;}
-input, button, select{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:none;}
-button{margin-top:15px;background:#4da3ff;font-weight:bold;cursor:pointer;}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#0b0f1a;
+  color:white;
+}
+header{
+  background:#11172a;
+  padding:20px;
+  text-align:center;
+}
+section{
+  max-width:850px;
+  margin:20px auto;
+  background:#1a2140;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 0 10px rgba(0,0,0,.4);
+}
+label{
+  display:block;
+  margin-top:12px;
+}
+input,select,button{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  border-radius:8px;
+  border:none;
+  font-size:15px;
+}
+button{
+  background:#4da3ff;
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+}
 button:hover{background:#6bb5ff;}
 .hidden{display:none;}
 ul{padding-left:20px;}
-li{margin-bottom:8px;}
-li button{margin-left:10px;}
-h2,h3{margin-top:20px;margin-bottom:10px;}
-.version{position:absolute;right:10px;bottom:5px;font-size:0.9em;opacity:0.8;}
+li{margin-bottom:15px;}
+.smallBtn{
+  width:auto;
+  padding:6px 10px;
+  margin-left:5px;
+}
+.version{
+  position:fixed;
+  right:10px;
+  bottom:8px;
+  opacity:.6;
+  font-size:14px;
+}
+.card{
+  background:#131a33;
+  padding:15px;
+  border-radius:10px;
+}
 </style>
 </head>
+
 <body>
 
 <header>
-<h1>Panel Admin GeoNet</h1>
+<h1>Admin GeoNet</h1>
+<p>JS Aerospace</p>
 </header>
 
 <section id="login">
-<label>Usuario</label><input type="email" id="user">
-<label>Contraseña</label><input type="password" id="pass">
-<button id="btnLogin">Entrar</button>
+<label>Email</label>
+<input type="email" id="user">
+<label>Contraseña</label>
+<input type="password" id="pass">
+<button id="loginBtn">Entrar</button>
 </section>
 
 <section id="panel" class="hidden">
 
-<h2>Información</h2>
-<label>Planos Orbitales</label><input type="number" id="confPlanesInput">
-<label>Lanzamientos</label><input type="number" id="confLaunchInput">
-<button id="saveConfigBtn">Guardar Información</button>
-
 <h2>Lanzamientos</h2>
-<ul id="launchList"></ul>
 
-<h3>Agregar Lanzamiento</h3>
-<label>Nombre</label><input type="text" id="newLaunchName">
+<div class="card">
+<label>Nombre</label>
+<input id="lnName">
+
 <label>Estado</label>
-<select id="newLaunchState">
-  <option value="Planeado">Planeado</option>
-  <option value="En progreso">En progreso</option>
-  <option value="Exitoso">Exitoso</option>
-  <option value="Fallido">Fallido</option>
+<select id="lnState">
+  <option>Planeado</option>
+  <option>En progreso</option>
+  <option>Exitoso</option>
+  <option>Fallido</option>
 </select>
-<label>Fecha</label>
-<select id="newLaunchDate">
+
+<label>Tipo de fecha</label>
+<select id="dateType">
+  <option value="EXACTA">Fecha exacta</option>
   <option value="NET">NET</option>
 </select>
-<label>Links (separar con comas)</label><input type="text" id="newLaunchLinks">
-<button id="addLaunchBtn">Agregar Lanzamiento</button>
 
-<h2>Galería</h2>
-<ul id="galleryList"></ul>
-<h3>Agregar Imagen/Video</h3>
-<label>Título</label><input type="text" id="newGalleryTitle">
-<label>Link</label><input type="text" id="newGalleryLink">
-<button id="addGalleryBtn">Agregar</button>
+<div id="exactDateBox">
+  <label>Fecha y hora (UTC)</label>
+  <input type="datetime-local" id="exactDate">
+</div>
+
+<div id="netBox" class="hidden">
+  <label>Precisión NET</label>
+  <select id="netPrecision">
+    <option value="none">NET</option>
+    <option value="year">NET Año</option>
+    <option value="month">NET Mes</option>
+    <option value="day">NET Día</option>
+  </select>
+
+  <div id="netInputs"></div>
+</div>
+
+<label>Links (imágenes o videos)</label>
+<input id="lnLinks" placeholder="https://... , https://...">
+
+<button id="addLaunch">Guardar lanzamiento</button>
+</div>
+
+<h3>Listado</h3>
+<ul id="launchList"></ul>
 
 </section>
 
-<footer>
-  © JS Aerospace
-  <span class="version" id="webVersion">V1</span>
-</footer>
+<div class="version">V1.2</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, onSnapshot, setDoc, deleteDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
@@ -81,192 +144,72 @@ const firebaseConfig = {
   projectId: "geonet-js-aerospace",
   storageBucket: "geonet-js-aerospace.appspot.com",
   messagingSenderId: "651364423254",
-  appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
-  measurementId: "G-X44HFVLSQ8"
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ---------------- VERSION ----------------
-const versionElement = document.getElementById("webVersion");
-let webVersion="V1"; // Cambiar manualmente
-versionElement.textContent=webVersion;
-
-// ---------------- LOGIN ----------------
+// LOGIN
 const USER="olanoagus@gmail.com";
 const PASS="Simba2011";
-const panel=document.getElementById("panel");
-const loginSec=document.getElementById("login");
+loginBtn.onclick=()=>{
+  if(user.value===USER && pass.value===PASS){
+    login.classList.add("hidden");
+    panel.classList.remove("hidden");
+  } else alert("Datos incorrectos");
+};
 
-document.getElementById("btnLogin").addEventListener("click", ()=>{
-  const u = document.getElementById("user").value;
-  const p = document.getElementById("pass").value;
-  if(u===USER && p===PASS){loginSec.classList.add("hidden");panel.classList.remove("hidden");loadData();}
-  else alert("Usuario o contraseña incorrectos");
-});
+// NET / EXACTA
+dateType.onchange=()=>{
+  exactDateBox.classList.toggle("hidden",dateType.value==="NET");
+  netBox.classList.toggle("hidden",dateType.value!=="NET");
+};
 
-// ---------------- INFORMACIÓN ----------------
-const confDoc = doc(db,"Config","Config");
-const confPlanesInput=document.getElementById("confPlanesInput");
-const confLaunchInput=document.getElementById("confLaunchInput");
+netPrecision.onchange=()=>{
+  netInputs.innerHTML="";
+  if(netPrecision.value==="year")
+    netInputs.innerHTML=`<input placeholder="Año (2026)">`;
+  if(netPrecision.value==="month")
+    netInputs.innerHTML=`<input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
+  if(netPrecision.value==="day")
+    netInputs.innerHTML=`<input placeholder="Día (25)"> <input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
+};
 
-document.getElementById("saveConfigBtn").addEventListener("click", async ()=>{
-  await setDoc(confDoc,{planos_orbitales:Number(confPlanesInput.value||0),lanzamientos:Number(confLaunchInput.value||0)});
-  alert("Información guardada");
-});
+const launches = collection(db,"launches");
 
-// ---------------- LANZAMIENTOS ----------------
-const launchCol = collection(db,"launches");
-const launchList = document.getElementById("launchList");
-const newLaunchName=document.getElementById("newLaunchName");
-const newLaunchState=document.getElementById("newLaunchState");
-const newLaunchDate=document.getElementById("newLaunchDate");
-const newLaunchLinks=document.getElementById("newLaunchLinks");
-const datesCol = collection(db,"Dates");
-
-// Cargar fechas dinámicas en el menú
-async function loadDateOptions(){
-  const snap = await getDoc(doc(db,"Dates","Dates"));
-  const dateSelect = document.getElementById("newLaunchDate");
-  dateSelect.innerHTML='<option value="NET">NET</option>';
-  if(snap.exists()){
-    const data = snap.data();
-    Object.values(data).forEach(d=>{
-      const opt = document.createElement("option");
-      opt.value=d; 
-      opt.textContent=d.replace("T"," ");
-      dateSelect.appendChild(opt);
-    });
-  }
-}
-
-// Agregar lanzamiento
-document.getElementById("addLaunchBtn").addEventListener("click", async ()=>{
-  if(!newLaunchName.value) return alert("Nombre requerido");
-  let links = newLaunchLinks.value.split(",").map(l=>l.trim()).filter(l=>l);
-  let fechaValue = newLaunchDate.value;
-
-  // Guardar nueva fecha en Dates si no existe y no es NET
-  if(fechaValue!=="NET"){
-    const dateDoc = doc(db,"Dates","Dates");
-    const snap = await getDoc(dateDoc);
-    let data = snap.exists()?snap.data():{};
-    if(!Object.values(data).includes(fechaValue)){
-      const key = "date"+Date.now();
-      await setDoc(dateDoc,{...data,[key]:fechaValue});
-      await loadDateOptions();
-    }
+addLaunch.onclick=async()=>{
+  let fecha;
+  if(dateType.value==="EXACTA"){
+    fecha={ tipo:"EXACTA", valor: exactDate.value };
+  }else{
+    const vals=[...netInputs.querySelectorAll("input")].map(i=>i.value);
+    fecha={ tipo:"NET", precision:netPrecision.value, valor:vals.join("-") };
   }
 
-  await addDoc(launchCol,{
-    nombre:newLaunchName.value,
-    estado:newLaunchState.value,
-    fecha:fechaValue,
-    links
+  await addDoc(launches,{
+    nombre:lnName.value,
+    estado:lnState.value,
+    fecha,
+    links: lnLinks.value.split(",").map(l=>l.trim()).filter(l=>l)
   });
-  newLaunchName.value=""; newLaunchDate.value="NET"; newLaunchLinks.value=""; newLaunchState.value="Planeado";
+
+  lnName.value=""; lnLinks.value=""; exactDate.value="";
+};
+
+onSnapshot(launches,snap=>{
+  launchList.innerHTML="";
+  snap.forEach(d=>{
+    const li=document.createElement("li");
+    li.innerHTML=`
+      <b>${d.data().nombre}</b> (${d.data().estado})
+      <br>
+      <button class="smallBtn">Eliminar</button>
+    `;
+    li.querySelector("button").onclick=()=>deleteDoc(d.ref);
+    launchList.appendChild(li);
+  });
 });
-
-// ---------------- GALERÍA ----------------
-const galleryCol = collection(db,"Gallery");
-const galleryList = document.getElementById("galleryList");
-const newGalleryTitle=document.getElementById("newGalleryTitle");
-const newGalleryLink=document.getElementById("newGalleryLink");
-
-document.getElementById("addGalleryBtn").addEventListener("click", async ()=>{
-  if(!newGalleryLink.value) return alert("Link requerido");
-  await addDoc(galleryCol,{title:newGalleryTitle.value,link:newGalleryLink.value});
-  newGalleryTitle.value=""; newGalleryLink.value="";
-});
-
-// ---------------- CARGAR DATOS ----------------
-async function loadData(){
-  await loadDateOptions();
-
-  // Config
-  const snapConfig = await getDoc(confDoc);
-  if(!snapConfig.exists()) await setDoc(confDoc,{planos_orbitales:0,lanzamientos:0});
-  else{
-    const data=snapConfig.data();
-    confPlanesInput.value=data.planos_orbitales||0;
-    confLaunchInput.value=data.lanzamientos||0;
-  }
-
-  // Lanzamientos
-  onSnapshot(launchCol, snap=>{
-    launchList.innerHTML="";
-    snap.docs.forEach(d=>{
-      const dat=d.data();
-      const li=document.createElement("li");
-      let linksHtml="";
-      if(dat.links && dat.links.length>0) linksHtml="<br>"+dat.links.map(l=>`<a href='${l}' target='_blank'>Ver</a>`).join(" ");
-      li.innerHTML=`
-      <input type="text" value="${dat.nombre}" style="width:35%;margin-right:5px;" class="editName">
-      <select class="editState">
-        <option value="Planeado" ${dat.estado==='Planeado'?'selected':''}>Planeado</option>
-        <option value="En progreso" ${dat.estado==='En progreso'?'selected':''}>En progreso</option>
-        <option value="Exitoso" ${dat.estado==='Exitoso'?'selected':''}>Exitoso</option>
-        <option value="Fallido" ${dat.estado==='Fallido'?'selected':''}>Fallido</option>
-      </select>
-      <select class="editDate" id="editDateSelect"></select>
-      ${linksHtml}
-      <button class="saveLaunchBtn">Guardar</button>
-      <button class="delLaunchBtn">Eliminar</button>
-      `;
-      launchList.appendChild(li);
-
-      const editDateSelect = li.querySelector(".editDate");
-      // Llenar menú desplegable de fechas para cada lanzamiento
-      onSnapshot(doc(db,"Dates","Dates"), snapDates=>{
-        editDateSelect.innerHTML='<option value="NET">NET</option>';
-        if(snapDates.exists()){
-          const datesData = snapDates.data();
-          Object.values(datesData).forEach(d=>{
-            const opt = document.createElement("option");
-            opt.value=d;
-            opt.textContent=d.replace("T"," ");
-            if(d===dat.fecha) opt.selected=true;
-            editDateSelect.appendChild(opt);
-          });
-        }
-      });
-
-      const saveBtn = li.querySelector(".saveLaunchBtn");
-      const delBtn = li.querySelector(".delLaunchBtn");
-      const nameInput = li.querySelector(".editName");
-      const stateSelect = li.querySelector(".editState");
-
-      saveBtn.addEventListener("click", async ()=>{
-        await updateDoc(d.ref,{
-          nombre:nameInput.value,
-          estado:stateSelect.value,
-          fecha:editDateSelect.value
-        });
-        alert("Lanzamiento actualizado");
-      });
-
-      delBtn.addEventListener("click", async ()=>{
-        if(confirm("Eliminar este lanzamiento?")) await deleteDoc(d.ref);
-      });
-    });
-  });
-
-  // Galería
-  onSnapshot(galleryCol, snap=>{
-    galleryList.innerHTML="";
-    snap.docs.forEach(d=>{
-      const dat=d.data();
-      const li=document.createElement("li");
-      li.innerHTML=`${dat.title||dat.link} <a href="${dat.link}" target="_blank">Ver</a> <button class="delGalBtn">Eliminar</button>`;
-      galleryList.appendChild(li);
-      const delBtn = li.querySelector(".delGalBtn");
-      delBtn.addEventListener("click", async ()=>{
-        if(confirm("Eliminar este item de galería?")) await deleteDoc(d.ref);
-      });
-    });
-  });
-}
 </script>
 
 </body>
