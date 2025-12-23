@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V3.2</title>
+<title>GeoNet Admin V3.3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -58,37 +58,42 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 <option>CANCELLED</option>
 </select>
 
-<select id="lTipo" onchange="toggleFechaNet()">
-<option value="FECHA">Fecha exacta</option>
+<select id="lTipo" onchange="toggleTipoFecha()">
+<option value="FECHA">Fecha Exacta</option>
 <option value="NET">NET</option>
 </select>
 
+<!-- Fecha exacta -->
 <div id="fechaDiv">
 <input id="lFecha" type="datetime-local">
 </div>
 
+<!-- NET dinámico -->
 <div id="netDiv" class="hidden">
-<div class="flex">
+<label>Precisión NET:</label>
+<select id="netLevel" onchange="toggleNetLevel()">
+<option value="year">Solo Año</option>
+<option value="month">Mes y Año</option>
+<option value="day">Día, Mes y Año</option>
+</select>
+<div id="netYearDiv" class="flex">
 <select id="netYear"></select>
+</div>
+<div id="netMonthDiv" class="flex hidden">
 <select id="netMonth">
 <option value="">Mes</option>
-<option value="Enero">Enero</option>
-<option value="Febrero">Febrero</option>
-<option value="Marzo">Marzo</option>
-<option value="Abril">Abril</option>
-<option value="Mayo">Mayo</option>
-<option value="Junio">Junio</option>
-<option value="Julio">Julio</option>
-<option value="Agosto">Agosto</option>
-<option value="Septiembre">Septiembre</option>
-<option value="Octubre">Octubre</option>
-<option value="Noviembre">Noviembre</option>
-<option value="Diciembre">Diciembre</option>
+<option value="Enero">Enero</option><option value="Febrero">Febrero</option>
+<option value="Marzo">Marzo</option><option value="Abril">Abril</option>
+<option value="Mayo">Mayo</option><option value="Junio">Junio</option>
+<option value="Julio">Julio</option><option value="Agosto">Agosto</option>
+<option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option>
+<option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option>
 </select>
+</div>
+<div id="netDayDiv" class="flex hidden">
 <select id="netDay">
 <option value="">Día</option>
 </select>
-</div>
 </div>
 
 <input id="lCarga" placeholder="Carga">
@@ -103,7 +108,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 </section>
 
-<div class="version">v3.2</div>
+<div class="version">v3.3</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -118,7 +123,6 @@ const panel = document.getElementById("panel");
 const user = document.getElementById("user");
 const pass = document.getElementById("pass");
 
-// Verificar login persistente
 window.addEventListener("load",()=>{
   if(localStorage.getItem("loggedIn")==="true"){
     loginForm.classList.add("hidden");
@@ -128,7 +132,6 @@ window.addEventListener("load",()=>{
   }
 });
 
-// Login
 window.login = () => {
   if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
     localStorage.setItem("loggedIn","true");
@@ -139,7 +142,6 @@ window.login = () => {
   } else alert("Usuario o contraseña incorrecta");
 };
 
-// Logout
 window.logout = () => {
   localStorage.removeItem("loggedIn");
   panel.classList.add("hidden");
@@ -167,23 +169,30 @@ window.saveAllInfo=async()=>{
 };
 
 // Lanzamientos
-function toggleFechaNet(){
+function toggleTipoFecha(){
   if(lTipo.value==="FECHA"){ 
     document.getElementById("fechaDiv").classList.remove("hidden");
     document.getElementById("netDiv").classList.add("hidden");
   } else {
     document.getElementById("fechaDiv").classList.add("hidden");
     document.getElementById("netDiv").classList.remove("hidden");
+    toggleNetLevel();
   }
 }
 
-// Llenar NET años y días
+// NET dinámico
 const currentYear = new Date().getFullYear();
 const netYear = document.getElementById("netYear");
 for(let y=currentYear;y<=currentYear+10;y++) netYear.innerHTML += `<option value="${y}">${y}</option>`;
 
 const netDay = document.getElementById("netDay");
 for(let d=1;d<=31;d++) netDay.innerHTML += `<option value="${d}">${d}</option>`;
+
+function toggleNetLevel(){
+  const level = document.getElementById("netLevel").value;
+  document.getElementById("netMonthDiv").classList.toggle("hidden",level==="year");
+  document.getElementById("netDayDiv").classList.toggle("hidden",level!=="day");
+}
 
 // Guardar lanzamiento
 window.saveLaunch = async () => {
@@ -192,15 +201,16 @@ window.saveLaunch = async () => {
   if(lTipo.value==="FECHA"){
     data = {nombre:lNombre.value,estado:lEstado.value,tipo:"FECHA",fecha:lFecha.value,carga:lCarga.value};
   } else {
+    let level = document.getElementById("netLevel").value;
     let netText = "NET";
-    if(netYear.value) netText += ` ${netYear.value}`;
-    if(netMonth.value) netText = `NET ${netMonth.value} ${netYear.value}`;
-    if(netDay.value) netText = `NET ${netDay.value} ${netMonth.value} ${netYear.value}`;
+    if(level==="year") netText += ` ${netYear.value}`;
+    if(level==="month") netText = `NET ${netMonth.value} ${netYear.value}`;
+    if(level==="day") netText = `NET ${netDay.value} ${netMonth.value} ${netYear.value}`;
     data = {nombre:lNombre.value,estado:lEstado.value,tipo:"NET",net:netText,carga:lCarga.value};
   }
   await addDoc(collection(db,"launches"),data);
   lNombre.value=""; lEstado.value="PLANNED"; lTipo.value="FECHA"; lFecha.value=""; netYear.value=""; netMonth.value=""; netDay.value=""; lCarga.value="";
-  toggleFechaNet();
+  toggleTipoFecha();
   loadLaunches();
 };
 
@@ -231,15 +241,13 @@ window.editLaunch = async (id) => {
     if(d.id===id){
       const data=d.data();
       lNombre.value=data.nombre; lEstado.value=data.estado; lTipo.value=data.tipo;
-      if(data.tipo==="FECHA"){ lFecha.value=data.fecha; toggleFechaNet(); }
+      if(data.tipo==="FECHA"){ lFecha.value=data.fecha; toggleTipoFecha(); }
       else{
-        toggleFechaNet();
-        if(data.net){
-          const parts = data.net.split(" ");
-          if(parts.length===2) netYear.value=parts[1];
-          else if(parts.length===3){ netMonth.value=parts[1]; netYear.value=parts[2]; }
-          else if(parts.length===4){ netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; }
-        }
+        toggleTipoFecha();
+        const parts = data.net.split(" ");
+        if(parts.length===2){ netYear.value=parts[1]; netLevel.value="year"; toggleNetLevel(); }
+        else if(parts.length===3){ netMonth.value=parts[1]; netYear.value=parts[2]; netLevel.value="month"; toggleNetLevel(); }
+        else if(parts.length===4){ netDay.value=parts[1]; netMonth.value=parts[2]; netYear.value=parts[3]; netLevel.value="day"; toggleNetLevel(); }
       }
       lCarga.value=data.carga;
     }
@@ -256,7 +264,7 @@ window.deleteLaunch = async (id) => {
 
 loadInfo();
 loadLaunches();
-toggleFechaNet();
+toggleTipoFecha();
 </script>
 
 </body>
