@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin</title>
+<title>GeoNet Admin V3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -27,12 +27,21 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 <section id="panel" class="hidden">
 
-<!-- SECCIÓN DE INFORMACIÓN MEJORADA -->
+<!-- SECCIÓN DE INFORMACIÓN -->
 <h2>Información</h2>
-<div id="infoList"></div>
-<input id="infoNombre" placeholder="Nombre">
-<input id="infoValor" placeholder="Valor">
-<button onclick="saveInfo()">Guardar</button>
+<div class="card">
+  <label>Lanzamientos:</label>
+  <input id="infoLanzamientos" type="number" placeholder="Cantidad de lanzamientos">
+</div>
+<div class="card">
+  <label>Planos Orbitales:</label>
+  <input id="infoPlanos" type="number" placeholder="Cantidad de planos orbitales">
+</div>
+<div class="card">
+  <label>N° de Satélites:</label>
+  <input id="infoSat" type="number" placeholder="Cantidad de satélites">
+</div>
+<button onclick="saveAllInfo()">Cambiar Información</button>
 
 <!-- SECCIÓN DE LANZAMIENTOS -->
 <h2>Lanzamiento</h2>
@@ -61,140 +70,78 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 </section>
 
-<div class="version">v1.5</div>
+<div class="version">v3.0</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,doc,setDoc,collection,addDoc,getDocs,updateDoc,deleteDoc,getDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,doc,setDoc,collection,addDoc,getDocs,deleteDoc,getDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey: "TU_API_KEY",
-  authDomain: "geonet-js-aerospace.firebaseapp.com",
-  projectId: "geonet-js-aerospace"
-});
+const app = initializeApp({apiKey:"TU_API_KEY",authDomain:"geonet-js-aerospace.firebaseapp.com",projectId:"geonet-js-aerospace"});
 const db = getFirestore(app);
 
+// LOGIN
 const loginForm = document.getElementById("login");
 const panel = document.getElementById("panel");
 const user = document.getElementById("user");
 const pass = document.getElementById("pass");
 
-// Login simple
 window.login = () => {
   if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
     loginForm.classList.add("hidden");
     panel.classList.remove("hidden");
     loadInfo();
     loadLaunches();
-  } else {
-    alert("Usuario o contraseña incorrecta");
-  }
+  } else alert("Usuario o contraseña incorrecta");
 };
 
-// ---------- SECCIÓN DE INFORMACIÓN ----------
+// ---------------- SECCIÓN INFORMACIÓN ----------------
 async function loadInfo(){
-  const infoList=document.getElementById("infoList");
-  infoList.innerHTML="";
   const docRef=doc(db,"Config","info");
   const docSnap = await getDoc(docRef);
   if(docSnap.exists()){
     const data=docSnap.data();
-    
-    // Mostrar lanzamientos y planos orbitales primero
-    const keysOrder=["lanzamientos","planos_orbitales"];
-    keysOrder.forEach(k=>{
-      if(data[k]!==undefined){
-        infoList.innerHTML += `
-        <div class="card">
-          <strong>${k}</strong>: ${data[k]}
-          <button onclick="editInfo('${k}','${data[k]}')">Editar</button>
-        </div>`;
-      }
-    });
-
-    // Mostrar los demás campos
-    for(const key in data){
-      if(!keysOrder.includes(key)){
-        infoList.innerHTML += `
-        <div class="card">
-          <strong>${key}</strong>: ${data[key]}
-          <button onclick="editInfo('${key}','${data[key]}')">Editar</button>
-        </div>`;
-      }
-    }
+    infoLanzamientos.value = data.lanzamientos || "";
+    infoPlanos.value = data.planos_orbitales || "";
+    infoSat.value = data.satelites || "";
   }
 }
 
-// Guardar o actualizar Información
-window.saveInfo=async()=>{
-  if(!infoNombre.value || !infoValor.value) return alert("Completa ambos campos");
+window.saveAllInfo=async()=>{
   await setDoc(doc(db,"Config","info"),{
-    [infoNombre.value]:infoValor.value
+    lanzamientos: parseInt(infoLanzamientos.value)||0,
+    planos_orbitales: parseInt(infoPlanos.value)||0,
+    satelites: parseInt(infoSat.value)||0
   },{merge:true});
-  infoNombre.value="";
-  infoValor.value="";
-  loadInfo();
+  alert("Información actualizada!");
 };
 
-// Editar información existente
-window.editInfo=(key,value)=>{
-  infoNombre.value=key;
-  infoValor.value=value;
-};
-
-// ---------- SECCIÓN DE LANZAMIENTOS ----------
+// ---------------- SECCIÓN LANZAMIENTOS ----------------
 window.saveLaunch = async () => {
   if(!lNombre.value) return alert("Debe poner un nombre de misión");
-  let data;
-  if(lTipo.value==="NET"){
-    data={
-      nombre:lNombre.value,
-      estado:lEstado.value,
-      tipo:"NET",
-      net:lNet.value,
-      carga:lCarga.value
-    };
-  } else {
-    data={
-      nombre:lNombre.value,
-      estado:lEstado.value,
-      tipo:"FECHA",
-      fecha:lFecha.value,
-      carga:lCarga.value
-    };
-  }
-  await addDoc(collection(db,"launches"), data);
-  lNombre.value="";
-  lEstado.value="PLANNED";
-  lTipo.value="FECHA";
-  lFecha.value="";
-  lNet.value="";
-  lCarga.value="";
+  let data = (lTipo.value==="NET") ? 
+    {nombre:lNombre.value,estado:lEstado.value,tipo:"NET",net:lNet.value,carga:lCarga.value} :
+    {nombre:lNombre.value,estado:lEstado.value,tipo:"FECHA",fecha:lFecha.value,carga:lCarga.value};
+  await addDoc(collection(db,"launches"),data);
+  lNombre.value=""; lEstado.value="PLANNED"; lTipo.value="FECHA"; lFecha.value=""; lNet.value=""; lCarga.value="";
   loadLaunches();
 };
 
-// ---------- GALERÍA ----------
-window.addGallery = async () => {
-  if(!gUrl.value) return alert("Ingrese URL");
-  await addDoc(collection(db,"Gallery"),{url:gUrl.value});
-  gUrl.value="";
+// ---------------- GALERÍA ----------------
+window.addGallery = async () => { 
+  if(!gUrl.value) return; 
+  await addDoc(collection(db,"Gallery"),{url:gUrl.value}); 
+  gUrl.value=""; 
 };
 
-// ---------- LISTAR LANZAMIENTOS EXISTENTES ----------
+// ---------------- LISTAR LANZAMIENTOS ----------------
 async function loadLaunches(){
   const listDiv = document.getElementById("launchList");
   listDiv.innerHTML="";
   const snaps = await getDocs(collection(db,"launches"));
   snaps.forEach(d=>{
-    const data=d.data();
-    const id=d.id;
+    const data=d.data(); const id=d.id;
     let dateDisplay = data.tipo==="NET"?data.net:new Date(data.fecha).toLocaleString();
-    listDiv.innerHTML += `
-    <div class="card">
-      <strong>${data.nombre}</strong> - ${data.estado} - ${dateDisplay}
-      <button onclick="editLaunch('${id}')">Editar</button>
-      <button class="delete" onclick="deleteLaunch('${id}')">Borrar</button>
-    </div>`;
+    listDiv.innerHTML += `<div class="card"><strong>${data.nombre}</strong> - ${data.estado} - ${dateDisplay}<button onclick="editLaunch('${id}')">Editar</button><button class="delete" onclick="deleteLaunch('${id}')">Borrar</button></div>`;
   });
 }
 
@@ -205,12 +152,7 @@ window.editLaunch = async (id) => {
   docSnap.forEach(d=>{
     if(d.id===id){
       const data=d.data();
-      lNombre.value=data.nombre;
-      lEstado.value=data.estado;
-      lTipo.value=data.tipo;
-      lFecha.value=data.fecha || "";
-      lNet.value=data.net || "";
-      lCarga.value=data.carga;
+      lNombre.value=data.nombre; lEstado.value=data.estado; lTipo.value=data.tipo; lFecha.value=data.fecha||""; lNet.value=data.net||""; lCarga.value=data.carga;
     }
   });
   await deleteDoc(docRef);
@@ -222,6 +164,9 @@ window.deleteLaunch = async (id) => {
   await deleteDoc(doc(db,"launches",id));
   loadLaunches();
 };
+
+loadInfo();
+loadLaunches();
 </script>
 
 </body>
