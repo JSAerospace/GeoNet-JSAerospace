@@ -16,7 +16,7 @@ header{
   text-align:center;
 }
 section{
-  max-width:850px;
+  max-width:900px;
   margin:20px auto;
   background:#1a2140;
   padding:20px;
@@ -27,7 +27,7 @@ label{
   display:block;
   margin-top:12px;
 }
-input,select,button{
+input,select,button,textarea{
   width:100%;
   padding:10px;
   margin-top:5px;
@@ -61,6 +61,13 @@ li{margin-bottom:15px;}
   background:#131a33;
   padding:15px;
   border-radius:10px;
+  margin-bottom:15px;
+}
+.gallery-item{
+  margin-bottom:10px;
+}
+.gallery-item input{
+  margin-bottom:5px;
 }
 </style>
 </head>
@@ -82,8 +89,8 @@ li{margin-bottom:15px;}
 
 <section id="panel" class="hidden">
 
+<!-- Lanzamientos -->
 <h2>Lanzamientos</h2>
-
 <div class="card">
 <label>Nombre</label>
 <input id="lnName">
@@ -118,14 +125,35 @@ li{margin-bottom:15px;}
   <div id="netInputs"></div>
 </div>
 
-<label>Links (imágenes o videos)</label>
-<input id="lnLinks" placeholder="https://... , https://...">
+<label>Links (imágenes o videos, separados por coma)</label>
+<input id="lnLinks" placeholder="https://..., https://...">
 
 <button id="addLaunch">Guardar lanzamiento</button>
 </div>
 
-<h3>Listado</h3>
+<h3>Listado de Lanzamientos</h3>
 <ul id="launchList"></ul>
+
+<!-- Información -->
+<h2>Información</h2>
+<div class="card">
+<label>Lanzamientos</label>
+<input id="infoLaunches">
+<label>Planos Orbitales</label>
+<input id="infoPlanes">
+<label>Satélites</label>
+<input id="infoSat">
+<button id="saveInfo">Guardar Información</button>
+</div>
+
+<!-- Galería -->
+<h2>Galería</h2>
+<div class="card" id="galleryContainer">
+<label>Agregar imagen o video (URL)</label>
+<input id="newGalleryItem" placeholder="https://...">
+<button id="addGalleryBtn">Agregar a galería</button>
+<ul id="galleryList"></ul>
+</div>
 
 </section>
 
@@ -133,9 +161,10 @@ li{margin-bottom:15px;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc } 
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, getDoc } 
 from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
   authDomain: "geonet-js-aerospace.firebaseapp.com",
@@ -155,6 +184,9 @@ loginBtn.onclick=()=>{
   if(user.value===USER && pass.value===PASS){
     login.classList.add("hidden");
     panel.classList.remove("hidden");
+    loadLaunches();
+    loadInfo();
+    loadGallery();
   } else alert("Datos incorrectos");
 };
 
@@ -183,9 +215,10 @@ netPrecision.onchange = () => {
   if (netPrecision.value === "day") netInputs.innerHTML=`<input placeholder="Día (25)"> <input placeholder="Mes (12)"> <input placeholder="Año (2026)">`;
 };
 
+// Lanzamientos
 const launches = collection(db,"launches");
 
-addLaunch.onclick=async()=>{
+const addLaunchFn = async() => {
   let fecha;
   if(dateType.value==="EXACTA"){
     fecha={ tipo:"EXACTA", valor: exactDate.value };
@@ -204,19 +237,63 @@ addLaunch.onclick=async()=>{
   lnName.value=""; lnLinks.value=""; exactDate.value="";
 };
 
-onSnapshot(launches,snap=>{
-  launchList.innerHTML="";
-  snap.forEach(d=>{
-    const li=document.createElement("li");
-    li.innerHTML=`
-      <b>${d.data().nombre}</b> (${d.data().estado})
-      <br>
-      <button class="smallBtn">Eliminar</button>
-    `;
-    li.querySelector("button").onclick=()=>deleteDoc(d.ref);
-    launchList.appendChild(li);
+addLaunch.onclick=addLaunchFn;
+
+const loadLaunches = ()=>{
+  onSnapshot(launches,snap=>{
+    launchList.innerHTML="";
+    snap.forEach(d=>{
+      const li=document.createElement("li");
+      const data=d.data();
+      li.innerHTML=`
+        <b>${data.nombre}</b> (${data.estado}) 
+        <button class="smallBtn">Eliminar</button>
+      `;
+      li.querySelector("button").onclick=()=>deleteDoc(d.ref);
+      launchList.appendChild(li);
+    });
   });
-});
+};
+
+// Información
+const infoDoc = doc(db,"Config","info");
+saveInfo.onclick=async()=>{
+  await updateDoc(infoDoc,{
+    lanzamientos: infoLaunches.value,
+    planos_orbitales: infoPlanes.value,
+    satelites: infoSat.value
+  });
+};
+const loadInfo = async()=>{
+  const d = await getDoc(infoDoc);
+  if(d.exists()){
+    infoLaunches.value=d.data().lanzamientos;
+    infoPlanes.value=d.data().planos_orbitales;
+    infoSat.value=d.data().satelites;
+  }
+};
+
+// Galería
+const galleryCol = collection(db,"Gallery");
+addGalleryBtn.onclick=async()=>{
+  const val=newGalleryItem.value.trim();
+  if(!val) return;
+  await addDoc(galleryCol,{url:val});
+  newGalleryItem.value="";
+};
+
+const loadGallery = ()=>{
+  onSnapshot(galleryCol,snap=>{
+    galleryList.innerHTML="";
+    snap.forEach(d=>{
+      const li=document.createElement("li");
+      li.classList.add("gallery-item");
+      li.innerHTML=`${d.data().url} <button class="smallBtn">Eliminar</button>`;
+      li.querySelector("button").onclick=()=>deleteDoc(d.ref);
+      galleryList.appendChild(li);
+    });
+  });
+};
 </script>
 
 </body>
