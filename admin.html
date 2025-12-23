@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V4.3</title>
+<title>GeoNet Admin V4.4</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -48,6 +48,7 @@ h2{margin-top:25px;margin-bottom:10px}
 <h2>Crear / Editar Lanzamiento</h2>
 <div class="card">
 <input id="lNombre" placeholder="Nombre misión">
+<input id="lVehiculo" placeholder="Vehículo de lanzamiento">
 <select id="lEstado">
 <option>Éxito</option>
 <option>Fallidos</option>
@@ -116,7 +117,7 @@ h2{margin-top:25px;margin-bottom:10px}
 
 </section>
 
-<div class="version">v4.3</div>
+<div class="version">v4.4</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -195,23 +196,25 @@ window.saveLaunch=async()=>{
   const nombre=document.getElementById("lNombre").value;
   const estado=document.getElementById("lEstado").value;
   const carga=document.getElementById("lCarga").value;
+  const vehiculo=document.getElementById("lVehiculo").value;
   const galeria = gUrl.value ? [gUrl.value] : [];
   if(!nombre) return alert("Debe poner un nombre de misión");
 
   let data;
-  if(lTipo.value==="FECHA"){data={nombre,estado,tipo:"FECHA",fecha:lFecha.value,carga,galeria}}
+  if(lTipo.value==="FECHA"){data={nombre,estado,tipo:"FECHA",fecha:lFecha.value,carga,vehiculo,galeria}}
   else{
     let netText="NET"; const lvl=netLevel.value;
     if(lvl==="year") netText+=` ${netYear.value}`;
     if(lvl==="month") netText=`NET ${netMonth.value} ${netYear.value}`;
     if(lvl==="day") netText=`NET ${netDay.value} ${netMonth.value} ${netYear.value}`;
-    data={nombre,estado,tipo:"NET",net:netText,carga,galeria};
+    data={nombre,estado,tipo:"NET",net:netText,carga,vehiculo,galeria};
   }
 
   if(currentEditId){await setDoc(doc(db,"launches",currentEditId),data,{merge:true}); currentEditId=null;}
   else{await addDoc(collection(db,"launches"),data);}
   
   document.getElementById("lNombre").value="";
+  document.getElementById("lVehiculo").value="";
   document.getElementById("lEstado").value="Planeado";
   lTipo.value="FECHA"; toggleTipoFecha();
   lFecha.value=""; netYear.value=""; netMonth.value=""; netDay.value=""; document.getElementById("lCarga").value="";
@@ -225,6 +228,7 @@ window.editLaunch=async(id)=>{
   if(!dSnap.exists()) return alert("No encontrado");
   const data=dSnap.data();
   document.getElementById("lNombre").value=data.nombre;
+  document.getElementById("lVehiculo").value=data.vehiculo||"";
   document.getElementById("lEstado").value=data.estado;
   lTipo.value=data.tipo; toggleTipoFecha();
   if(data.tipo==="FECHA") lFecha.value=data.fecha;
@@ -250,6 +254,7 @@ async function loadLaunches(){
     const card=document.createElement("div"); card.className="card";
     card.innerHTML=`
       <div><strong>Nombre:</strong> ${data.nombre}<br>
+      <strong>Vehículo:</strong> ${data.vehiculo || "-"}<br>
       <strong>Estado:</strong> ${data.estado}<br>
       <strong>Fecha/NET:</strong> ${fecha}<br>
       <strong>Carga:</strong> ${data.carga}<br>
