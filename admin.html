@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V3.3</title>
+<title>GeoNet Admin V3.4</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -53,7 +53,6 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 <select id="lEstado">
 <option>PLANNED</option>
-<option>NET</option>
 <option>LAUNCHED</option>
 <option>CANCELLED</option>
 </select>
@@ -76,10 +75,11 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 <option value="month">Mes y Año</option>
 <option value="day">Día, Mes y Año</option>
 </select>
-<div id="netYearDiv" class="flex">
+
+<div id="netYearDiv">
 <select id="netYear"></select>
 </div>
-<div id="netMonthDiv" class="flex hidden">
+<div id="netMonthDiv" class="hidden">
 <select id="netMonth">
 <option value="">Mes</option>
 <option value="Enero">Enero</option><option value="Febrero">Febrero</option>
@@ -90,7 +90,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 <option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option>
 </select>
 </div>
-<div id="netDayDiv" class="flex hidden">
+<div id="netDayDiv" class="hidden">
 <select id="netDay">
 <option value="">Día</option>
 </select>
@@ -108,7 +108,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 </section>
 
-<div class="version">v3.3</div>
+<div class="version">v3.4</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
