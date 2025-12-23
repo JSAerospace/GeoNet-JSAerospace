@@ -2,98 +2,118 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet – J.S Aerospace</title>
+<title>GeoNet V4.4</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
-header{padding:20px;text-align:center;font-size:26px;font-weight:bold}
 section{padding:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px}
-.card{background:#141a2e;border-radius:12px;padding:15px;box-shadow:0 0 15px rgba(0,0,0,.4)}
-.card h3{margin:0 0 10px}
-.state{padding:4px 8px;border-radius:6px;font-size:12px}
-.PLANNED{background:#1e90ff}
-.NET{background:#f0ad4e}
-.LAUNCHED{background:#28a745}
-.CANCELLED{background:#dc3545}
-.gallery img, .gallery iframe{width:100%;border-radius:10px}
+.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 0 10px rgba(0,0,0,.4)}
 .version{position:fixed;bottom:10px;right:10px;font-size:12px;opacity:.6}
+h2{margin-top:25px;margin-bottom:10px}
+.img-gallery img, .img-gallery video{max-width:100%;margin-top:10px;border-radius:8px}
+.flex{display:flex;gap:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
 
-<header>GeoNet – J.S Aerospace</header>
-
-<section id="info">
+<section>
 <h2>Información</h2>
-<div class="grid" id="infoBox"></div>
+<div class="card">
+<strong>Lanzamientos:</strong> <span id="infoLanzamientos">-</span><br>
+<strong>Planos Orbitales:</strong> <span id="infoPlanos">-</span><br>
+<strong>N° de Satélites:</strong> <span id="infoSat">-</span>
+</div>
 </section>
 
 <section>
 <h2>Lanzamientos</h2>
-<div class="grid" id="launches"></div>
+<div id="launchList"></div>
 </section>
 
 <section>
 <h2>Galería</h2>
-<div class="grid gallery" id="gallery"></div>
+<div id="gallery" class="img-gallery"></div>
 </section>
 
-<div class="version">v1.5</div>
+<div class="version">v4.4</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,collection,getDocs,doc,getDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,collection} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
-  apiKey: "TU_API_KEY",
-  authDomain: "geonet-js-aerospace.firebaseapp.com",
-  projectId: "geonet-js-aerospace"
+  apiKey:"TU_API_KEY",
+  authDomain:"geonet-js-aerospace.firebaseapp.com",
+  projectId:"geonet-js-aerospace"
 });
 const db = getFirestore(app);
 
-// Información
-const infoSnap = await getDoc(doc(db,"Config","info"));
-const infoBox = document.getElementById("infoBox");
-if(infoSnap.exists()){
-  const d = infoSnap.data();
-  for(const k in d){
-    infoBox.innerHTML += `<div class="card"><h3>${k}</h3><p>${d[k]}</p></div>`;
+// Cargar Información
+async function loadInfo(){
+  const docSnap = await getDoc(doc(db,"Config","info"));
+  if(docSnap.exists()){
+    const data = docSnap.data();
+    document.getElementById("infoLanzamientos").textContent = data.lanzamientos || "-";
+    document.getElementById("infoPlanos").textContent = data.planos_orbitales || "-";
+    document.getElementById("infoSat").textContent = data.satelites || "-";
   }
 }
+loadInfo();
 
-// Lanzamientos
-const launchSnap = await getDocs(collection(db,"launches"));
-const launches = document.getElementById("launches");
-launchSnap.forEach(l=>{
-  const d=l.data();
-  let dateDisplay = "";
-  if(d.tipo==="NET"){
-    dateDisplay = d.net;
-  } else if(d.fecha){
-    const localDate = new Date(d.fecha);
-    dateDisplay = localDate.toLocaleString();
-  }
-  launches.innerHTML+=`
-  <div class="card">
-    <h3>${d.nombre}</h3>
-    <span class="state ${d.estado}">${d.estado}</span>
-    <p>${dateDisplay}</p>
-    <p>${d.carga}</p>
-  </div>`;
-});
+// Cargar lanzamientos
+async function loadLaunches(){
+  const listDiv = document.getElementById("launchList");
+  listDiv.innerHTML = "";
+  const snaps = await getDocs(collection(db,"launches"));
+  snaps.forEach(d=>{
+    const data = d.data();
+    const card = document.createElement("div");
+    card.className = "card";
+    
+    let fechaDisplay = "-";
+    if(data.tipo==="FECHA" && data.fecha){
+      const dt = new Date(data.fecha);
+      fechaDisplay = dt.toLocaleString();
+    } else if(data.tipo==="NET" && data.net){
+      fechaDisplay = data.net;
+    }
 
-// Galería
-const galSnap = await getDocs(collection(db,"Gallery"));
-const gallery=document.getElementById("gallery");
-galSnap.forEach(g=>{
-  const u=g.data().url;
-  if(u.includes("youtube")||u.includes("drive")){
-    gallery.innerHTML+=`<iframe src="${u}" allowfullscreen></iframe>`;
-  }else{
-    gallery.innerHTML+=`<img src="${u}">`;
-  }
-});
+    let galeriaHTML = "";
+    if(data.galeria?.length){
+      data.galeria.forEach(url=>{
+        if(url.includes("drive.google.com")) url = url.replace("/view?usp=sharing","").replace("/view?usp=drivesdk","").replace("file/d/","uc?export=view&id=");
+        if(url.match(/\.(mp4|webm|ogg)$/i)) galeriaHTML += `<video controls src="${url}"></video>`;
+        else galeriaHTML += `<img src="${url}">`;
+      });
+    } else galeriaHTML="-";
+
+    card.innerHTML=`
+      <strong>Nombre:</strong> ${data.nombre}<br>
+      <strong>Vehículo:</strong> ${data.vehiculo || "-"}<br>
+      <strong>Estado:</strong> ${data.estado || "-"}<br>
+      <strong>Fecha/NET:</strong> ${fechaDisplay}<br>
+      <strong>Carga:</strong> ${data.carga || "-"}<br>
+      <strong>Galería:</strong><br>${galeriaHTML}
+    `;
+    listDiv.appendChild(card);
+  });
+}
+loadLaunches();
+
+// Cargar galería independiente
+async function loadGallery(){
+  const galleryDiv = document.getElementById("gallery");
+  galleryDiv.innerHTML="";
+  const snaps = await getDocs(collection(db,"gallery"));
+  snaps.forEach(d=>{
+    let url = d.data().url;
+    if(url.includes("drive.google.com")) url = url.replace("/view?usp=sharing","").replace("/view?usp=drivesdk","").replace("file/d/","uc?export=view&id=");
+    const element = url.match(/\.(mp4|webm|ogg)$/i)?`<video controls src="${url}"></video>`:`<img src="${url}">`;
+    galleryDiv.innerHTML += element;
+  });
+}
+loadGallery();
+
 </script>
 </body>
 </html>
