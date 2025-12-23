@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet Admin V3</title>
+<title>GeoNet Admin V3 – Persistente</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -26,6 +26,8 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 </section>
 
 <section id="panel" class="hidden">
+
+<button onclick="logout()" style="margin-bottom:15px;background:#dc3545;">Cerrar sesión</button>
 
 <!-- SECCIÓN DE INFORMACIÓN -->
 <h2>Información</h2>
@@ -70,7 +72,7 @@ button{background:#1e90ff;color:#fff;font-weight:bold;cursor:pointer}
 
 </section>
 
-<div class="version">v3.0</div>
+<div class="version">v3.1</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -85,13 +87,32 @@ const panel = document.getElementById("panel");
 const user = document.getElementById("user");
 const pass = document.getElementById("pass");
 
+// Verificar login persistente al cargar
+window.addEventListener("load",()=>{
+  if(localStorage.getItem("loggedIn")==="true"){
+    loginForm.classList.add("hidden");
+    panel.classList.remove("hidden");
+    loadInfo();
+    loadLaunches();
+  }
+});
+
+// Iniciar sesión
 window.login = () => {
   if(user.value==="olanoagus@gmail.com" && pass.value==="Simba2011"){
+    localStorage.setItem("loggedIn","true"); // Guardar estado
     loginForm.classList.add("hidden");
     panel.classList.remove("hidden");
     loadInfo();
     loadLaunches();
   } else alert("Usuario o contraseña incorrecta");
+};
+
+// Cerrar sesión
+window.logout = () => {
+  localStorage.removeItem("loggedIn");
+  panel.classList.add("hidden");
+  loginForm.classList.remove("hidden");
 };
 
 // ---------------- SECCIÓN INFORMACIÓN ----------------
