@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin GeoNet V4.6</title>
+<title>Admin GeoNet V5.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -14,7 +14,7 @@ h2{margin-top:25px;margin-bottom:10px}
 .flex{display:flex;gap:10px;flex-wrap:wrap}
 .img-gallery img, .img-gallery video{max-width:100%;margin-top:10px;border-radius:8px}
 .card-launch{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
-.card-launch button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000}
+.card-launch button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000;margin-right:5px}
 #loginContainer{position:fixed;top:0;left:0;width:100%;height:100%;background:#0b0f1a;display:flex;align-items:center;justify-content:center;z-index:1000}
 #loginBox{background:#141a2e;padding:30px;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,.5);width:300px;text-align:center}
 #loginBox input{width:100%;margin-bottom:15px}
@@ -64,12 +64,33 @@ h2{margin-top:25px;margin-bottom:10px}
   <option value="FECHA">Fecha Exacta</option>
   <option value="NET">NET</option>
 </select>
-<label id="labelFecha">Fecha:</label>
+
+<div id="fechaExacta">
+<label>Fecha Exacta:</label>
 <input type="datetime-local" id="inputFecha">
-<div id="netInputs" style="display:none">
-  <label>NET:</label>
-  <input type="text" id="inputNet" placeholder="Ej: NET Diciembre 2026">
 </div>
+
+<div id="netInputs" style="display:none">
+<label>Tipo NET:</label>
+<select id="netTipo">
+  <option value="YEAR">NET Año</option>
+  <option value="MONTH">NET Mes/Año</option>
+  <option value="DAY">NET Día/Mes/Año</option>
+</select>
+<div id="netYear" style="display:none">
+  <input type="number" id="netInputYear" placeholder="Año">
+</div>
+<div id="netMonth" style="display:none">
+  <input type="number" id="netInputMonth" placeholder="Mes">
+  <input type="number" id="netInputYear2" placeholder="Año">
+</div>
+<div id="netDay" style="display:none">
+  <input type="number" id="netInputDay" placeholder="Día">
+  <input type="number" id="netInputMonth2" placeholder="Mes">
+  <input type="number" id="netInputYear3" placeholder="Año">
+</div>
+</div>
+
 <label>Carga:</label><input type="text" id="inputCarga">
 <label>Galería (separar por comas):</label><input type="text" id="inputGaleria">
 <button id="btnAgregarLanzamiento">Agregar/Editar Lanzamiento</button>
@@ -93,7 +114,7 @@ h2{margin-top:25px;margin-bottom:10px}
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,collection,addDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,setDoc,collection,addDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey:"TU_API_KEY",
@@ -118,8 +139,7 @@ const galeriaSection = document.getElementById("galeriaSection");
 const USER = "olanoagus@gmail.com";
 const PASS = "Simba2011";
 
-// Verificar si ya está logueado
-if(localStorage.getItem("adminLogged") === "true"){
+if(localStorage.getItem("adminLogged")==="true"){
   loginContainer.style.display="none";
   adminContent.classList.remove("hidden");
   lanzamientosSection.classList.remove("hidden");
@@ -142,16 +162,32 @@ btnLogin.addEventListener("click",()=>{
   }
 });
 
-// Mostrar/ocultar inputs NET
+// Mostrar NET según tipo
 const tipoFecha = document.getElementById("inputTipoFecha");
+const fechaExactaDiv = document.getElementById("fechaExacta");
+const netDiv = document.getElementById("netInputs");
 tipoFecha.addEventListener("change",()=>{
   if(tipoFecha.value==="NET"){
-    document.getElementById("inputFecha").style.display="none";
-    document.getElementById("netInputs").style.display="block";
+    fechaExactaDiv.style.display="none";
+    netDiv.style.display="block";
   } else {
-    document.getElementById("inputFecha").style.display="block";
-    document.getElementById("netInputs").style.display="none";
+    fechaExactaDiv.style.display="block";
+    netDiv.style.display="none";
   }
+});
+
+const netTipo = document.getElementById("netTipo");
+const netYearDiv = document.getElementById("netYear");
+const netMonthDiv = document.getElementById("netMonth");
+const netDayDiv = document.getElementById("netDay");
+
+netTipo.addEventListener("change",()=>{
+  netYearDiv.style.display="none";
+  netMonthDiv.style.display="none";
+  netDayDiv.style.display="none";
+  if(netTipo.value==="YEAR") netYearDiv.style.display="block";
+  if(netTipo.value==="MONTH") netMonthDiv.style.display="block";
+  if(netTipo.value==="DAY") netDayDiv.style.display="block";
 });
 
 // Cambiar Información
@@ -164,14 +200,12 @@ document.getElementById("btnCambiarInfo").addEventListener("click",async()=>{
   alert("Información actualizada");
 });
 
-// Función para mostrar enlaces embebibles o links
+// Mostrar media
 function renderMedia(url){
   if(url.includes("imgur.com") || url.match(/\.(jpg|jpeg|png|gif|mp4)$/i)){
     if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
     else return `<img src="${url}">`;
-  } else {
-    return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
-  }
+  } else return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
 }
 
 // Cargar Información inicial
@@ -192,8 +226,14 @@ document.getElementById("btnAgregarLanzamiento").addEventListener("click",async(
   const vehiculo = document.getElementById("inputVehiculo").value;
   const estado = document.getElementById("inputEstado").value;
   const tipo = document.getElementById("inputTipoFecha").value;
-  const fecha = tipo==="FECHA"?document.getElementById("inputFecha").value:null;
-  const net = tipo==="NET"?document.getElementById("inputNet").value:null;
+  let fecha=null; let net=null;
+  if(tipo==="FECHA") fecha=document.getElementById("inputFecha").value;
+  else{
+    const tipoNet=netTipo.value;
+    if(tipoNet==="YEAR") net=`NET ${document.getElementById("netInputYear").value}`;
+    if(tipoNet==="MONTH") net=`NET ${document.getElementById("netInputMonth2")?.value || document.getElementById("netInputMonth")?.value}/${document.getElementById("netInputYear2")?.value || document.getElementById("netInputYear")?.value}`;
+    if(tipoNet==="DAY") net=`NET ${document.getElementById("netInputDay").value}/${document.getElementById("netInputMonth2").value}/${document.getElementById("netInputYear3").value}`;
+  }
   const carga = document.getElementById("inputCarga").value;
   const galeria = document.getElementById("inputGaleria").value.split(",").map(x=>x.trim()).filter(x=>x);
 
@@ -237,33 +277,37 @@ async function loadLaunchesAdmin(){
       <strong>Fecha/NET:</strong> ${fechaDisplay}<br>
       <strong>Carga:</strong> ${data.carga || "-"}<br>
       <strong>Galería:</strong><br>${galeriaHTML}
-      <button data-id="${d.id}">Editar</button>
+      <button data-id="${d.id}" class="editBtn">Editar</button>
+      <button data-id="${d.id}" class="deleteBtn">Eliminar</button>
     `;
-    card.querySelector("button").addEventListener("click",()=>{
+    card.querySelector(".editBtn").addEventListener("click",()=>{
       document.getElementById("inputNombre").value = data.nombre;
       document.getElementById("inputVehiculo").value = data.vehiculo || "";
       document.getElementById("inputEstado").value = data.estado || "Planeado";
       document.getElementById("inputTipoFecha").value = data.tipo || "FECHA";
       if(data.tipo==="FECHA"){
-        document.getElementById("inputFecha").style.display="block";
-        document.getElementById("netInputs").style.display="none";
+        fechaExactaDiv.style.display="block"; netDiv.style.display="none"; 
         document.getElementById("inputFecha").value = data.fecha || "";
       } else {
-        document.getElementById("inputFecha").style.display="none";
-        document.getElementById("netInputs").style.display="block";
+        fechaExactaDiv.style.display="none"; netDiv.style.display="block";
         document.getElementById("inputNet").value = data.net || "";
       }
       document.getElementById("inputCarga").value = data.carga || "";
       document.getElementById("inputGaleria").value = data.galeria?.join(",") || "";
       editingId = d.id;
     });
-
+    card.querySelector(".deleteBtn").addEventListener("click",async()=>{
+      if(confirm("Eliminar este lanzamiento?")){
+        await deleteDoc(doc(db,"launches",d.id));
+        loadLaunchesAdmin();
+      }
+    });
     container.appendChild(card);
   });
 }
 loadLaunchesAdmin();
 
-// Agregar a galería
+// Galería
 document.getElementById("btnAgregarGaleria").addEventListener("click",async()=>{
   const url = document.getElementById("inputGaleriaURL").value.trim();
   if(url){
@@ -272,14 +316,20 @@ document.getElementById("btnAgregarGaleria").addEventListener("click",async()=>{
     loadGaleriaAdmin();
   }
 });
-
-// Cargar galería admin
 async function loadGaleriaAdmin(){
   const div = document.getElementById("galeriaAdmin");
   div.innerHTML="";
   const snaps = await getDocs(collection(db,"gallery"));
   snaps.forEach(d=>{
-    div.innerHTML += renderMedia(d.data().url);
+    const container=document.createElement("div");
+    container.innerHTML=renderMedia(d.data().url)+` <button data-id="${d.id}">Eliminar</button>`;
+    container.querySelector("button").addEventListener("click",async()=>{
+      if(confirm("Eliminar elemento de galería?")){
+        await deleteDoc(doc(db,"gallery",d.id));
+        loadGaleriaAdmin();
+      }
+    });
+    div.appendChild(container);
   });
 }
 loadGaleriaAdmin();
