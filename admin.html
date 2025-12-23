@@ -53,8 +53,6 @@ h2,h3{margin-top:20px;margin-bottom:10px;}
 <label>Fecha</label>
 <select id="newLaunchDate">
   <option value="NET">NET</option>
-  <option value="2025-12-22T15:00">2025-12-22 15:00 UTC</option>
-  <option value="2025-12-25T12:00">2025-12-25 12:00 UTC</option>
 </select>
 <label>Links (separar con comas)</label><input type="text" id="newLaunchLinks">
 <button id="addLaunchBtn">Agregar Lanzamiento</button>
@@ -125,14 +123,46 @@ const newLaunchName=document.getElementById("newLaunchName");
 const newLaunchState=document.getElementById("newLaunchState");
 const newLaunchDate=document.getElementById("newLaunchDate");
 const newLaunchLinks=document.getElementById("newLaunchLinks");
+const datesCol = collection(db,"Dates");
 
+// Cargar fechas dinámicas en el menú
+async function loadDateOptions(){
+  const snap = await getDoc(doc(db,"Dates","Dates"));
+  const dateSelect = document.getElementById("newLaunchDate");
+  dateSelect.innerHTML='<option value="NET">NET</option>';
+  if(snap.exists()){
+    const data = snap.data();
+    Object.values(data).forEach(d=>{
+      const opt = document.createElement("option");
+      opt.value=d; 
+      opt.textContent=d.replace("T"," ");
+      dateSelect.appendChild(opt);
+    });
+  }
+}
+
+// Agregar lanzamiento
 document.getElementById("addLaunchBtn").addEventListener("click", async ()=>{
   if(!newLaunchName.value) return alert("Nombre requerido");
   let links = newLaunchLinks.value.split(",").map(l=>l.trim()).filter(l=>l);
+  let fechaValue = newLaunchDate.value;
+
+  // Guardar nueva fecha en Dates si no existe y no es NET
+  if(fechaValue!=="NET"){
+    const dateDoc = doc(db,"Dates","Dates");
+    const snap = await getDoc(dateDoc);
+    let data = snap.exists()?snap.data():{};
+    if(!Object.values(data).includes(fechaValue)){
+      const key = "date"+Date.now();
+      await setDoc(dateDoc,{...data,[key]:fechaValue});
+      await loadDateOptions();
+    }
+  }
+
   await addDoc(launchCol,{
     nombre:newLaunchName.value,
     estado:newLaunchState.value,
-    fecha:newLaunchDate.value,
+    fecha:fechaValue,
     links
   });
   newLaunchName.value=""; newLaunchDate.value="NET"; newLaunchLinks.value=""; newLaunchState.value="Planeado";
@@ -152,6 +182,8 @@ document.getElementById("addGalleryBtn").addEventListener("click", async ()=>{
 
 // ---------------- CARGAR DATOS ----------------
 async function loadData(){
+  await loadDateOptions();
+
   // Config
   const snapConfig = await getDoc(confDoc);
   if(!snapConfig.exists()) await setDoc(confDoc,{planos_orbitales:0,lanzamientos:0});
@@ -169,37 +201,47 @@ async function loadData(){
       const li=document.createElement("li");
       let linksHtml="";
       if(dat.links && dat.links.length>0) linksHtml="<br>"+dat.links.map(l=>`<a href='${l}' target='_blank'>Ver</a>`).join(" ");
-      // Menú desplegable de estado editable
       li.innerHTML=`
-      <input type="text" value="${dat.nombre}" style="width:40%;margin-right:5px;" class="editName">
+      <input type="text" value="${dat.nombre}" style="width:35%;margin-right:5px;" class="editName">
       <select class="editState">
         <option value="Planeado" ${dat.estado==='Planeado'?'selected':''}>Planeado</option>
         <option value="En progreso" ${dat.estado==='En progreso'?'selected':''}>En progreso</option>
         <option value="Exitoso" ${dat.estado==='Exitoso'?'selected':''}>Exitoso</option>
         <option value="Fallido" ${dat.estado==='Fallido'?'selected':''}>Fallido</option>
       </select>
-      <select class="editDate">
-        <option value="NET" ${dat.fecha==='NET'?'selected':''}>NET</option>
-        <option value="2025-12-22T15:00" ${dat.fecha==='2025-12-22T15:00'?'selected':''}>2025-12-22 15:00 UTC</option>
-        <option value="2025-12-25T12:00" ${dat.fecha==='2025-12-25T12:00'?'selected':''}>2025-12-25 12:00 UTC</option>
-      </select>
+      <select class="editDate" id="editDateSelect"></select>
       ${linksHtml}
       <button class="saveLaunchBtn">Guardar</button>
       <button class="delLaunchBtn">Eliminar</button>
       `;
       launchList.appendChild(li);
 
+      const editDateSelect = li.querySelector(".editDate");
+      // Llenar menú desplegable de fechas para cada lanzamiento
+      onSnapshot(doc(db,"Dates","Dates"), snapDates=>{
+        editDateSelect.innerHTML='<option value="NET">NET</option>';
+        if(snapDates.exists()){
+          const datesData = snapDates.data();
+          Object.values(datesData).forEach(d=>{
+            const opt = document.createElement("option");
+            opt.value=d;
+            opt.textContent=d.replace("T"," ");
+            if(d===dat.fecha) opt.selected=true;
+            editDateSelect.appendChild(opt);
+          });
+        }
+      });
+
       const saveBtn = li.querySelector(".saveLaunchBtn");
       const delBtn = li.querySelector(".delLaunchBtn");
       const nameInput = li.querySelector(".editName");
       const stateSelect = li.querySelector(".editState");
-      const dateSelect = li.querySelector(".editDate");
 
       saveBtn.addEventListener("click", async ()=>{
         await updateDoc(d.ref,{
           nombre:nameInput.value,
           estado:stateSelect.value,
-          fecha:dateSelect.value
+          fecha:editDateSelect.value
         });
         alert("Lanzamiento actualizado");
       });
