@@ -37,6 +37,12 @@ body::before {
   opacity: 0.3;
   z-index: 0;
   pointer-events: none;
+  animation: twinkle 5s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
 }
 
 header {
@@ -247,19 +253,109 @@ section h2::after {
 }
 
 .version {
-  position: fixed;
-  bottom: 15px;
-  right: 15px;
+  display: inline-block;
   font-size: 13px;
   color: #0af;
-  background: rgba(26, 34, 53, 0.8);
-  padding: 8px 16px;
+  background: rgba(26, 34, 53, 0.6);
+  padding: 6px 14px;
   border-radius: 20px;
   border: 1px solid rgba(0, 170, 255, 0.3);
   backdrop-filter: blur(10px);
   font-weight: 600;
-  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer mejorado */
+footer {
+  background: linear-gradient(135deg, #1e2742 0%, #2a3454 100%);
+  padding: 25px 20px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+  border-top: 2px solid #0af;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  margin-top: 40px;
+}
+
+footer::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0af, transparent);
+  animation: scanLine 3s linear infinite;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(26, 34, 53, 0.6);
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: 1px solid rgba(0, 170, 255, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: #e0e6ed;
+  font-size: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.footer-badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(0, 170, 255, 0.4);
+  border-color: rgba(0, 170, 255, 0.6);
+  background: rgba(26, 34, 53, 0.8);
+}
+
+.footer-icon {
+  font-size: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.footer-text {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.footer-link {
+  color: #0af;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #4da6ff;
+}
+
+.footer-divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0af, transparent);
+  margin: 10px 0;
+}
+
+.footer-copyright {
+  font-size: 13px;
+  color: #8a9db5;
+  margin-top: 10px;
 }
 
 @keyframes fadeInUp {
@@ -267,6 +363,16 @@ section h2::after {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 /* Responsive */
@@ -291,16 +397,15 @@ section h2::after {
   #galeriaContainer {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
-}
-
-/* Loading animation */
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-.loading {
-  animation: pulse 1.5s ease-in-out infinite;
+  
+  .footer-badge {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+  
+  .version {
+    margin-top: 5px;
+  }
 }
 </style>
 </head>
@@ -332,7 +437,19 @@ section h2::after {
   <div id="galeriaContainer" class="flex"></div>
 </section>
 
-<div class="version">V5.2</div>
+<footer>
+  <div class="footer-content">
+    <a href="https://new.halconspace.site/" target="_blank" rel="noopener noreferrer" class="footer-badge">
+      <span class="footer-icon">🦅</span>
+      <span class="footer-text">Desarrollado por <span class="footer-link">Halcon Space</span></span>
+    </a>
+    <div class="footer-divider"></div>
+    <div class="footer-copyright">
+      © 2024 GeoNet J.S Aerospace • Todos los derechos reservados
+    </div>
+    <div class="version">V5.5</div>
+  </div>
+</footer>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
