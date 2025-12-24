@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>GeoNet J.S Aerospace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0a0e1a 0%, #1a1f3a 100%);
+  color: #e0e6ed;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Efecto de estrellas de fondo */
+body::before {
+  content: '';
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+    radial-gradient(2px 2px at 60px 70px, #fff, transparent),
+    radial-gradient(1px 1px at 50px 50px, #ddd, transparent),
+    radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+    radial-gradient(2px 2px at 90px 10px, #eee, transparent);
+  background-size: 200px 200px;
+  background-repeat: repeat;
+  opacity: 0.3;
+  z-index: 0;
+  pointer-events: none;
+}
+
+header {
+  background: linear-gradient(135deg, #1e2742 0%, #2a3454 100%);
+  padding: 30px 20px;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 10;
+  border-bottom: 2px solid #0af;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background-image: linear-gradient(135deg, #1e2742 0%, #2a3454 50%, #1e2742 100%);
+  animation: headerGlow 3s ease-in-out infinite;
+}
+
+@keyframes headerGlow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(0, 170, 255, 0.3); }
+  50% { box-shadow: 0 4px 30px rgba(0, 170, 255, 0.6); }
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0af, transparent);
+  animation: scanLine 2s linear infinite;
+}
+
+@keyframes scanLine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+section {
+  padding: 40px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+section h2 {
+  font-size: 28px;
+  margin-bottom: 25px;
+  color: #0af;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-left: 4px solid #0af;
+  padding-left: 15px;
+  position: relative;
+  display: inline-block;
+}
+
+section h2::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, #0af, transparent);
+}
+
+.card {
+  background: linear-gradient(135deg, #1a2235 0%, #212d45 100%);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 170, 255, 0.2);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 170, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.card:hover::before {
+  left: 100%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 170, 255, 0.3);
+  border-color: rgba(0, 170, 255, 0.5);
+}
+
+.card p {
+  margin: 12px 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.card strong {
+  color: #4da6ff;
+  font-weight: 600;
+}
+
+.flex {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card img, .card video {
+  max-width: 100%;
+  border-radius: 12px;
+  margin-top: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.card img:hover, .card video:hover {
+  transform: scale(1.05);
+}
+
+.card a {
+  color: #0af;
+  text-decoration: none;
+  transition: color 0.3s;
+  word-break: break-all;
+}
+
+.card a:hover {
+  color: #4da6ff;
+  text-decoration: underline;
+}
+
+.card-launch, .card-orbit {
+  background: linear-gradient(135deg, #1e2742 0%, #2a3454 100%);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+  margin-bottom: 15px;
+  border: 1px solid rgba(0, 170, 255, 0.15);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.card-launch::after, .card-orbit::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(0, 170, 255, 0.1), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.card-launch:hover, .card-orbit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 35px rgba(0, 170, 255, 0.25);
+  border-color: rgba(0, 170, 255, 0.4);
+}
+
+.card-launch strong, .card-orbit strong {
+  color: #4da6ff;
+}
+
+#launchesContainer, #planosContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+#galeriaContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+#galeriaContainer > div {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
+  background: #1a2235;
+  border: 1px solid rgba(0, 170, 255, 0.2);
+}
+
+#galeriaContainer > div:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0, 170, 255, 0.3);
+}
+
+.version {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  font-size: 13px;
+  color: #0af;
+  background: rgba(26, 34, 53, 0.8);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 170, 255, 0.3);
+  backdrop-filter: blur(10px);
+  font-weight: 600;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header {
+    font-size: 24px;
+    padding: 20px 15px;
+  }
+  
+  section {
+    padding: 30px 15px;
+  }
+  
+  section h2 {
+    font-size: 22px;
+  }
+  
+  #launchesContainer, #planosContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  #galeriaContainer {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+</style>
+</head>
+<body>
+
+<header>🚀 GeoNet J.S Aerospace</header>
+
+<section id="infoSection">
+  <h2>📊 Información General</h2>
+  <div class="card">
+    <p><strong>🚀 Lanzamientos:</strong> <span id="infoLanzamientos" class="loading">Cargando...</span></p>
+    <p><strong>🛰️ Planos Orbitales:</strong> <span id="infoPlanos" class="loading">Cargando...</span></p>
+    <p><strong>📡 Satélites:</strong> <span id="infoSat" class="loading">Cargando...</span></p>
+  </div>
+</section>
+
+<section id="launchesSection">
+  <h2>🚀 Lanzamientos</h2>
+  <div id="launchesContainer"></div>
+</section>
+
+<section id="planosSection">
+  <h2>🛰️ Planos Orbitales</h2>
+  <div id="planosContainer"></div>
+</section>
+
+<section id="galeriaSection">
+  <h2>🖼️ Galería</h2>
+  <div id="galeriaContainer" class="flex"></div>
+</section>
+
+<div class="version">V5.2</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore, doc, getDoc, getDocs, collection} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"TU_API_KEY",
+  authDomain:"geonet-js-aerospace.firebaseapp.com",
+  projectId:"geonet-js-aerospace"
+});
+const db = getFirestore(app);
+
+// Renderizar media: imagen, video o link
+function renderMedia(url){
+  if(url.match(/\.(jpg|jpeg|png|gif)$/i)) return `<img src="${url}" alt="media">`;
+  if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
+  return `<a href="${url}" target="_blank">${url}</a>`;
+}
+
+// Información general
+async function loadInfo(){
+  try {
+    const docSnap = await getDoc(doc(db,"Config","info"));
+    if(docSnap.exists()){
+      const data = docSnap.data();
+      document.getElementById("infoLanzamientos").textContent = data.lanzamientos || "-";
+      document.getElementById("infoPlanos").textContent = data.planos_orbitales || "-";
+      document.getElementById("infoSat").textContent = data.satelites || "-";
+      document.getElementById("infoLanzamientos").classList.remove("loading");
+      document.getElementById("infoPlanos").classList.remove("loading");
+      document.getElementById("infoSat").classList.remove("loading");
+    }
+  } catch (error) {
+    console.error("Error cargando información:", error);
+  }
+}
+loadInfo();
+
+// Lanzamientos
+async function loadLaunches(){
+  try {
+    const container = document.getElementById("launchesContainer");
+    container.innerHTML="<p style='text-align:center; color:#4da6ff;'>Cargando lanzamientos...</p>";
+    const snaps = await getDocs(collection(db,"launches"));
+    container.innerHTML="";
+    let delay=0;
+    snaps.forEach(d=>{
+      const data = d.data();
+      let fechaDisplay="-";
+      if(data.tipo==="FECHA" && data.fecha) fechaDisplay=new Date(data.fecha).toLocaleString('es-ES');
+      if(data.tipo==="NET" && data.net) fechaDisplay=data.net;
+
+      let galeriaHTML="Sin imágenes";
+      if(data.galeria?.length) galeriaHTML = data.galeria.map(renderMedia).join("");
+
+      const card = document.createElement("div");
+      card.className="card-launch";
+      card.style.animationDelay = `${delay}s`;
+      delay+=0.1;
+      card.innerHTML=`
+        <strong>📛 Nombre:</strong> ${data.nombre || "-"}<br>
+        <strong>🚀 Vehículo:</strong> ${data.vehiculo || "-"}<br>
+        <strong>📊 Estado:</strong> ${data.estado || "-"}<br>
+        <strong>📅 Fecha/NET:</strong> ${fechaDisplay}<br>
+        <strong>📦 Carga:</strong> ${data.carga || "-"}<br>
+        <strong>🖼️ Galería:</strong><br>${galeriaHTML}
+      `;
+      container.appendChild(card);
+    });
+    if(snaps.empty) container.innerHTML="<p style='text-align:center; color:#888;'>No hay lanzamientos registrados</p>";
+  } catch (error) {
+    console.error("Error cargando lanzamientos:", error);
+  }
+}
+loadLaunches();
+
+// Planos Orbitales
+async function loadPlanos(){
+  try {
+    const container = document.getElementById("planosContainer");
+    container.innerHTML="<p style='text-align:center; color:#4da6ff;'>Cargando planos orbitales...</p>";
+    const snaps = await getDocs(collection(db,"planos"));
+    container.innerHTML="";
+    let delay=0;
+    snaps.forEach(d=>{
+      const data = d.data();
+      const card = document.createElement("div");
+      card.className="card-orbit";
+      card.style.animationDelay = `${delay}s`;
+      delay+=0.1;
+      card.innerHTML=`
+        <strong>📛 Nombre:</strong> ${data.nombre || "-"}<br>
+        <strong>🌍 Planeta:</strong> ${data.planeta || "-"}<br>
+        <strong>📏 Altitud:</strong> ${data.altitud || "-"} km<br>
+        <strong>📐 Inclinación:</strong> ${data.inclinacion || "-"}°<br>
+        <strong>🛰️ N° de Satélites:</strong> ${data.satelites || "-"}<br>
+      `;
+      container.appendChild(card);
+    });
+    if(snaps.empty) container.innerHTML="<p style='text-align:center; color:#888;'>No hay planos orbitales registrados</p>";
+  } catch (error) {
+    console.error("Error cargando planos:", error);
+  }
+}
+loadPlanos();
+
+// Galería
+async function loadGaleria(){
+  try {
+    const container = document.getElementById("galeriaContainer");
+    container.innerHTML="<p style='text-align:center; color:#4da6ff;'>Cargando galería...</p>";
+    const snaps = await getDocs(collection(db,"gallery"));
+    container.innerHTML="";
+    let delay=0;
+    snaps.forEach(d=>{
+      const div = document.createElement("div");
+      div.style.animation = "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+      div.style.animationDelay = `${delay}s`;
+      delay+=0.1;
+      div.innerHTML = renderMedia(d.data().url);
+      container.appendChild(div);
+    });
+    if(snaps.empty) container.innerHTML="<p style='text-align:center; color:#888;'>No hay imágenes en la galería</p>";
+  } catch (error) {
+    console.error("Error cargando galería:", error);
+  }
+}
+loadGaleria();
+</script>
+</body>
+</html>
