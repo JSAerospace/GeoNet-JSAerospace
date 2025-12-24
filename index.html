@@ -15,9 +15,10 @@ header {
   background:#141a2e;
   padding:20px;
   text-align:center;
-  font-size:24px;
+  font-size:26px;
   font-weight:bold;
   box-shadow:0 2px 5px rgba(0,0,0,0.5);
+  transition: background 0.3s;
 }
 section {
   padding:20px;
@@ -28,6 +29,9 @@ section {
   padding:15px;
   margin-bottom:15px;
   box-shadow:0 0 10px rgba(0,0,0,0.4);
+  opacity:0;
+  transform:translateY(20px);
+  animation:fadeInUp 0.6s forwards;
 }
 h2 {
   margin-top:0;
@@ -51,6 +55,9 @@ h2 {
   border-radius:10px;
   box-shadow:0 0 5px rgba(0,0,0,0.5);
   margin-bottom:10px;
+  opacity:0;
+  transform:translateY(10px);
+  animation:fadeInUp 0.5s forwards;
 }
 .version {
   position:fixed;
@@ -58,6 +65,9 @@ h2 {
   right:10px;
   font-size:12px;
   color:#0af;
+}
+@keyframes fadeInUp {
+  to {opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
@@ -89,7 +99,7 @@ h2 {
   <div id="galeriaContainer" class="flex"></div>
 </section>
 
-<div class="version">V5.1</div>
+<div class="version">V5.2</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -102,14 +112,14 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-// Mostrar media (imagen, video o enlace)
+// Renderizar media: imagen, video o link
 function renderMedia(url){
   if(url.match(/\.(jpg|jpeg|png|gif)$/i)) return `<img src="${url}" alt="media">`;
   if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
   return `<a href="${url}" target="_blank" style="color:#0af">${url}</a>`;
 }
 
-// Cargar información general
+// Información general
 async function loadInfo(){
   const docSnap = await getDoc(doc(db,"Config","info"));
   if(docSnap.exists()){
@@ -121,11 +131,12 @@ async function loadInfo(){
 }
 loadInfo();
 
-// Cargar lanzamientos
+// Lanzamientos
 async function loadLaunches(){
   const container = document.getElementById("launchesContainer");
   container.innerHTML="";
   const snaps = await getDocs(collection(db,"launches"));
+  let delay=0;
   snaps.forEach(d=>{
     const data = d.data();
     let fechaDisplay="-";
@@ -137,6 +148,8 @@ async function loadLaunches(){
 
     const card = document.createElement("div");
     card.className="card-launch";
+    card.style.animationDelay = `${delay}s`;
+    delay+=0.1;
     card.innerHTML=`
       <strong>Nombre:</strong> ${data.nombre}<br>
       <strong>Vehículo:</strong> ${data.vehiculo || "-"}<br>
@@ -150,15 +163,18 @@ async function loadLaunches(){
 }
 loadLaunches();
 
-// Cargar planos orbitales
+// Planos Orbitales
 async function loadPlanos(){
   const container = document.getElementById("planosContainer");
   container.innerHTML="";
   const snaps = await getDocs(collection(db,"planos"));
+  let delay=0;
   snaps.forEach(d=>{
     const data = d.data();
     const card = document.createElement("div");
     card.className="card-orbit";
+    card.style.animationDelay = `${delay}s`;
+    delay+=0.1;
     card.innerHTML=`
       <strong>Nombre:</strong> ${data.nombre}<br>
       <strong>Planeta:</strong> ${data.planeta}<br>
@@ -171,13 +187,17 @@ async function loadPlanos(){
 }
 loadPlanos();
 
-// Cargar galería
+// Galería
 async function loadGaleria(){
   const container = document.getElementById("galeriaContainer");
   container.innerHTML="";
   const snaps = await getDocs(collection(db,"gallery"));
+  let delay=0;
   snaps.forEach(d=>{
     const div = document.createElement("div");
+    div.style.animation = "fadeInUp 0.5s forwards";
+    div.style.animationDelay = `${delay}s`;
+    delay+=0.1;
     div.innerHTML = renderMedia(d.data().url);
     container.appendChild(div);
   });
