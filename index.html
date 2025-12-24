@@ -2,114 +2,148 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoNet J.S Aerospace</title>
+<title>GeoNet J.S. Aerospace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0b0f1a;color:#fff}
-header{padding:20px;background:#141a2e;text-align:center;font-size:24px;font-weight:bold;color:#0af}
-.container{padding:20px;display:flex;flex-wrap:wrap;gap:20px;justify-content:center}
-.card{background:#141a2e;border-radius:12px;padding:15px;flex:1 1 300px;max-width:400px;box-shadow:0 0 15px rgba(0,0,0,.5)}
-.card h2{margin-top:0;color:#0af}
-.card p,label{margin:5px 0}
-img,video{max-width:100%;border-radius:10px;margin-top:10px}
-a{color:#0af;word-break:break-word}
-.footer{position:fixed;bottom:10px;right:10px;color:#0af;font-size:12px}
+body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
+header{background:#141a2e;padding:15px;text-align:center;font-size:24px;font-weight:bold;box-shadow:0 0 10px rgba(0,0,0,0.5)}
+section{padding:20px;margin:0 auto;max-width:900px}
+.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 0 10px rgba(0,0,0,.4)}
+h2{margin-top:25px;margin-bottom:10px}
+label{font-weight:bold}
+.img-gallery img,.img-gallery video{max-width:100%;margin-top:10px;border-radius:8px}
+.card-launch,.card-orbital{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
+.card-launch button,.card-orbital button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000;margin-right:5px;cursor:pointer;border:none;border-radius:5px}
+.version{position:fixed;bottom:10px;right:10px;color:#0af;font-weight:bold}
+.flex{display:flex;gap:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
 
-<header>GeoNet J.S Aerospace</header>
+<header>GeoNet J.S. Aerospace</header>
 
-<div class="container">
-
-<div class="card" id="infoCard">
+<section id="infoSection">
 <h2>Información</h2>
+<div class="card">
 <p><strong>Lanzamientos:</strong> <span id="infoLanzamientos">-</span></p>
 <p><strong>Planos Orbitales:</strong> <span id="infoPlanos">-</span></p>
 <p><strong>N° de Satélites:</strong> <span id="infoSat">-</span></p>
 </div>
+</section>
 
-<div class="card" id="launchesCard">
+<section id="lanzamientosSection">
 <h2>Lanzamientos</h2>
-<div id="launchesContent">Cargando...</div>
-</div>
+<div id="launchesContainer"></div>
+</section>
 
-<div class="card" id="galleryCard">
+<section id="orbitalSection">
+<h2>Planos Orbitales</h2>
+<div id="orbitalContainer"></div>
+</section>
+
+<section id="galeriaSection">
 <h2>Galería</h2>
-<div id="galleryContent">Cargando...</div>
-</div>
+<div id="galeriaContainer" class="img-gallery"></div>
+</section>
 
-</div>
-
-<div class="footer">Versión: V1.0</div>
+<div class="version">V1.0</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getFirestore,doc,getDoc,getDocs,collection} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey:"TU_API_KEY",
-  authDomain:"geonet-js-aerospace.firebaseapp.com",
-  projectId:"geonet-js-aerospace"
-});
+// --- Config Firebase ---
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "geonet-js-aerospace.firebaseapp.com",
+  projectId: "geonet-js-aerospace",
+  storageBucket: "geonet-js-aerospace.appspot.com",
+  messagingSenderId: "651364423254",
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
+};
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Información
+// --- Función para mostrar media ---
+function renderMedia(url){
+  if(url.includes("imgur.com") || url.match(/\.(jpg|jpeg|png|gif|mp4)$/i)){
+    if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
+    else return `<img src="${url}">`;
+  } else return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
+}
+
+// --- Cargar Información ---
 async function loadInfo(){
   const docSnap = await getDoc(doc(db,"Config","info"));
   if(docSnap.exists()){
     const data = docSnap.data();
-    document.getElementById("infoLanzamientos").textContent = data.lanzamientos ?? "-";
-    document.getElementById("infoPlanos").textContent = data.planos_orbitales ?? "-";
-    document.getElementById("infoSat").textContent = data.satelites ?? "-";
+    document.getElementById("infoLanzamientos").textContent = data.lanzamientos || "-";
+    document.getElementById("infoPlanos").textContent = data.planos_orbitales || "-";
+    document.getElementById("infoSat").textContent = data.satelites || "-";
   }
 }
 loadInfo();
 
-// Lanzamientos
-function renderMedia(url){
-  if(url.match(/\.(jpg|jpeg|png|gif)$/i)) return `<img src="${url}">`;
-  if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
-  return `<a href="${url}" target="_blank">${url}</a>`;
-}
-
+// --- Cargar Lanzamientos ---
 async function loadLaunches(){
-  const container = document.getElementById("launchesContent");
+  const container=document.getElementById("launchesContainer");
   container.innerHTML="";
-  const snaps = await getDocs(collection(db,"launches"));
-  if(snaps.empty){container.textContent="No hay lanzamientos disponibles."; return;}
+  const snaps=await getDocs(collection(db,"launches"));
   snaps.forEach(d=>{
-    const data = d.data();
+    const data=d.data();
     let fechaDisplay="-";
-    if(data.tipo==="FECHA" && data.fecha) fechaDisplay = new Date(data.fecha).toLocaleString();
-    if(data.tipo==="NET" && data.net) fechaDisplay = data.net;
+    if(data.tipo==="FECHA" && data.fecha) fechaDisplay=new Date(data.fecha).toLocaleString();
+    if(data.tipo==="NET" && data.net) fechaDisplay=data.net;
     let galeriaHTML="-";
-    if(data.galeria?.length) galeriaHTML = data.galeria.map(url=>renderMedia(url)).join("");
-    const div = document.createElement("div");
-    div.innerHTML=`<p><strong>${data.nombre}</strong></p>
-                   <p>Vehículo: ${data.vehiculo || "-"}</p>
-                   <p>Estado: ${data.estado || "-"}</p>
-                   <p>Fecha/NET: ${fechaDisplay}</p>
-                   <p>Carga: ${data.carga || "-"}</p>
-                   <div>${galeriaHTML}</div>
-                   <hr>`;
-    container.appendChild(div);
+    if(data.galeria?.length) galeriaHTML=data.galeria.map(url=>renderMedia(url)).join("");
+    const card=document.createElement("div");
+    card.className="card-launch";
+    card.innerHTML=`
+      <strong>Nombre:</strong> ${data.nombre}<br>
+      <strong>Vehículo:</strong> ${data.vehiculo || "-"}<br>
+      <strong>Estado:</strong> ${data.estado || "-"}<br>
+      <strong>Fecha/NET:</strong> ${fechaDisplay}<br>
+      <strong>Carga:</strong> ${data.carga || "-"}<br>
+      <strong>Galería:</strong><br>${galeriaHTML}
+    `;
+    container.appendChild(card);
   });
 }
 loadLaunches();
 
-// Galería
-async function loadGallery(){
-  const container = document.getElementById("galleryContent");
+// --- Cargar Planos Orbitales ---
+async function loadOrbital(){
+  const container=document.getElementById("orbitalContainer");
   container.innerHTML="";
-  const snaps = await getDocs(collection(db,"gallery"));
-  if(snaps.empty){container.textContent="No hay elementos en la galería."; return;}
+  const snaps=await getDocs(collection(db,"orbitalPlanes"));
   snaps.forEach(d=>{
-    const data = d.data();
-    container.innerHTML += renderMedia(data.url);
+    const data=d.data();
+    const card=document.createElement("div");
+    card.className="card-orbital";
+    card.innerHTML=`
+      <strong>Nombre:</strong> ${data.nombre}<br>
+      <strong>Planeta:</strong> ${data.planeta}<br>
+      <strong>Altitud:</strong> ${data.altitud || "-"} km<br>
+      <strong>N° de Satélites:</strong> ${data.satellites || "-"}
+    `;
+    container.appendChild(card);
   });
 }
-loadGallery();
+loadOrbital();
+
+// --- Cargar Galería ---
+async function loadGaleria(){
+  const container=document.getElementById("galeriaContainer");
+  container.innerHTML="";
+  const snaps=await getDocs(collection(db,"gallery"));
+  snaps.forEach(d=>{
+    const media = renderMedia(d.data().url);
+    const div=document.createElement("div");
+    div.innerHTML=media;
+    container.appendChild(div);
+  });
+}
+loadGaleria();
 </script>
 </body>
 </html>
