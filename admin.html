@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin GeoNet V5.2</title>
+<title>Admin GeoNet V6</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -13,8 +13,8 @@ button{background:#0af;color:#000;font-weight:bold;cursor:pointer}
 h2{margin-top:25px;margin-bottom:10px}
 .flex{display:flex;gap:10px;flex-wrap:wrap}
 .img-gallery img, .img-gallery video{max-width:100%;margin-top:10px;border-radius:8px}
-.card-launch{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
-.card-launch button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000;margin-right:5px}
+.card-launch, .card-orbital{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
+.card-launch button, .card-orbital button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000;margin-right:5px}
 #loginContainer{position:fixed;top:0;left:0;width:100%;height:100%;background:#0b0f1a;display:flex;align-items:center;justify-content:center;z-index:1000}
 #loginBox{background:#141a2e;padding:30px;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,.5);width:300px;text-align:center}
 #loginBox input{width:100%;margin-bottom:15px}
@@ -36,17 +36,17 @@ label{font-weight:bold}
 </div>
 
 <section class="hidden" id="adminContent">
-  <button id="btnLogout" style="float:right;margin-bottom:10px;">Cerrar Sesión</button>
-  <h2>Información</h2>
-  <div class="card">
-    <label>Lanzamientos:</label>
-    <input type="number" id="inputLanzamientos">
-    <label>Planos Orbitales:</label>
-    <input type="number" id="inputPlanos">
-    <label>N° de Satélites:</label>
-    <input type="number" id="inputSat">
-    <button id="btnCambiarInfo">Cambiar Información</button>
-  </div>
+<h2>Información</h2>
+<div class="card">
+<label>Lanzamientos:</label>
+<input type="number" id="inputLanzamientos">
+<label>Planos Orbitales:</label>
+<input type="number" id="inputPlanos">
+<label>N° de Satélites:</label>
+<input type="number" id="inputSat">
+<button id="btnCambiarInfo">Cambiar Información</button>
+<button id="btnCerrarSesion">Cerrar Sesión</button>
+</div>
 </section>
 
 <section class="hidden" id="lanzamientosSection">
@@ -128,6 +128,25 @@ label{font-weight:bold}
 <div id="launchesAdmin"></div>
 </section>
 
+<section class="hidden" id="orbitalSection">
+<h2>Planos Orbitales</h2>
+<div class="card">
+<label>Nombre:</label>
+<input type="text" id="inputOrbitalNombre">
+<label>Planeta:</label>
+<select id="inputOrbitalPlaneta">
+  <option value="Kerbin">Kerbin</option>
+  <option value="Duna">Duna</option>
+</select>
+<label>Altitud:</label>
+<input type="number" id="inputOrbitalAltitud">
+<label>N° de Satélites:</label>
+<input type="number" id="inputOrbitalSat">
+<button id="btnAgregarOrbital">Agregar/Editar Plano</button>
+</div>
+<div id="orbitalesAdmin"></div>
+</section>
+
 <section class="hidden" id="galeriaSection">
 <h2>Galería</h2>
 <div class="card">
@@ -138,36 +157,25 @@ label{font-weight:bold}
 <div id="galeriaAdmin" class="img-gallery"></div>
 </section>
 
-<section class="hidden" id="planosSection">
-<h2>Planos Orbitales</h2>
-<div class="card">
-<label>Planeta:</label>
-<select id="selectPlaneta">
-  <option value="Kerbin">Kerbin</option>
-  <option value="Duna">Duna</option>
-</select>
-<label>Nombre del Plano:</label>
-<input type="text" id="inputPlanoNombre">
-<label>Altitud:</label>
-<input type="number" id="inputPlanoAltitud">
-<label>Inclinación:</label>
-<input type="number" id="inputPlanoInclinacion">
-<button id="btnAgregarPlano">Agregar/Editar Plano</button>
-</div>
-<div id="planosAdmin"></div>
-</section>
-
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,collection,addDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, getDocs, setDoc, collection, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
+  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
   authDomain: "geonet-js-aerospace.firebaseapp.com",
-  projectId: "geonet-js-aerospace"
+  projectId: "geonet-js-aerospace",
+  storageBucket: "geonet-js-aerospace.firebasestorage.app",
+  messagingSenderId: "651364423254",
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7",
+  measurementId: "G-X44HFVLSQ8"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+let editingId = null;
+let editingOrbitalId = null;
 
 // ----- LOGIN -----
 const loginUserInput = document.getElementById("loginUser");
@@ -179,63 +187,60 @@ const adminContent = document.getElementById("adminContent");
 const lanzamientosSection = document.getElementById("lanzamientosSection");
 const launchesExistSection = document.getElementById("launchesExistSection");
 const galeriaSection = document.getElementById("galeriaSection");
-const planosSection = document.getElementById("planosSection");
-const btnLogout = document.getElementById("btnLogout");
+const orbitalSection = document.getElementById("orbitalSection");
 
 const USER = "olanoagus@gmail.com";
 const PASS = "Simba2011";
 
-if(localStorage.getItem("adminLogged")==="true"){
+function showAdmin(){
   loginContainer.style.display="none";
   adminContent.classList.remove("hidden");
   lanzamientosSection.classList.remove("hidden");
   launchesExistSection.classList.remove("hidden");
   galeriaSection.classList.remove("hidden");
-  planosSection.classList.remove("hidden");
+  orbitalSection.classList.remove("hidden");
 }
+
+if(localStorage.getItem("adminLogged")==="true"){ showAdmin(); }
 
 btnLogin.addEventListener("click",()=>{
   const u = loginUserInput.value;
   const p = loginPassInput.value;
   if(u===USER && p===PASS){
     localStorage.setItem("adminLogged","true");
-    loginContainer.style.display="none";
-    adminContent.classList.remove("hidden");
-    lanzamientosSection.classList.remove("hidden");
-    launchesExistSection.classList.remove("hidden");
-    galeriaSection.classList.remove("hidden");
-    planosSection.classList.remove("hidden");
-  } else {
-    loginError.textContent="Usuario o contraseña incorrectos";
-  }
+    showAdmin();
+  } else { loginError.textContent="Usuario o contraseña incorrectos"; }
 });
 
-btnLogout.addEventListener("click",()=>{
+document.getElementById("btnCerrarSesion").addEventListener("click",()=>{
   localStorage.removeItem("adminLogged");
   location.reload();
 });
 
-// ----- NET/Fecha -----
+// Mostrar NET según tipo
 const tipoFecha = document.getElementById("inputTipoFecha");
 const fechaExactaDiv = document.getElementById("fechaExacta");
 const netDiv = document.getElementById("netInputs");
 tipoFecha.addEventListener("change",()=>{
-  if(tipoFecha.value==="NET"){fechaExactaDiv.style.display="none"; netDiv.style.display="block";}
-  else{fechaExactaDiv.style.display="block"; netDiv.style.display="none";}
+  if(tipoFecha.value==="NET"){ fechaExactaDiv.style.display="none"; netDiv.style.display="block"; }
+  else { fechaExactaDiv.style.display="block"; netDiv.style.display="none"; }
 });
 
 const netTipo = document.getElementById("netTipo");
 const netYearDiv = document.getElementById("netYear");
 const netMonthDiv = document.getElementById("netMonth");
 const netDayDiv = document.getElementById("netDay");
+const netSelectDay = document.getElementById("netSelectDay");
+const netSelectMonth = document.getElementById("netSelectMonth");
+
 netTipo.addEventListener("change",()=>{
-  netYearDiv.style.display="block"; netMonthDiv.style.display="none"; netDayDiv.style.display="none";
+  netYearDiv.style.display="block";
+  netMonthDiv.style.display="none";
+  netDayDiv.style.display="none";
   if(netTipo.value==="MONTH") netMonthDiv.style.display="block";
   if(netTipo.value==="DAY") {netMonthDiv.style.display="block"; netDayDiv.style.display="block";}
 });
 
-const netSelectDay = document.getElementById("netSelectDay");
-const netSelectMonth = document.getElementById("netSelectMonth");
 function fillDays(month){
   netSelectDay.innerHTML="";
   const daysInMonth = new Date(2025, month, 0).getDate();
@@ -248,7 +253,7 @@ function fillDays(month){
 netSelectMonth.addEventListener("change",()=>fillDays(parseInt(netSelectMonth.value)));
 fillDays(parseInt(netSelectMonth.value));
 
-// ----- Información -----
+// Cambiar Información
 document.getElementById("btnCambiarInfo").addEventListener("click",async()=>{
   await setDoc(doc(db,"Config","info"),{
     lanzamientos: Number(document.getElementById("inputLanzamientos").value),
@@ -258,6 +263,15 @@ document.getElementById("btnCambiarInfo").addEventListener("click",async()=>{
   alert("Información actualizada");
 });
 
+// Render media
+function renderMedia(url){
+  if(url.match(/\.(jpg|jpeg|png|gif)$/i)) return `<img src="${url}">`;
+  if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
+  if(url.includes("youtube.com") || url.includes("youtu.be")) return `<a href="${url}" target="_blank" style="color:#0af;">Video</a>`;
+  return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
+}
+
+// Cargar Información inicial
 async function loadInfo(){
   const docSnap = await getDoc(doc(db,"Config","info"));
   if(docSnap.exists()){
@@ -269,15 +283,7 @@ async function loadInfo(){
 }
 loadInfo();
 
-// ----- Lanzamientos -----
-let editingId = null;
-function renderMedia(url){
-  if(url.includes("imgur.com") || url.match(/\.(jpg|jpeg|png|gif|mp4)$/i)){
-    if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
-    else return `<img src="${url}">`;
-  } else return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
-}
-
+// Lanzamientos
 document.getElementById("btnAgregarLanzamiento").addEventListener("click",async()=>{
   const nombre = document.getElementById("inputNombre").value;
   const vehiculo = document.getElementById("inputVehiculo").value;
@@ -291,19 +297,19 @@ document.getElementById("btnAgregarLanzamiento").addEventListener("click",async(
     if(tipoNet==="MONTH") net=`NET ${document.getElementById("netSelectMonth").value}/${document.getElementById("netInputYear").value}`;
     if(tipoNet==="DAY") net=`NET ${document.getElementById("netSelectDay").value}/${document.getElementById("netSelectMonth").value}/${document.getElementById("netInputYear").value}`;
   }
-  const carga = document.getElementById("inputCarga").value;
-  const galeria = document.getElementById("inputGaleria").value.split(",").map(x=>x.trim()).filter(x=>x);
+  const carga=document.getElementById("inputCarga").value;
+  const galeria=document.getElementById("inputGaleria").value.split(",").map(x=>x.trim()).filter(x=>x);
 
   if(editingId){
     await setDoc(doc(db,"launches",editingId),{nombre,vehiculo,estado,tipo,fecha,net,carga,galeria});
     editingId=null;
-    alert("Lanzamiento editado");
-  } else {
-    await addDoc(collection(db,"launches"),{nombre,vehiculo,estado,tipo,fecha,net,carga,galeria});
-    alert("Lanzamiento agregado");
-  }
+  } else { await addDoc(collection(db,"launches"),{nombre,vehiculo,estado,tipo,fecha,net,carga,galeria}); }
 
-  ["inputNombre","inputVehiculo","inputCarga","inputGaleria","inputFecha"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("inputNombre").value="";
+  document.getElementById("inputVehiculo").value="";
+  document.getElementById("inputCarga").value="";
+  document.getElementById("inputGaleria").value="";
+  document.getElementById("inputFecha").value="";
   loadLaunchesAdmin();
 });
 
@@ -312,16 +318,14 @@ async function loadLaunchesAdmin(){
   container.innerHTML="";
   const snaps = await getDocs(collection(db,"launches"));
   snaps.forEach(d=>{
-    const data = d.data();
-    const card = document.createElement("div");
+    const data=d.data();
+    const card=document.createElement("div");
     card.className="card-launch";
     let fechaDisplay="-";
-    if(data.tipo==="FECHA" && data.fecha) fechaDisplay = new Date(data.fecha).toLocaleString();
-    if(data.tipo==="NET" && data.net) fechaDisplay = data.net;
-
+    if(data.tipo==="FECHA" && data.fecha) fechaDisplay=new Date(data.fecha).toLocaleString();
+    if(data.tipo==="NET" && data.net) fechaDisplay=data.net;
     let galeriaHTML="-";
-    if(data.galeria?.length) galeriaHTML = data.galeria.map(url=>renderMedia(url)).join("");
-
+    if(data.galeria?.length) galeriaHTML=data.galeria.map(url=>renderMedia(url)).join("");
     card.innerHTML=`
       <strong>Nombre:</strong> ${data.nombre}<br>
       <strong>Vehículo:</strong> ${data.vehiculo || "-"}<br>
@@ -333,26 +337,14 @@ async function loadLaunchesAdmin(){
       <button data-id="${d.id}" class="deleteBtn">Eliminar</button>
     `;
     card.querySelector(".editBtn").addEventListener("click",()=>{
-      document.getElementById("inputNombre").value = data.nombre;
-      document.getElementById("inputVehiculo").value = data.vehiculo || "";
-      document.getElementById("inputEstado").value = data.estado || "Planeado";
-      document.getElementById("inputTipoFecha").value = data.tipo || "FECHA";
-      if(data.tipo==="FECHA"){fechaExactaDiv.style.display="block"; netDiv.style.display="none"; document.getElementById("inputFecha").value=data.fecha||"";}
-      else{fechaExactaDiv.style.display="none"; netDiv.style.display="block";
-        if(data.net){
-          if(data.net.startsWith("NET ")){
-            const parts = data.net.slice(4).split("/");
-            if(parts.length===1) {netTipo.value="YEAR"; document.getElementById("netInputYear").value=parts[0];}
-            if(parts.length===2) {netTipo.value="MONTH"; document.getElementById("netInputYear").value=parts[1]; netSelectMonth.value=parts[0];}
-            if(parts.length===3) {netTipo.value="DAY"; document.getElementById("netInputYear").value=parts[2]; netSelectMonth.value=parts[1]; netSelectDay.value=parts[0];}
-          }
-        }
-        netYearDiv.style.display="block";
-        netMonthDiv.style.display=(netTipo.value!=="YEAR")?"block":"none";
-        netDayDiv.style.display=(netTipo.value==="DAY")?"block":"none";
-      }
-      document.getElementById("inputCarga").value = data.carga || "";
-      document.getElementById("inputGaleria").value = data.galeria?.join(",") || "";
+      document.getElementById("inputNombre").value=data.nombre;
+      document.getElementById("inputVehiculo").value=data.vehiculo||"";
+      document.getElementById("inputEstado").value=data.estado||"Planeado";
+      document.getElementById("inputTipoFecha").value=data.tipo||"FECHA";
+      if(data.tipo==="FECHA"){ fechaExactaDiv.style.display="block"; netDiv.style.display="none"; document.getElementById("inputFecha").value=data.fecha||""; }
+      else{ fechaExactaDiv.style.display="none"; netDiv.style.display="block"; /* NET relleno */ }
+      document.getElementById("inputCarga").value=data.carga||"";
+      document.getElementById("inputGaleria").value=data.galeria?.join(",")||"";
       editingId=d.id;
     });
     card.querySelector(".deleteBtn").addEventListener("click",async()=>{
@@ -366,19 +358,71 @@ async function loadLaunchesAdmin(){
 }
 loadLaunchesAdmin();
 
-// ----- Galería -----
+// Planos Orbitales
+document.getElementById("btnAgregarOrbital").addEventListener("click",async()=>{
+  const nombre=document.getElementById("inputOrbitalNombre").value;
+  const planeta=document.getElementById("inputOrbitalPlaneta").value;
+  const altitud=document.getElementById("inputOrbitalAltitud").value;
+  const sat=document.getElementById("inputOrbitalSat").value;
+  if(editingOrbitalId){
+    await setDoc(doc(db,"orbitalPlanes",editingOrbitalId),{nombre,planeta,altitud:Number(altitud),satellites:Number(sat)});
+    editingOrbitalId=null;
+  } else { await addDoc(collection(db,"orbitalPlanes"),{nombre,planeta,altitud:Number(altitud),satellites:Number(sat)}); }
+  document.getElementById("inputOrbitalNombre").value="";
+document.getElementById("inputOrbitalNombre").value="";
+  document.getElementById("inputOrbitalAltitud").value="";
+  document.getElementById("inputOrbitalSat").value="";
+  loadOrbitalAdmin();
+});
+
+async function loadOrbitalAdmin(){
+  const container=document.getElementById("orbitalesAdmin");
+  container.innerHTML="";
+  const snaps=await getDocs(collection(db,"orbitalPlanes"));
+  snaps.forEach(d=>{
+    const data=d.data();
+    const card=document.createElement("div");
+    card.className="card-orbital";
+    card.innerHTML=`
+      <strong>Nombre:</strong> ${data.nombre}<br>
+      <strong>Planeta:</strong> ${data.planeta}<br>
+      <strong>Altitud:</strong> ${data.altitud || "-"} km<br>
+      <strong>N° de Satélites:</strong> ${data.satellites || "-"}<br>
+      <button data-id="${d.id}" class="editOrbitalBtn">Editar</button>
+      <button data-id="${d.id}" class="deleteOrbitalBtn">Eliminar</button>
+    `;
+    card.querySelector(".editOrbitalBtn").addEventListener("click",()=>{
+      document.getElementById("inputOrbitalNombre").value=data.nombre;
+      document.getElementById("inputOrbitalPlaneta").value=data.planeta;
+      document.getElementById("inputOrbitalAltitud").value=data.altitud;
+      document.getElementById("inputOrbitalSat").value=data.satellites;
+      editingOrbitalId=d.id;
+    });
+    card.querySelector(".deleteOrbitalBtn").addEventListener("click",async()=>{
+      if(confirm("Eliminar este plano orbital?")){
+        await deleteDoc(doc(db,"orbitalPlanes",d.id));
+        loadOrbitalAdmin();
+      }
+    });
+    container.appendChild(card);
+  });
+}
+loadOrbitalAdmin();
+
+// Galería
 document.getElementById("btnAgregarGaleria").addEventListener("click",async()=>{
-  const url = document.getElementById("inputGaleriaURL").value.trim();
+  const url=document.getElementById("inputGaleriaURL").value.trim();
   if(url){
     await addDoc(collection(db,"gallery"),{url});
     document.getElementById("inputGaleriaURL").value="";
     loadGaleriaAdmin();
   }
 });
+
 async function loadGaleriaAdmin(){
-  const div = document.getElementById("galeriaAdmin");
+  const div=document.getElementById("galeriaAdmin");
   div.innerHTML="";
-  const snaps = await getDocs(collection(db,"gallery"));
+  const snaps=await getDocs(collection(db,"gallery"));
   snaps.forEach(d=>{
     const container=document.createElement("div");
     container.innerHTML=renderMedia(d.data().url)+` <button data-id="${d.id}">Eliminar</button>`;
@@ -392,70 +436,7 @@ async function loadGaleriaAdmin(){
   });
 }
 loadGaleriaAdmin();
-
-// ----- Planos Orbitales -----
-let editingPlanoId = null;
-const selectPlaneta = document.getElementById("selectPlaneta");
-const inputPlanoNombre = document.getElementById("inputPlanoNombre");
-const inputPlanoAltitud = document.getElementById("inputPlanoAltitud");
-const inputPlanoInclinacion = document.getElementById("inputPlanoInclinacion");
-const btnAgregarPlano = document.getElementById("btnAgregarPlano");
-const planosAdmin = document.getElementById("planosAdmin");
-
-btnAgregarPlano.addEventListener("click", async()=>{
-  const planeta = selectPlaneta.value;
-  const nombre = inputPlanoNombre.value.trim();
-  const altitud = Number(inputPlanoAltitud.value);
-  const inclinacion = Number(inputPlanoInclinacion.value);
-
-  if(!nombre){alert("Ingrese un nombre"); return;}
-
-  if(editingPlanoId){
-    await setDoc(doc(db,"planos",editingPlanoId),{planeta,nombre,altitud,inclinacion});
-    editingPlanoId = null;
-    alert("Plano editado");
-  } else {
-    await addDoc(collection(db,"planos"),{planeta,nombre,altitud,inclinacion});
-    alert("Plano agregado");
-  }
-
-  inputPlanoNombre.value=""; inputPlanoAltitud.value=""; inputPlanoInclinacion.value="";
-  loadPlanosAdmin();
-});
-
-async function loadPlanosAdmin(){
-  planosAdmin.innerHTML="";
-  const snaps = await getDocs(collection(db,"planos"));
-  snaps.forEach(d=>{
-    const data = d.data();
-    const card = document.createElement("div");
-    card.className="card-launch";
-    card.innerHTML=`
-      <strong>Planeta:</strong> ${data.planeta}<br>
-      <strong>Nombre:</strong> ${data.nombre}<br>
-      <strong>Altitud:</strong> ${data.altitud} km<br>
-      <strong>Inclinación:</strong> ${data.inclinacion}°<br>
-      <button data-id="${d.id}" class="editPlanoBtn">Editar</button>
-      <button data-id="${d.id}" class="deletePlanoBtn">Eliminar</button>
-    `;
-    card.querySelector(".editPlanoBtn").addEventListener("click",()=>{
-      selectPlaneta.value = data.planeta;
-      inputPlanoNombre.value = data.nombre;
-      inputPlanoAltitud.value = data.altitud;
-      inputPlanoInclinacion.value = data.inclinacion;
-      editingPlanoId = d.id;
-    });
-    card.querySelector(".deletePlanoBtn").addEventListener("click", async()=>{
-      if(confirm("Eliminar este plano?")){
-        await deleteDoc(doc(db,"planos",d.id));
-        loadPlanosAdmin();
-      }
-    });
-    planosAdmin.appendChild(card);
-  });
-}
-loadPlanosAdmin();
-
 </script>
 </body>
 </html>
+  
