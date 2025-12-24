@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin GeoNet V5.2</title>
+<title>Admin GeoNet V6.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
@@ -13,19 +13,19 @@ button{background:#0af;color:#000;font-weight:bold;cursor:pointer}
 h2{margin-top:25px;margin-bottom:10px}
 .flex{display:flex;gap:10px;flex-wrap:wrap}
 .img-gallery img, .img-gallery video{max-width:100%;margin-top:10px;border-radius:8px}
-.card-launch, .card-plano{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
-.card-launch button, .card-plano button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000;margin-right:5px}
+.card-launch{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
+.card-launch button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000;margin-right:5px}
 #loginContainer{position:fixed;top:0;left:0;width:100%;height:100%;background:#0b0f1a;display:flex;align-items:center;justify-content:center;z-index:1000}
 #loginBox{background:#141a2e;padding:30px;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,.5);width:300px;text-align:center}
 #loginBox input{width:100%;margin-bottom:15px}
 #loginBox button{width:100%}
 .hidden{display:none}
 label{font-weight:bold}
-#btnLogout{background:#f55;color:#fff;margin-top:10px}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="loginContainer">
   <div id="loginBox">
     <h2>Login Admin</h2>
@@ -36,108 +36,101 @@ label{font-weight:bold}
   </div>
 </div>
 
+<!-- ADMIN CONTENT -->
 <section class="hidden" id="adminContent">
-<button id="btnLogout">Cerrar sesión</button>
 
 <h2>Información</h2>
 <div class="card">
-<label>Lanzamientos:</label>
-<input type="number" id="inputLanzamientos">
-<label>Planos Orbitales:</label>
-<input type="number" id="inputPlanos">
-<label>N° de Satélites:</label>
-<input type="number" id="inputSat">
-<button id="btnCambiarInfo">Cambiar Información</button>
+  <label>Lanzamientos:</label>
+  <input type="number" id="inputLanzamientos">
+  <label>Planos Orbitales:</label>
+  <input type="number" id="inputPlanos">
+  <label>N° de Satélites:</label>
+  <input type="number" id="inputSat">
+  <button id="btnCambiarInfo">Cambiar Información</button>
+  <button id="btnCerrarSesion" style="background:#f55;color:#fff;margin-top:10px;">Cerrar Sesión</button>
 </div>
 
-<h2>Lanzamientos</h2>
+<h2>Agregar/Editar Lanzamiento</h2>
 <div class="card">
-<label>Nombre:</label>
-<input type="text" id="inputNombre">
-<label>Vehículo:</label>
-<input type="text" id="inputVehiculo">
-<label>Estado:</label>
-<select id="inputEstado">
-  <option value="Éxito">Éxito</option>
-  <option value="Fallido">Fallido</option>
-  <option value="Planeado">Planeado</option>
-  <option value="En Vuelo">En Vuelo</option>
-</select>
-<label>Tipo de Fecha:</label>
-<select id="inputTipoFecha">
-  <option value="FECHA">Fecha Exacta</option>
-  <option value="NET">NET</option>
-</select>
-<div id="fechaExacta">
-  <label>Fecha Exacta:</label>
-  <input type="datetime-local" id="inputFecha">
-</div>
-<div id="netInputs" style="display:none">
-  <label>Tipo NET:</label>
-  <select id="netTipo">
-    <option value="YEAR">NET Año</option>
-    <option value="MONTH">NET Mes/Año</option>
-    <option value="DAY">NET Día/Mes/Año</option>
+  <label>Nombre:</label>
+  <input type="text" id="inputNombre">
+
+  <label>Vehículo:</label>
+  <input type="text" id="inputVehiculo">
+
+  <label>Estado:</label>
+  <select id="inputEstado">
+    <option value="Éxito">Éxito</option>
+    <option value="Fallido">Fallido</option>
+    <option value="Planeado">Planeado</option>
+    <option value="En Vuelo">En Vuelo</option>
   </select>
-  <div id="netYear" style="margin-top:5px;">
-    <input type="number" id="netInputYear" placeholder="Año">
+
+  <label>Tipo de Fecha:</label>
+  <select id="inputTipoFecha">
+    <option value="FECHA">Fecha Exacta</option>
+    <option value="NET">NET</option>
+  </select>
+
+  <div id="fechaExacta">
+    <label>Fecha Exacta:</label>
+    <input type="datetime-local" id="inputFecha">
   </div>
-  <div id="netMonth" style="display:none;margin-top:5px;">
-    <label>Mes:</label>
-    <select id="netSelectMonth">
-      <option value="1">Enero</option>
-      <option value="2">Febrero</option>
-      <option value="3">Marzo</option>
-      <option value="4">Abril</option>
-      <option value="5">Mayo</option>
-      <option value="6">Junio</option>
-      <option value="7">Julio</option>
-      <option value="8">Agosto</option>
-      <option value="9">Septiembre</option>
-      <option value="10">Octubre</option>
-      <option value="11">Noviembre</option>
-      <option value="12">Diciembre</option>
+
+  <div id="netInputs" style="display:none">
+    <label>Tipo NET:</label>
+    <select id="netTipo">
+      <option value="YEAR">NET Año</option>
+      <option value="MONTH">NET Mes/Año</option>
+      <option value="DAY">NET Día/Mes/Año</option>
     </select>
+
+    <div id="netYear" style="margin-top:5px;">
+      <input type="number" id="netInputYear" placeholder="Año">
+    </div>
+
+    <div id="netMonth" style="display:none;margin-top:5px;">
+      <label>Mes:</label>
+      <select id="netSelectMonth">
+        <option value="1">Enero</option>
+        <option value="2">Febrero</option>
+        <option value="3">Marzo</option>
+        <option value="4">Abril</option>
+        <option value="5">Mayo</option>
+        <option value="6">Junio</option>
+        <option value="7">Julio</option>
+        <option value="8">Agosto</option>
+        <option value="9">Septiembre</option>
+        <option value="10">Octubre</option>
+        <option value="11">Noviembre</option>
+        <option value="12">Diciembre</option>
+      </select>
+    </div>
+
+    <div id="netDay" style="display:none;margin-top:5px;">
+      <label>Día:</label>
+      <select id="netSelectDay"></select>
+    </div>
   </div>
-  <div id="netDay" style="display:none;margin-top:5px;">
-    <label>Día:</label>
-    <select id="netSelectDay"></select>
-  </div>
-</div>
-<label>Carga:</label>
-<input type="text" id="inputCarga">
-<label>Galería (separar por comas):</label>
-<input type="text" id="inputGaleria">
-<button id="btnAgregarLanzamiento">Agregar/Editar Lanzamiento</button>
+
+  <label>Carga:</label>
+  <input type="text" id="inputCarga">
+
+  <label>Galería (separar por comas):</label>
+  <input type="text" id="inputGaleria">
+
+  <button id="btnAgregarLanzamiento">Agregar/Editar Lanzamiento</button>
 </div>
 
 <h2>Lanzamientos Existentes</h2>
 <div id="launchesAdmin"></div>
 
-<h2>Planos Orbitales</h2>
-<div class="card">
-<label>Nombre del Plano:</label>
-<input type="text" id="inputPlanoNombre">
-<label>Altitud:</label>
-<input type="number" id="inputPlanoAltitud">
-<label>Inclinación:</label>
-<input type="number" id="inputPlanoInclinacion">
-<label>Ubicación:</label>
-<select id="inputPlanoUbicacion">
-  <option value="Kerbin">Kerbin</option>
-  <option value="Duna">Duna</option>
-</select>
-<label>Satélites (separar por comas):</label>
-<input type="text" id="inputPlanoSats">
-<button id="btnAgregarPlano">Agregar/Editar Plano</button>
-</div>
-<div id="planosAdmin"></div>
-
 <h2>Galería</h2>
 <div class="card">
-<label>URL Imagen/Video/Enlace:</label>
-<input type="text" id="inputGaleriaURL">
-<button id="btnAgregarGaleria">Agregar a Galería</button>
+  <label>URL Imagen/Video/Enlace:</label>
+  <input type="text" id="inputGaleriaURL">
+  <button id="btnAgregarGaleria">Agregar a Galería</button>
 </div>
 <div id="galeriaAdmin" class="img-gallery"></div>
 
@@ -147,7 +140,7 @@ label{font-weight:bold}
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getFirestore,doc,getDoc,getDocs,setDoc,collection,addDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// --- CONFIG ---
+// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
   authDomain: "geonet-js-aerospace.firebaseapp.com",
@@ -160,15 +153,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- LOGIN ---
+let editingId = null;
+
+// LOGIN
+const USER = "olanoagus@gmail.com";
+const PASS = "Simba2011";
 const loginUserInput = document.getElementById("loginUser");
 const loginPassInput = document.getElementById("loginPass");
 const btnLogin = document.getElementById("btnLogin");
 const loginError = document.getElementById("loginError");
 const loginContainer = document.getElementById("loginContainer");
 const adminContent = document.getElementById("adminContent");
-const USER="olanoagus@gmail.com";
-const PASS="Simba2011";
+const lanzamientosSection = document.getElementById("lanzamientosSection");
 
 if(localStorage.getItem("adminLogged")==="true"){
   loginContainer.style.display="none";
@@ -183,12 +179,47 @@ btnLogin.addEventListener("click",()=>{
   } else loginError.textContent="Usuario o contraseña incorrectos";
 });
 
-document.getElementById("btnLogout").addEventListener("click",()=>{
+document.getElementById("btnCerrarSesion").addEventListener("click",()=>{
   localStorage.removeItem("adminLogged");
   location.reload();
 });
 
-// --- INFO ---
+// Mostrar NET según tipo
+const tipoFecha = document.getElementById("inputTipoFecha");
+const fechaExactaDiv = document.getElementById("fechaExacta");
+const netDiv = document.getElementById("netInputs");
+
+tipoFecha.addEventListener("change",()=>{
+  if(tipoFecha.value==="NET"){fechaExactaDiv.style.display="none"; netDiv.style.display="block";}
+  else{fechaExactaDiv.style.display="block"; netDiv.style.display="none";}
+});
+
+const netTipo = document.getElementById("netTipo");
+const netYearDiv = document.getElementById("netYear");
+const netMonthDiv = document.getElementById("netMonth");
+const netDayDiv = document.getElementById("netDay");
+const netSelectMonth = document.getElementById("netSelectMonth");
+const netSelectDay = document.getElementById("netSelectDay");
+
+netTipo.addEventListener("change",()=>{
+  netYearDiv.style.display="block"; netMonthDiv.style.display="none"; netDayDiv.style.display="none";
+  if(netTipo.value==="MONTH") netMonthDiv.style.display="block";
+  if(netTipo.value==="DAY") {netMonthDiv.style.display="block"; netDayDiv.style.display="block";}
+});
+
+function fillDays(month){
+  netSelectDay.innerHTML="";
+  const daysInMonth = new Date(2025, month, 0).getDate();
+  for(let i=1;i<=daysInMonth;i++){
+    const opt = document.createElement("option");
+    opt.value=i; opt.text=i;
+    netSelectDay.appendChild(opt);
+  }
+}
+netSelectMonth.addEventListener("change",()=>fillDays(parseInt(netSelectMonth.value)));
+fillDays(parseInt(netSelectMonth.value));
+
+// Cambiar Información
 document.getElementById("btnCambiarInfo").addEventListener("click",async()=>{
   await setDoc(doc(db,"Config","info"),{
     lanzamientos: Number(document.getElementById("inputLanzamientos").value),
@@ -198,65 +229,39 @@ document.getElementById("btnCambiarInfo").addEventListener("click",async()=>{
   alert("Información actualizada");
 });
 
-async function loadInfo(){
-  const docSnap = await getDoc(doc(db,"Config","info"));
-  if(docSnap.exists()){
-    const data = docSnap.data();
-    document.getElementById("inputLanzamientos").value = data.lanzamientos || "";
-    document.getElementById("inputPlanos").value = data.planos_orbitales || "";
-    document.getElementById("inputSat").value = data.satelites || "";
-  }
+// Render media
+function renderMedia(url){
+  if(url.match(/\.(jpg|jpeg|png|gif|mp4)$/i)){
+    if(url.match(/\.(mp4)$/i)) return `<video controls src="${url}"></video>`;
+    return `<img src="${url}">`;
+  } return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
 }
-loadInfo();
 
-// --- MENÚ NET ---
-const tipoFecha=document.getElementById("inputTipoFecha");
-const fechaExactaDiv=document.getElementById("fechaExacta");
-const netDiv=document.getElementById("netInputs");
-tipoFecha.addEventListener("change",()=>{
-  if(tipoFecha.value==="NET"){fechaExactaDiv.style.display="none"; netDiv.style.display="block";}
-  else{fechaExactaDiv.style.display="block"; netDiv.style.display="none";}
-});
-const netTipo=document.getElementById("netTipo");
-const netYearDiv=document.getElementById("netYear");
-const netMonthDiv=document.getElementById("netMonth");
-const netDayDiv=document.getElementById("netDay");
-const netSelectMonth=document.getElementById("netSelectMonth");
-const netSelectDay=document.getElementById("netSelectDay");
-
-function fillDays(month){netSelectDay.innerHTML="";const daysInMonth=new Date(2025,month,0).getDate();for(let i=1;i<=daysInMonth;i++){const opt=document.createElement("option");opt.value=i;opt.text=i;netSelectDay.appendChild(opt);}}
-netSelectMonth.addEventListener("change",()=>fillDays(parseInt(netSelectMonth.value)));
-fillDays(parseInt(netSelectMonth.value));
-
-netTipo.addEventListener("change",()=>{
-  netYearDiv.style.display="block"; netMonthDiv.style.display="none"; netDayDiv.style.display="none";
-  if(netTipo.value==="MONTH") netMonthDiv.style.display="block";
-  if(netTipo.value==="DAY") {netMonthDiv.style.display="block"; netDayDiv.style.display="block";}
-});
-
-// --- RENDER MEDIA ---
-function renderMedia(url){if(url.includes("imgur.com")||url.match(/\.(jpg|jpeg|png|gif|mp4)$/i)){if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`; else return `<img src="${url}">`;}else return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;}
-
-// --- LANZAMIENTOS ---
-let editingId=null;
-document.getElementById("btnAgregarLanzamiento").addEventListener("click",async()=>{
-  const nombre=document.getElementById("inputNombre").value;
-  const vehiculo=document.getElementById("inputVehiculo").value;
-  const estado=document.getElementById("inputEstado").value;
-  const tipo=document.getElementById("inputTipoFecha").value;
-  let fecha=null, net=null;
+// Lanzamientos
+document.getElementById("btnAgregarLanzamiento").addEventListener("click", async()=>{
+  const nombre = document.getElementById("inputNombre").value;
+  const vehiculo = document.getElementById("inputVehiculo").value;
+  const estado = document.getElementById("inputEstado").value;
+  const tipo = document.getElementById("inputTipoFecha").value;
+  let fecha=null; let net=null;
   if(tipo==="FECHA") fecha=document.getElementById("inputFecha").value;
   else{
-    const t=netTipo.value;
-    if(t==="YEAR") net=`NET ${document.getElementById("netInputYear").value}`;
-    if(t==="MONTH") net=`NET ${document.getElementById("netSelectMonth").value}/${document.getElementById("netInputYear").value}`;
-    if(t==="DAY") net=`NET ${document.getElementById("netSelectDay").value}/${document.getElementById("netSelectMonth").value}/${document.getElementById("netInputYear").value}`;
+    const tipoNet=netTipo.value;
+    if(tipoNet==="YEAR") net=`NET ${document.getElementById("netInputYear").value}`;
+    if(tipoNet==="MONTH") net=`NET ${document.getElementById("netSelectMonth").value}/${document.getElementById("netInputYear").value}`;
+    if(tipoNet==="DAY") net=`NET ${document.getElementById("netSelectDay").value}/${document.getElementById("netSelectMonth").value}/${document.getElementById("netInputYear").value}`;
   }
-  const carga=document.getElementById("inputCarga").value;
-  const galeria=document.getElementById("inputGaleria").value.split(",").map(x=>x.trim()).filter(x=>x);
+  const carga = document.getElementById("inputCarga").value;
+  const galeria = document.getElementById("inputGaleria").value.split(",").map(x=>x.trim()).filter(x=>x);
 
-  if(editingId){await setDoc(doc(db,"launches",editingId),{nombre,vehiculo,estado,tipo,fecha,net,carga,galeria}); editingId=null;}
-  else await addDoc(collection(db,"launches"),{nombre,vehiculo,estado,tipo,fecha,net,carga,galeria});
+  if(editingId){
+    await setDoc(doc(db,"launches",editingId),{nombre,vehiculo,estado,tipo,fecha,net,carga,galeria});
+    editingId=null;
+    alert("Lanzamiento editado");
+  } else {
+    await addDoc(collection(db,"launches"),{nombre,vehiculo,estado,tipo,fecha,net,carga,galeria});
+    alert("Lanzamiento agregado");
+  }
 
   document.getElementById("inputNombre").value="";
   document.getElementById("inputVehiculo").value="";
@@ -266,18 +271,22 @@ document.getElementById("btnAgregarLanzamiento").addEventListener("click",async(
   loadLaunchesAdmin();
 });
 
+// Mostrar lanzamientos existentes
 async function loadLaunchesAdmin(){
-  const container=document.getElementById("launchesAdmin"); container.innerHTML="";
-  const snaps=await getDocs(collection(db,"launches"));
+  const container = document.getElementById("launchesAdmin");
+  container.innerHTML="";
+  const snaps = await getDocs(collection(db,"launches"));
   snaps.forEach(d=>{
-    const data=d.data();
-    const card=document.createElement("div");
+    const data = d.data();
+    const card = document.createElement("div");
     card.className="card-launch";
     let fechaDisplay="-";
-    if(data.tipo==="FECHA" && data.fecha) fechaDisplay=new Date(data.fecha).toLocaleString();
-    if(data.tipo==="NET" && data.net) fechaDisplay=data.net;
+    if(data.tipo==="FECHA" && data.fecha) fechaDisplay = new Date(data.fecha).toLocaleString();
+    if(data.tipo==="NET" && data.net) fechaDisplay = data.net;
+
     let galeriaHTML="-";
-    if(data.galeria?.length) galeriaHTML=data.galeria.map(url=>renderMedia(url)).join("");
+    if(data.galeria?.length) galeriaHTML = data.galeria.map(url=>renderMedia(url)).join("");
+
     card.innerHTML=`
       <strong>Nombre:</strong> ${data.nombre}<br>
       <strong>Vehículo:</strong> ${data.vehiculo || "-"}<br>
@@ -286,102 +295,47 @@ async function loadLaunchesAdmin(){
       <strong>Carga:</strong> ${data.carga || "-"}<br>
       <strong>Galería:</strong><br>${galeriaHTML}
       <button data-id="${d.id}" class="editBtn">Editar</button>
-      <button data-id="${d.id}" class="deleteBtn">Eliminar</button>`;
+      <button data-id="${d.id}" class="deleteBtn">Eliminar</button>
+    `;
     card.querySelector(".editBtn").addEventListener("click",()=>{
-      document.getElementById("inputNombre").value=data.nombre;
-      document.getElementById("inputVehiculo").value=data.vehiculo||"";
-      document.getElementById("inputEstado").value=data.estado||"Planeado";
-      document.getElementById("inputTipoFecha").value=data.tipo||"FECHA";
+      document.getElementById("inputNombre").value = data.nombre;
+      document.getElementById("inputVehiculo").value = data.vehiculo || "";
+      document.getElementById("inputEstado").value = data.estado || "Planeado";
+      document.getElementById("inputTipoFecha").value = data.tipo || "FECHA";
       if(data.tipo==="FECHA"){fechaExactaDiv.style.display="block"; netDiv.style.display="none"; document.getElementById("inputFecha").value=data.fecha||"";}
-      else{
-        fechaExactaDiv.style.display="none"; netDiv.style.display="block";
-        if(data.net){const parts=data.net.slice(4).split("/"); if(parts.length===1){netTipo.value="YEAR"; document.getElementById("netInputYear").value=parts[0];}
-        if(parts.length===2){netTipo.value="MONTH"; document.getElementById("netInputYear").value=parts[1]; netSelectMonth.value=parts[0];}
-        if(parts.length===3){netTipo.value="DAY"; document.getElementById("netInputYear").value=parts[2]; netSelectMonth.value=parts[1]; netSelectDay.value=parts[0];}}
-        netYearDiv.style.display="block"; netMonthDiv.style.display=(netTipo.value!=="YEAR")?"block":"none"; netDayDiv.style.display=(netTipo.value==="DAY")?"block":"none";
-      }
-      document.getElementById("inputCarga").value=data.carga||"";
-      document.getElementById("inputGaleria").value=data.galeria?.join(",")||"";
-      editingId=d.id;
+      else{fechaExactaDiv.style.display="none"; netDiv.style.display="block"; editingId=d.id;}
+      document.getElementById("inputCarga").value = data.carga || "";
+      document.getElementById("inputGaleria").value = data.galeria?.join(",") || "";
+      editingId = d.id;
     });
     card.querySelector(".deleteBtn").addEventListener("click",async()=>{
-      if(confirm("Eliminar este lanzamiento?")){await deleteDoc(doc(db,"launches",d.id)); loadLaunchesAdmin();}
+      if(confirm("Eliminar este lanzamiento?")){
+        await deleteDoc(doc(db,"launches",d.id));
+        loadLaunchesAdmin();
+      }
     });
     container.appendChild(card);
   });
 }
 loadLaunchesAdmin();
 
-// --- PLANOS ORBITALES ---
-let editingPlano=null;
-document.getElementById("btnAgregarPlano").addEventListener("click",async()=>{
-  const nombre=document.getElementById("inputPlanoNombre").value;
-  const altitud=document.getElementById("inputPlanoAltitud").value;
-  const inclinacion=document.getElementById("inputPlanoInclinacion").value;
-  const ubicacion=document.getElementById("inputPlanoUbicacion").value;
-  const satelites=document.getElementById("inputPlanoSats").value.split(",").map(x=>x.trim()).filter(x=>x);
-  if(editingPlano){await setDoc(doc(db,"planos",editingPlano),{nombre,altitud,inclinacion,ubicacion,satelites}); editingPlano=null;}
-  else await addDoc(collection(db,"planos"),{nombre,altitud,inclinacion,ubicacion,satelites});
-  document.getElementById("inputPlanoNombre").value="";
-  document.getElementById("inputPlanoAltitud").value="";
-  document.getElementById("inputPlanoInclinacion").value="";
-  document.getElementById("inputPlanoSats").value="";
-  loadPlanosAdmin();
-});
-
-async function load
-async function loadPlanosAdmin(){
-  const container=document.getElementById("planosAdmin"); container.innerHTML="";
-  const snaps=await getDocs(collection(db,"planos"));
-  snaps.forEach(d=>{
-    const data=d.data();
-    const card=document.createElement("div");
-    card.className="card-plano";
-    card.innerHTML=`
-      <strong>Nombre:</strong> ${data.nombre}<br>
-      <strong>Altitud:</strong> ${data.altitud || "-"} km<br>
-      <strong>Inclinación:</strong> ${data.inclinacion || "-"}°<br>
-      <strong>Ubicación:</strong> ${data.ubicacion || "-"}<br>
-      <strong>Satélites:</strong> ${data.satelites?.join(", ") || "-"}<br>
-      <button data-id="${d.id}" class="editPlanoBtn">Editar</button>
-      <button data-id="${d.id}" class="deletePlanoBtn">Eliminar</button>
-    `;
-    card.querySelector(".editPlanoBtn").addEventListener("click",()=>{
-      document.getElementById("inputPlanoNombre").value = data.nombre;
-      document.getElementById("inputPlanoAltitud").value = data.altitud || "";
-      document.getElementById("inputPlanoInclinacion").value = data.inclinacion || "";
-      document.getElementById("inputPlanoUbicacion").value = data.ubicacion || "Kerbin";
-      document.getElementById("inputPlanoSats").value = data.satelites?.join(",") || "";
-      editingPlano = d.id;
-    });
-    card.querySelector(".deletePlanoBtn").addEventListener("click", async()=>{
-      if(confirm("Eliminar este plano orbital?")){
-        await deleteDoc(doc(db,"planos",d.id));
-        loadPlanosAdmin();
-      }
-    });
-    container.appendChild(card);
-  });
-}
-loadPlanosAdmin();
-
-// --- GALERÍA ---
+// Galería
 document.getElementById("btnAgregarGaleria").addEventListener("click",async()=>{
-  const url=document.getElementById("inputGaleriaURL").value.trim();
+  const url = document.getElementById("inputGaleriaURL").value.trim();
   if(url){
     await addDoc(collection(db,"gallery"),{url});
     document.getElementById("inputGaleriaURL").value="";
     loadGaleriaAdmin();
   }
 });
-
 async function loadGaleriaAdmin(){
-  const div=document.getElementById("galeriaAdmin"); div.innerHTML="";
-  const snaps=await getDocs(collection(db,"gallery"));
+  const div = document.getElementById("galeriaAdmin");
+  div.innerHTML="";
+  const snaps = await getDocs(collection(db,"gallery"));
   snaps.forEach(d=>{
     const container=document.createElement("div");
     container.innerHTML=renderMedia(d.data().url)+` <button data-id="${d.id}">Eliminar</button>`;
-    container.querySelector("button").addEventListener("click", async()=>{
+    container.querySelector("button").addEventListener("click",async()=>{
       if(confirm("Eliminar elemento de galería?")){
         await deleteDoc(doc(db,"gallery",d.id));
         loadGaleriaAdmin();
@@ -392,5 +346,6 @@ async function loadGaleriaAdmin(){
 }
 loadGaleriaAdmin();
 </script>
+
 </body>
 </html>
