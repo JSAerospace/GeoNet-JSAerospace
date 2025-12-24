@@ -2,77 +2,114 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>GeoNet J.S. Aerospace</title>
+<title>GeoNet J.S Aerospace</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
-header{background:#141a2e;padding:15px;text-align:center;font-size:24px;font-weight:bold;box-shadow:0 0 10px rgba(0,0,0,0.5)}
-section{padding:20px;margin:0 auto;max-width:900px}
-.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 0 10px rgba(0,0,0,.4)}
-h2{margin-top:25px;margin-bottom:10px}
-label{font-weight:bold}
-.img-gallery img,.img-gallery video{max-width:100%;margin-top:10px;border-radius:8px}
-.card-launch,.card-orbital{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
-.card-launch button,.card-orbital button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000;margin-right:5px;cursor:pointer;border:none;border-radius:5px}
-.version{position:fixed;bottom:10px;right:10px;color:#0af;font-weight:bold}
-.flex{display:flex;gap:10px;flex-wrap:wrap}
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#0b0f1a;
+  color:#fff;
+}
+header {
+  background:#141a2e;
+  padding:20px;
+  text-align:center;
+  font-size:24px;
+  font-weight:bold;
+  box-shadow:0 2px 5px rgba(0,0,0,0.5);
+}
+section {
+  padding:20px;
+}
+.card {
+  background:#141a2e;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 0 10px rgba(0,0,0,0.4);
+}
+h2 {
+  margin-top:0;
+  margin-bottom:10px;
+  border-bottom:1px solid #0af;
+  padding-bottom:5px;
+}
+.flex {
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+}
+.card img, .card video {
+  max-width:100%;
+  border-radius:8px;
+  margin-top:10px;
+}
+.card-launch, .card-orbit {
+  padding:10px;
+  background:#1a2030;
+  border-radius:10px;
+  box-shadow:0 0 5px rgba(0,0,0,0.5);
+  margin-bottom:10px;
+}
+.version {
+  position:fixed;
+  bottom:5px;
+  right:10px;
+  font-size:12px;
+  color:#0af;
+}
 </style>
 </head>
 <body>
 
-<header>GeoNet J.S. Aerospace</header>
+<header>GeoNet J.S Aerospace</header>
 
 <section id="infoSection">
-<h2>Información</h2>
-<div class="card">
-<p><strong>Lanzamientos:</strong> <span id="infoLanzamientos">-</span></p>
-<p><strong>Planos Orbitales:</strong> <span id="infoPlanos">-</span></p>
-<p><strong>N° de Satélites:</strong> <span id="infoSat">-</span></p>
-</div>
+  <h2>Información</h2>
+  <div class="card">
+    <p><strong>Lanzamientos:</strong> <span id="infoLanzamientos">-</span></p>
+    <p><strong>Planos Orbitales:</strong> <span id="infoPlanos">-</span></p>
+    <p><strong>Satélites:</strong> <span id="infoSat">-</span></p>
+  </div>
 </section>
 
-<section id="lanzamientosSection">
-<h2>Lanzamientos</h2>
-<div id="launchesContainer"></div>
+<section id="launchesSection">
+  <h2>Lanzamientos</h2>
+  <div id="launchesContainer"></div>
 </section>
 
-<section id="orbitalSection">
-<h2>Planos Orbitales</h2>
-<div id="orbitalContainer"></div>
+<section id="planosSection">
+  <h2>Planos Orbitales</h2>
+  <div id="planosContainer"></div>
 </section>
 
 <section id="galeriaSection">
-<h2>Galería</h2>
-<div id="galeriaContainer" class="img-gallery"></div>
+  <h2>Galería</h2>
+  <div id="galeriaContainer" class="flex"></div>
 </section>
 
-<div class="version">V1.0</div>
+<div class="version">V5.1</div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,doc,getDoc,getDocs,collection} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore, doc, getDoc, getDocs, collection} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// --- Config Firebase ---
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "geonet-js-aerospace.firebaseapp.com",
-  projectId: "geonet-js-aerospace",
-  storageBucket: "geonet-js-aerospace.appspot.com",
-  messagingSenderId: "651364423254",
-  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
-};
-const app = initializeApp(firebaseConfig);
+const app = initializeApp({
+  apiKey:"TU_API_KEY",
+  authDomain:"geonet-js-aerospace.firebaseapp.com",
+  projectId:"geonet-js-aerospace"
+});
 const db = getFirestore(app);
 
-// --- Función para mostrar media ---
+// Mostrar media (imagen, video o enlace)
 function renderMedia(url){
-  if(url.includes("imgur.com") || url.match(/\.(jpg|jpeg|png|gif|mp4)$/i)){
-    if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
-    else return `<img src="${url}">`;
-  } else return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
+  if(url.match(/\.(jpg|jpeg|png|gif)$/i)) return `<img src="${url}" alt="media">`;
+  if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
+  return `<a href="${url}" target="_blank" style="color:#0af">${url}</a>`;
 }
 
-// --- Cargar Información ---
+// Cargar información general
 async function loadInfo(){
   const docSnap = await getDoc(doc(db,"Config","info"));
   if(docSnap.exists()){
@@ -84,19 +121,21 @@ async function loadInfo(){
 }
 loadInfo();
 
-// --- Cargar Lanzamientos ---
+// Cargar lanzamientos
 async function loadLaunches(){
-  const container=document.getElementById("launchesContainer");
+  const container = document.getElementById("launchesContainer");
   container.innerHTML="";
-  const snaps=await getDocs(collection(db,"launches"));
+  const snaps = await getDocs(collection(db,"launches"));
   snaps.forEach(d=>{
-    const data=d.data();
+    const data = d.data();
     let fechaDisplay="-";
     if(data.tipo==="FECHA" && data.fecha) fechaDisplay=new Date(data.fecha).toLocaleString();
     if(data.tipo==="NET" && data.net) fechaDisplay=data.net;
+
     let galeriaHTML="-";
-    if(data.galeria?.length) galeriaHTML=data.galeria.map(url=>renderMedia(url)).join("");
-    const card=document.createElement("div");
+    if(data.galeria?.length) galeriaHTML = data.galeria.map(renderMedia).join("");
+
+    const card = document.createElement("div");
     card.className="card-launch";
     card.innerHTML=`
       <strong>Nombre:</strong> ${data.nombre}<br>
@@ -111,35 +150,35 @@ async function loadLaunches(){
 }
 loadLaunches();
 
-// --- Cargar Planos Orbitales ---
-async function loadOrbital(){
-  const container=document.getElementById("orbitalContainer");
+// Cargar planos orbitales
+async function loadPlanos(){
+  const container = document.getElementById("planosContainer");
   container.innerHTML="";
-  const snaps=await getDocs(collection(db,"orbitalPlanes"));
+  const snaps = await getDocs(collection(db,"planos"));
   snaps.forEach(d=>{
-    const data=d.data();
-    const card=document.createElement("div");
-    card.className="card-orbital";
+    const data = d.data();
+    const card = document.createElement("div");
+    card.className="card-orbit";
     card.innerHTML=`
       <strong>Nombre:</strong> ${data.nombre}<br>
       <strong>Planeta:</strong> ${data.planeta}<br>
-      <strong>Altitud:</strong> ${data.altitud || "-"} km<br>
-      <strong>N° de Satélites:</strong> ${data.satellites || "-"}
+      <strong>Altitud:</strong> ${data.altitud} km<br>
+      <strong>Inclinación:</strong> ${data.inclinacion}°<br>
+      <strong>N° de Satélites:</strong> ${data.satelites || "-"}<br>
     `;
     container.appendChild(card);
   });
 }
-loadOrbital();
+loadPlanos();
 
-// --- Cargar Galería ---
+// Cargar galería
 async function loadGaleria(){
-  const container=document.getElementById("galeriaContainer");
+  const container = document.getElementById("galeriaContainer");
   container.innerHTML="";
-  const snaps=await getDocs(collection(db,"gallery"));
+  const snaps = await getDocs(collection(db,"gallery"));
   snaps.forEach(d=>{
-    const media = renderMedia(d.data().url);
-    const div=document.createElement("div");
-    div.innerHTML=media;
+    const div = document.createElement("div");
+    div.innerHTML = renderMedia(d.data().url);
     container.appendChild(div);
   });
 }
