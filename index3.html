@@ -1,215 +1,100 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>J.S. Aerospace</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    :root {
-      --bg: #050914;
-      --card: #0c1328;
-      --accent: #3fa9f5;
-      --text: #eaeaea;
-      --muted: #9aa4c7;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-    }
-
-    body {
-      background: radial-gradient(circle at top, #0a1025, #02040a);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    header {
-      padding: 80px 20px;
-      text-align: center;
-      background: linear-gradient(to bottom, #0b122e, transparent);
-    }
-
-    header h1 {
-      font-size: 3rem;
-      letter-spacing: 2px;
-    }
-
-    header p {
-      max-width: 700px;
-      margin: 20px auto;
-      color: var(--muted);
-      font-size: 1.1rem;
-    }
-
-    .cta {
-      margin-top: 30px;
-    }
-
-    .cta a {
-      display: inline-block;
-      padding: 14px 32px;
-      background: var(--accent);
-      color: #000;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 30px;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .cta a:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(63,169,245,0.6);
-    }
-
-    section {
-      padding: 60px 20px;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    section h2 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-      border-left: 4px solid var(--accent);
-      padding-left: 12px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background: var(--card);
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      transition: transform 0.2s;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-    }
-
-    .card h3 {
-      margin-bottom: 10px;
-      color: var(--accent);
-    }
-
-    .card p {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-      border-top: 1px solid #111;
-      margin-top: 60px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>J.S. Aerospace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
+header{background:#141a2e;padding:20px;text-align:center;font-size:28px;font-weight:bold}
+section{padding:20px}
+.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:20px;box-shadow:0 0 10px rgba(0,0,0,.4)}
+h2{margin-top:25px;margin-bottom:10px;color:#0af}
+.card img, .card video{max-width:100%;border-radius:8px;margin-top:10px}
+.flex{display:flex;gap:10px;flex-wrap:wrap}
+a{color:#0af;text-decoration:none}
+</style>
 </head>
 <body>
 
-  <!-- HERO -->
-  <header>
-    <h1>J.S. AEROSPACE</h1>
-    <p>
-      Ingeniería orbital, exploración espacial y desarrollo de sistemas satelitales
-      para una nueva era interplanetaria.
-    </p>
+<header>J.S. Aerospace</header>
 
-    <div class="cta">
-      <a href="https://jsaerospace.github.io/GeoNet-JSAerospace/index2.html">
-        Acceder al sistema GeoNet
-      </a>
-    </div>
-  </header>
+<section id="companyInfo" class="card">
+<h2>Información de la Compañía</h2>
+<p><strong>Nombre:</strong> <span id="companyName">Cargando...</span></p>
+<p><strong>Contratistas:</strong> <span id="companyContractors">Cargando...</span></p>
+<p><strong>Proyectos:</strong> <span id="companyProjects">Cargando...</span></p>
+<p><strong>Noticias:</strong> <span id="companyNews">Cargando...</span></p>
+<div id="companyMedia"></div>
+</section>
 
-  <!-- SOBRE LA EMPRESA -->
-  <section>
-    <h2>Sobre Nosotros</h2>
-    <p style="color: var(--muted); max-width: 900px;">
-      J.S. Aerospace es una compañía aeroespacial dedicada al diseño, lanzamiento y
-      operación de satélites, constelaciones orbitales y misiones interplanetarias.
-    </p>
-  </section>
+<section id="launchesSection" class="card">
+<h2>Lanzamientos</h2>
+<div id="launchesContainer" class="flex"></div>
+</section>
 
-  <!-- ÁREAS -->
-  <section>
-    <h2>Áreas Principales</h2>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore, doc, getDoc, collection, getDocs} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    <div class="grid">
-      <div class="card">
-        <h3>Lanzamientos</h3>
-        <p>Gestión de misiones orbitales y extraplanetarias.</p>
-      </div>
+// --- Firebase config ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+  authDomain: "geonet-js-aerospace.firebaseapp.com",
+  projectId: "geonet-js-aerospace",
+  storageBucket: "geonet-js-aerospace.appspot.com",
+  messagingSenderId: "651364423254",
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-      <div class="card">
-        <h3>Constelaciones</h3>
-        <p>Desarrollo de redes satelitales como GeoNet.</p>
-      </div>
+// --- Función para renderizar media ---
+function renderMedia(url){
+  if(!url) return "";
+  if(url.includes("youtube.com") || url.includes("youtu.be")) return `<a href="${url}" target="_blank">Video</a>`;
+  if(url.match(/\.(jpg|jpeg|png|gif)$/i)) return `<img src="${url}">`;
+  if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
+  return `<a href="${url}" target="_blank">${url}</a>`;
+}
 
-      <div class="card">
-        <h3>Exploración</h3>
-        <p>Arquitecturas orbitales en Tierra y Marte.</p>
-      </div>
+// --- Cargar Información de la Compañía ---
+async function loadCompanyInfo(){
+  const docSnap = await getDoc(doc(db,"company","info"));
+  if(docSnap.exists()){
+    const data = docSnap.data();
+    document.getElementById("companyName").textContent = data.name || "-";
+    document.getElementById("companyContractors").textContent = (data.contractors || []).join(", ") || "-";
+    document.getElementById("companyProjects").textContent = (data.projects || []).join(", ") || "-";
+    document.getElementById("companyNews").textContent = (data.news || []).join(", ") || "-";
+    document.getElementById("companyMedia").innerHTML = renderMedia(data.media);
+  }
+}
+loadCompanyInfo();
 
-      <div class="card">
-        <h3>I+D</h3>
-        <p>Innovación en tecnología aeroespacial.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ARTÍCULOS -->
-  <section>
-    <h2>Artículos & Noticias</h2>
-
-    <div class="grid">
-      <div class="card">
-        <h3>Expansión GeoNet</h3>
-        <p>Nuevos planos orbitales y mayor cobertura.</p>
-      </div>
-
-      <div class="card">
-        <h3>Marte</h3>
-        <p>Diseño de constelaciones alrededor de Duna.</p>
-      </div>
-
-      <div class="card">
-        <h3>Próximas Misiones</h3>
-        <p>Lanzamientos planeados y en preparación.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTRATISTAS -->
-  <section>
-    <h2>Contratistas</h2>
-
-    <div class="grid">
-      <div class="card">
-        <h3>Halcón Space</h3>
-        <p>Servicios de lanzamiento orbital.</p>
-      </div>
-
-      <div class="card">
-        <h3>Centros Científicos</h3>
-        <p>Colaboraciones tecnológicas.</p>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    © 2025 J.S. Aerospace — Expanding Orbits, Connecting Worlds
-  </footer>
+// --- Cargar Lanzamientos ---
+async function loadLaunches(){
+  const container = document.getElementById("launchesContainer");
+  container.innerHTML="";
+  const snaps = await getDocs(collection(db,"launches"));
+  snaps.forEach(d=>{
+    const data = d.data();
+    const div = document.createElement("div");
+    div.className="card";
+    div.style.flex="1 1 300px";
+    div.innerHTML=`
+      <p><strong>Nombre:</strong> ${data.name || "-"}</p>
+      <p><strong>Vehículo:</strong> ${data.vehicle || "-"}</p>
+      <p><strong>Estado:</strong> ${data.status || "-"}</p>
+      <p><strong>Fecha (UTC):</strong> ${data.date || "-"}</p>
+      <p><strong>Satélites:</strong> ${data.satellites || "-"}</p>
+      ${renderMedia(data.media)}
+    `;
+    container.appendChild(div);
+  });
+}
+loadLaunches();
+</script>
 
 </body>
 </html>
