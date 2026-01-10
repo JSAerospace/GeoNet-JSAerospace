@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Admin J.S. Aerospace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
+header{background:#141a2e;padding:15px;text-align:center;font-size:24px;font-weight:bold}
+section{padding:20px}
+.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 0 10px rgba(0,0,0,.4)}
+input, select, textarea, button{padding:5px;margin-top:5px;margin-bottom:10px;width:100%;border-radius:5px;border:none}
+textarea{resize:vertical}
+button{background:#0af;color:#000;font-weight:bold;cursor:pointer}
+h2{margin-top:25px;margin-bottom:10px}
+.hidden{display:none}
+label{font-weight:bold}
+.card-item{margin-bottom:10px;padding:10px;background:#1a2030;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
+.card-item button{width:auto;margin-top:5px;padding:3px 10px;background:#0af;color:#000;margin-right:5px}
+</style>
+</head>
+<body>
+
+<header>Admin J.S. Aerospace</header>
+
+<div id="loginContainer">
+  <div class="card">
+    <h2>Login Admin</h2>
+    <input type="text" id="loginUser" placeholder="Usuario">
+    <input type="password" id="loginPass" placeholder="Contraseña">
+    <button id="btnLogin">Entrar</button>
+    <p id="loginError" style="color:#f55"></p>
+  </div>
+</div>
+
+<section class="hidden" id="adminContent">
+
+<h2>Información General</h2>
+<div class="card">
+<label>Nombre de la Compañía:</label>
+<input type="text" id="inputCompany">
+<label>Contratistas:</label>
+<textarea id="inputContractors" placeholder="Separar por comas"></textarea>
+<label>Proyectos:</label>
+<textarea id="inputProjects" placeholder="Separar por comas"></textarea>
+<label>Noticias:</label>
+<textarea id="inputNews" placeholder="Separar por comas"></textarea>
+<label>Imagen/Video Opcional:</label>
+<input type="text" id="inputMedia" placeholder="URL Imagen o Video">
+<button id="btnUpdateInfo">Actualizar Información</button>
+</div>
+
+<h2>Lanzamientos</h2>
+<div class="card">
+<label>Nombre del Lanzamiento:</label>
+<input type="text" id="launchName">
+<label>Vehículo:</label>
+<input type="text" id="launchVehicle">
+<label>Estado:</label>
+<select id="launchStatus">
+  <option value="Planeado">Planeado</option>
+  <option value="Éxito">Éxito</option>
+  <option value="Fallido">Fallido</option>
+  <option value="En Vuelo">En Vuelo</option>
+</select>
+<label>Fecha (UTC):</label>
+<input type="datetime-local" id="launchDate">
+<label>Opcional Media:</label>
+<input type="text" id="launchMedia" placeholder="URL Imagen/Video">
+<label>Cantidad de Satélites:</label>
+<input type="number" id="launchSat">
+<button id="btnAddLaunch">Agregar/Editar Lanzamiento</button>
+</div>
+
+<h2>Lanzamientos Existentes</h2>
+<div id="launchesList"></div>
+
+<button id="btnLogout">Cerrar Sesión</button>
+
+</section>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// --- Firebase config ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+  authDomain: "geonet-js-aerospace.firebaseapp.com",
+  projectId: "geonet-js-aerospace",
+  storageBucket: "geonet-js-aerospace.appspot.com",
+  messagingSenderId: "651364423254",
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// --- Login ---
+const USER = "olanoagus@gmail.com";
+const PASS = "Simba2011";
+const loginContainer = document.getElementById("loginContainer");
+const adminContent = document.getElementById("adminContent");
+const loginUser = document.getElementById("loginUser");
+const loginPass = document.getElementById("loginPass");
+const loginError = document.getElementById("loginError");
+const btnLogin = document.getElementById("btnLogin");
+const btnLogout = document.getElementById("btnLogout");
+
+if(localStorage.getItem("adminLogged")==="true"){
+  loginContainer.style.display="none";
+  adminContent.classList.remove("hidden");
+}
+
+btnLogin.addEventListener("click",()=>{
+  if(loginUser.value===USER && loginPass.value===PASS){
+    localStorage.setItem("adminLogged","true");
+    loginContainer.style.display="none";
+    adminContent.classList.remove("hidden");
+  } else loginError.textContent="Usuario o contraseña incorrectos";
+});
+
+btnLogout.addEventListener("click",()=>{
+  localStorage.removeItem("adminLogged");
+  location.reload();
+});
+
+// --- Info General ---
+const inputCompany = document.getElementById("inputCompany");
+const inputContractors = document.getElementById("inputContractors");
+const inputProjects = document.getElementById("inputProjects");
+const inputNews = document.getElementById("inputNews");
+const inputMedia = document.getElementById("inputMedia");
+const btnUpdateInfo = document.getElementById("btnUpdateInfo");
+
+async function loadInfo(){
+  const docSnap = await getDoc(doc(db,"company","info"));
+  if(docSnap.exists()){
+    const data = docSnap.data();
+    inputCompany.value = data.name || "";
+    inputContractors.value = (data.contractors || []).join(", ");
+    inputProjects.value = (data.projects || []).join(", ");
+    inputNews.value = (data.news || []).join(", ");
+    inputMedia.value = data.media || "";
+  }
+}
+loadInfo();
+
+btnUpdateInfo.addEventListener("click",async()=>{
+  await setDoc(doc(db,"company","info"),{
+    name: inputCompany.value,
+    contractors: inputContractors.value.split(",").map(x=>x.trim()),
+    projects: inputProjects.value.split(",").map(x=>x.trim()),
+    news: inputNews.value.split(",").map(x=>x.trim()),
+    media: inputMedia.value.trim()
+  });
+  alert("Información actualizada");
+});
+
+// --- Lanzamientos ---
+let editingId = null;
+const launchName = document.getElementById("launchName");
+const launchVehicle = document.getElementById("launchVehicle");
+const launchStatus = document.getElementById("launchStatus");
+const launchDate = document.getElementById("launchDate");
+const launchMedia = document.getElementById("launchMedia");
+const launchSat = document.getElementById("launchSat");
+const btnAddLaunch = document.getElementById("btnAddLaunch");
+const launchesList = document.getElementById("launchesList");
+
+function renderMedia(url){
+  if(!url) return "";
+  if(url.includes("youtube.com") || url.includes("youtu.be")) return `<a href="${url}" target="_blank" style="color:#0af;">Video</a>`;
+  if(url.match(/\.(jpg|jpeg|png|gif)$/i)) return `<img src="${url}" style="max-width:100%;border-radius:8px">`;
+  if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}" style="max-width:100%;border-radius:8px"></video>`;
+  return `<a href="${url}" target="_blank" style="color:#0af;">${url}</a>`;
+}
+
+async function loadLaunches(){
+  launchesList.innerHTML="";
+  const snaps = await getDocs(collection(db,"launches"));
+  snaps.forEach(d=>{
+    const data = d.data();
+    const card = document.createElement("div");
+    card.className="card-item";
+    card.innerHTML=`
+      <strong>Nombre:</strong> ${data.name}<br>
+      <strong>Vehículo:</strong> ${data.vehicle}<br>
+      <strong>Estado:</strong> ${data.status}<br>
+      <strong>Fecha (UTC):</strong> ${data.date || "-"}<br>
+      <strong>Satélites:</strong> ${data.satellites || "-"}<br>
+      ${renderMedia(data.media)}<br>
+      <button data-id="${d.id}" class="editBtn">Editar</button>
+      <button data-id="${d.id}" class="deleteBtn">Eliminar</button>
+    `;
+    card.querySelector(".editBtn").addEventListener("click",()=>{
+      launchName.value = data.name;
+      launchVehicle.value = data.vehicle;
+      launchStatus.value = data.status;
+      launchDate.value = data.date;
+      launchMedia.value = data.media || "";
+      launchSat.value = data.satellites || "";
+      editingId = d.id;
+    });
+    card.querySelector(".deleteBtn").addEventListener("click",async()=>{
+      if(confirm("Eliminar lanzamiento?")){
+        await deleteDoc(doc(db,"launches",d.id));
+        loadLaunches();
+      }
+    });
+    launchesList.appendChild(card);
+  });
+}
+loadLaunches();
+
+btnAddLaunch.addEventListener("click",async()=>{
+  const data = {
+    name: launchName.value,
+    vehicle: launchVehicle.value,
+    status: launchStatus.value,
+    date: launchDate.value,
+    media: launchMedia.value.trim(),
+    satellites: launchSat.value
+  };
+  if(editingId){
+    await setDoc(doc(db,"launches",editingId),data);
+    editingId=null;
+    alert("Lanzamiento editado");
+  } else {
+    await addDoc(collection(db,"launches"),data);
+    alert("Lanzamiento agregado");
+  }
+  launchName.value="";
+  launchVehicle.value="";
+  launchStatus.value="Planeado";
+  launchDate.value="";
+  launchMedia.value="";
+  launchSat.value="";
+  loadLaunches();
+});
+</script>
+</body>
+</html>

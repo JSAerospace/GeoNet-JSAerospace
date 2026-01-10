@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>J.S. Aerospace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
+header{background:#141a2e;padding:20px;text-align:center;font-size:28px;font-weight:bold}
+section{padding:20px}
+.card{background:#141a2e;border-radius:12px;padding:15px;margin-bottom:20px;box-shadow:0 0 10px rgba(0,0,0,.4)}
+h2{margin-top:25px;margin-bottom:10px;color:#0af}
+.card img, .card video{max-width:100%;border-radius:8px;margin-top:10px}
+.flex{display:flex;gap:10px;flex-wrap:wrap}
+a{color:#0af;text-decoration:none}
+</style>
+</head>
+<body>
+
+<header>J.S. Aerospace</header>
+
+<section id="companyInfo" class="card">
+<h2>Información de la Compañía</h2>
+<p><strong>Nombre:</strong> <span id="companyName">Cargando...</span></p>
+<p><strong>Contratistas:</strong> <span id="companyContractors">Cargando...</span></p>
+<p><strong>Proyectos:</strong> <span id="companyProjects">Cargando...</span></p>
+<p><strong>Noticias:</strong> <span id="companyNews">Cargando...</span></p>
+<div id="companyMedia"></div>
+</section>
+
+<section id="launchesSection" class="card">
+<h2>Lanzamientos</h2>
+<div id="launchesContainer" class="flex"></div>
+</section>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore, doc, getDoc, collection, getDocs} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// --- Firebase config ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAIBwQ4YmJNfyPa9js6cox-sOnZMegKaNA",
+  authDomain: "geonet-js-aerospace.firebaseapp.com",
+  projectId: "geonet-js-aerospace",
+  storageBucket: "geonet-js-aerospace.appspot.com",
+  messagingSenderId: "651364423254",
+  appId: "1:651364423254:web:f4105d4cd47e95512e8df7"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// --- Función para renderizar media ---
+function renderMedia(url){
+  if(!url) return "";
+  if(url.includes("youtube.com") || url.includes("youtu.be")) return `<a href="${url}" target="_blank">Video</a>`;
+  if(url.match(/\.(jpg|jpeg|png|gif)$/i)) return `<img src="${url}">`;
+  if(url.match(/\.(mp4|webm|ogg)$/i)) return `<video controls src="${url}"></video>`;
+  return `<a href="${url}" target="_blank">${url}</a>`;
+}
+
+// --- Cargar Información de la Compañía ---
+async function loadCompanyInfo(){
+  const docSnap = await getDoc(doc(db,"company","info"));
+  if(docSnap.exists()){
+    const data = docSnap.data();
+    document.getElementById("companyName").textContent = data.name || "-";
+    document.getElementById("companyContractors").textContent = (data.contractors || []).join(", ") || "-";
+    document.getElementById("companyProjects").textContent = (data.projects || []).join(", ") || "-";
+    document.getElementById("companyNews").textContent = (data.news || []).join(", ") || "-";
+    document.getElementById("companyMedia").innerHTML = renderMedia(data.media);
+  }
+}
+loadCompanyInfo();
+
+// --- Cargar Lanzamientos ---
+async function loadLaunches(){
+  const container = document.getElementById("launchesContainer");
+  container.innerHTML="";
+  const snaps = await getDocs(collection(db,"launches"));
+  snaps.forEach(d=>{
+    const data = d.data();
+    const div = document.createElement("div");
+    div.className="card";
+    div.style.flex="1 1 300px";
+    div.innerHTML=`
+      <p><strong>Nombre:</strong> ${data.name || "-"}</p>
+      <p><strong>Vehículo:</strong> ${data.vehicle || "-"}</p>
+      <p><strong>Estado:</strong> ${data.status || "-"}</p>
+      <p><strong>Fecha (UTC):</strong> ${data.date || "-"}</p>
+      <p><strong>Satélites:</strong> ${data.satellites || "-"}</p>
+      ${renderMedia(data.media)}
+    `;
+    container.appendChild(div);
+  });
+}
+loadLaunches();
+</script>
+
+</body>
+</html>

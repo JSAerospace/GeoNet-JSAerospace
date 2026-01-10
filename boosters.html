@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>J.S. Aerospace — Boosters</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles/boosters.css">
+</head>
+<body>
+  <header>
+    J.S. Aerospace
+    <nav style="margin-top:8px; font-size:14px;"><a href="index.html" style="color:#0af; text-decoration:none;">Inicio</a> • <a href="boosters.html" style="color:#0af; text-decoration:none;">Boosters</a></nav>
+  </header>
+
+  <main>
+    <section class="card">
+      <h1>Boosters</h1>
+      <div class="controls" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+        <input id="search" placeholder="Buscar booster por nombre..." aria-label="Buscar booster">
+        <select id="stateFilter" aria-label="Filtrar por estado">
+          <option value="all">Todos</option>
+          <option value="operational">Operativo</option>
+          <option value="prototype">Prototipo</option>
+          <option value="retired">Retirado</option>
+        </select>
+      </div>
+
+      <div id="grid" class="boosters-grid"></div>
+    </section>
+  </main>
+
+  <!-- Modal de detalle -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <button id="modalClose" class="close">×</button>
+      <h2 id="modalTitle"></h2>
+      <img id="modalImage" src="" alt="Imagen del booster">
+      <p id="modalState"></p>
+      <p id="modalDesc"></p>
+      <h3>Misiones</h3>
+      <ul id="modalMissions"></ul>
+    </div>
+  </div>
+
+  <script src="scripts/app.js"></script>
+</body>
+</html>
