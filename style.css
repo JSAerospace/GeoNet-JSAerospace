@@ -43,9 +43,22 @@ body {
 }
 
 .logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+}
+
+.logo img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-text {
     color: #fff;
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 2px;

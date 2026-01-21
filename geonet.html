@@ -91,7 +91,7 @@
         }
 
         .logo img {
-            height: 40px;
+            height: 32px;
             width: auto;
             object-fit: contain;
         }
@@ -1748,7 +1748,7 @@
 
                 // Update Dashboard List
                 const planesList = document.querySelector('.planes-list');
-                const isAdmin = currentUser?.displayName === 'Esstor';
+                const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
 
                 if (planesList) {
                     planesList.innerHTML = planes.map((p, i) => `
@@ -1826,7 +1826,8 @@
         // ADD PLANE TO FIREBASE
         adminPlaneForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (currentUser?.displayName !== 'Esstor') return alert('No autorizado');
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) return alert('No autorizado');
 
             const newPlane = {
                 name: document.getElementById('planeName').value,
@@ -1852,7 +1853,8 @@
         import { remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         window.deletePlane = async (planeId, name) => {
-            if (currentUser?.displayName !== 'Esstor') return;
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) return;
             if (!confirm(`¿Estás seguro de que deseas eliminar el plano "${name}" y todos sus satélites?`)) return;
 
             try {
@@ -1864,7 +1866,8 @@
         };
 
         window.openSatManager = (planeId) => {
-            if (currentUser?.displayName !== 'Esstor') return;
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) return;
 
             // Open modal
             adminModal.classList.add('active');
@@ -1909,7 +1912,8 @@
         const adminSatForm = document.getElementById('adminSatForm');
         adminSatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (currentUser?.displayName !== 'Esstor') return alert('No autorizado');
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) return alert('No autorizado');
 
             const planeId = document.getElementById('targetPlane').value;
             const countToUpdate = parseInt(document.getElementById('satCountToAdd').value);
@@ -1962,7 +1966,8 @@
         });
 
         window.updateTotalLaunches = async (delta) => {
-            if (currentUser?.displayName !== 'Esstor') return;
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) return;
             try {
                 const newValue = Math.max(0, currentTotalLaunches + delta);
                 await update(statsRef, { totalLaunches: newValue });
@@ -1972,7 +1977,8 @@
         };
 
         window.setExactLaunches = async () => {
-            if (currentUser?.displayName !== 'Esstor') return;
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) return;
             const input = document.getElementById('setExactLaunches');
             const val = parseInt(input.value);
             if (isNaN(val) || val < 0) return alert('Por favor, ingresa un número válido');

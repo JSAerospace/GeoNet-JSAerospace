@@ -94,7 +94,7 @@
         }
 
         .logo img {
-            height: 40px;
+            height: 32px;
             width: auto;
             object-fit: contain;
         }
@@ -1562,7 +1562,8 @@ ASTRO-3_launch.png
 
         // ADMIN CHECK
         function checkAdmin(user) {
-            if (user && user.displayName === 'Esstor') {
+            const isAdmin = user && (user.displayName === 'Esstor' || user.displayName === 'Agus');
+            if (isAdmin) {
                 if (addRocketBtn) addRocketBtn.style.display = 'flex';
                 document.body.classList.add('is-admin');
                 console.log("Modo administrador activado para: " + user.displayName);
@@ -1575,8 +1576,9 @@ ASTRO-3_launch.png
 
         // DELETE ROCKET
         window.deleteRocket = async (id) => {
-            if (currentUser?.displayName !== 'Esstor') {
-                alert('No autorizado. Solo Esstor puede gestionar la flota.');
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) {
+                alert('No autorizado. Solo administradores pueden gestionar la flota.');
                 return;
             }
             if (confirm('¿Estás seguro de que deseas eliminar este elemento de la flota?')) {
@@ -1685,8 +1687,9 @@ ASTRO-3_launch.png
 
         // EDIT ROCKET
         window.editRocket = async (id) => {
-            if (currentUser?.displayName !== 'Esstor') {
-                alert('No autorizado. Solo Esstor puede gestionar la flota.');
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) {
+                alert('No autorizado. Solo administradores pueden gestionar la flota.');
                 return;
             }
             try {
@@ -1774,8 +1777,9 @@ ASTRO-3_launch.png
             rocketForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                if (currentUser?.displayName !== 'Esstor') {
-                    alert('No autorizado. Solo Esstor puede gestionar la flota.');
+                const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+                if (!isAdmin) {
+                    alert('No autorizado. Solo administradores pueden gestionar la flota.');
                     return;
                 }
 

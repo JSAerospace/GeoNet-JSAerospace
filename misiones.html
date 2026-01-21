@@ -94,7 +94,7 @@
         }
 
         .logo img {
-            height: 40px;
+            height: 32px;
             width: auto;
             object-fit: contain;
         }
@@ -1595,7 +1595,8 @@
 
         // ADMIN CHECK
         function checkAdmin(user) {
-            if (user.displayName === 'Esstor') {
+            const isAdmin = user && (user.displayName === 'Esstor' || user.displayName === 'Agus');
+            if (isAdmin) {
                 if (addMissionBtn) addMissionBtn.style.display = 'flex';
                 document.body.classList.add('is-admin');
             } else {
@@ -1647,7 +1648,12 @@
         // Save Mission (Add/Update)
         if (missionForm) {
             missionForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
+                const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+                if (!isAdmin) {
+                    alert('No autorizado. Solo administradores pueden gestionar las misiones.');
+                    return;
+                }
+
                 saveMissionBtn.disabled = true;
                 const originalText = saveMissionBtn.textContent;
                 saveMissionBtn.textContent = 'Guardando...';
@@ -1691,6 +1697,11 @@
 
         // Global functions for card buttons
         window.editMission = async (id) => {
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) {
+                alert('No autorizado. Solo los administradores pueden editar misiones.');
+                return;
+            }
             try {
                 const snapshot = await get(ref(database, 'missions/' + id));
                 if (snapshot.exists()) {
@@ -1716,6 +1727,11 @@
         };
 
         window.deleteMission = async (id) => {
+            const isAdmin = currentUser && (currentUser.displayName === 'Esstor' || currentUser.displayName === 'Agus');
+            if (!isAdmin) {
+                alert('No autorizado. Solo los administradores pueden eliminar misiones.');
+                return;
+            }
             if (confirm('¿Estás seguro de eliminar esta misión?')) {
                 try {
                     await set(ref(database, 'missions/' + id), null);
