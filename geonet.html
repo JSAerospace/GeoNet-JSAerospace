@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>J.S.Aerospace | GeoNet 3D</title>
+    <link rel="icon" type="image/png" href="LOGO_JTT.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,6 +81,32 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            color: #fff;
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .highlight {
+            color: var(--primary-color);
         }
 
         .sat-main-title {
@@ -805,6 +832,10 @@
 
     <!-- Loading Screen -->
     <div id="loading" class="loading">
+        <div class="logo" style="margin-bottom: 25px;">
+            <img src="LOGO_JTT.png" alt="J.S.Aerospace Logo">
+            <div class="logo-text" style="color: #00d4ff;">J.S.<span class="highlight">AEROSPACE</span></div>
+        </div>
         <div class="loading-text">INICIALIZANDO GEONET</div>
         <div class="progress-container">
             <div class="progress-bar"></div>
@@ -817,7 +848,10 @@
     <!-- HUD Overlay -->
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="logo">J.S.<span class="highlight">AEROSPACE</span></div>
+        <a href="index.html" class="logo">
+            <img src="LOGO_JTT.png" alt="J.S.Aerospace Logo">
+            <div class="logo-text">J.S.<span class="highlight">AEROSPACE</span></div>
+        </a>
         <ul class="nav-links">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="misiones.html">Misiones</a></li>
