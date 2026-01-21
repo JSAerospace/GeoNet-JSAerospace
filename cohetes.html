@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.S.Aerospace | Cohetes</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --neon-green: #00ff6a;
+            --neon-red: #ff3333;
+            --neon-orange: #ff6b35;
+            --bg-dark: #050510;
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* ===== ENTRY TRANSITION ===== */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-rocket {
+            font-size: 3rem;
+            color: var(--neon-red);
+            animation: rocketPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes rocketPulse {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                text-shadow: 0 0 20px var(--neon-red);
+            }
+
+            50% {
+                transform: translateY(-10px) scale(1.1);
+                text-shadow: 0 0 40px var(--neon-red), 0 20px 30px var(--neon-orange);
+            }
+        }
+
+        /* Navbar entry animation */
+
+
+        .logo {
+            color: #fff;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        .highlight {
+            color: var(--primary-color);
+        }
+
+
+
+
+
+        /* Accent line under navbar */
+
+
+        /* Hero Background Container */
+        .hero-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 1.5s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Animated space background */
+        .space-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 80%, rgba(255, 51, 51, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, rgba(10, 10, 30, 1) 0%, rgba(5, 5, 16, 1) 100%);
+        }
+
+        /* Stars */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 90px 40px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 160px 120px, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 230px 80px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 300px 150px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 370px 50px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 450px 200px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 520px 100px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 600px 180px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0));
+            background-size: 650px 250px;
+            animation: twinkle 8s ease-in-out infinite;
+        }
+
+        .stars:nth-child(2) {
+            background-position: 50px 50px;
+            animation-delay: -3s;
+            opacity: 0.6;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Animated grid lines */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255, 51, 51, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 51, 51, 0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(80px);
+            }
+        }
+
+        /* Glowing orbs */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0;
+            animation: float 10s ease-in-out infinite, orbAppear 1s ease forwards;
+        }
+
+        .glow-orb.red {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 51, 51, 0.6) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation-delay: 0.5s, 0.5s;
+        }
+
+        .glow-orb.orange {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.5) 0%, transparent 70%);
+            top: 20%;
+            right: -50px;
+            animation-delay: 0.7s, 0.7s;
+        }
+
+        .glow-orb.purple {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(120, 50, 200, 0.3) 0%, transparent 70%);
+            top: 60%;
+            left: 30%;
+            animation-delay: 0.9s, 0.9s;
+        }
+
+        @keyframes orbAppear {
+            to {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* Rocket trail particles */
+        .particle-container {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 60%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-orange);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-orange), 0 0 20px var(--neon-red);
+            animation: rise 4s ease-out infinite;
+        }
+
+        .particle:nth-child(1) {
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .particle:nth-child(2) {
+            left: 35%;
+            animation-delay: 0.5s;
+        }
+
+        .particle:nth-child(3) {
+            left: 50%;
+            animation-delay: 1s;
+        }
+
+        .particle:nth-child(4) {
+            left: 65%;
+            animation-delay: 1.5s;
+        }
+
+        .particle:nth-child(5) {
+            left: 80%;
+            animation-delay: 2s;
+        }
+
+        .particle:nth-child(6) {
+            left: 25%;
+            animation-delay: 2.5s;
+        }
+
+        .particle:nth-child(7) {
+            left: 45%;
+            animation-delay: 3s;
+        }
+
+        .particle:nth-child(8) {
+            left: 70%;
+            animation-delay: 3.5s;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: -10px;
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                bottom: 100%;
+                opacity: 0;
+                transform: scale(0.3);
+            }
+        }
+
+        /* Main content area */
+        .main-content {
+            padding-top: 100px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Coming soon message with entry animation */
+        .coming-soon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 100px);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .coming-soon h1 {
+            font-family: var(--font-heading);
+            font-size: 4rem;
+            color: var(--neon-red);
+            text-shadow: 0 0 30px rgba(255, 51, 51, 0.5);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            opacity: 0;
+            transform: translateY(50px) scale(0.8);
+            animation: heroAppear 1s ease forwards;
+            animation-delay: 0.8s;
+        }
+
+        .coming-soon p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.3rem;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: textAppear 0.8s ease forwards;
+            animation-delay: 1.1s;
+        }
+
+        @keyframes heroAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes textAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Exit transition overlay */
+        .exit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .exit-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Exit animations for page elements */
+        body.exiting .navbar {
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        body.exiting .coming-soon h1 {
+            animation: fadeOutDown 0.4s ease forwards;
+        }
+
+        body.exiting .coming-soon p {
+            animation: fadeOutDown 0.3s ease forwards;
+            animation-delay: 0.1s;
+        }
+
+        body.exiting .hero-background {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeOutDown {
+            to {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .nav-links a {
+                font-size: 0.8rem;
+            }
+
+            .coming-soon h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Profile Modal Specifics */
+        .profile-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .profile-section h3 {
+            font-family: var(--font-heading);
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, var(--primary-color), var(--neon-green));
+            color: #000;
+        }
+
+        .btn-update:hover {
+            box-shadow: 0 10px 30px rgba(0, 255, 106, 0.3);
+        }
+
+        .btn-logout {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: var(--font-heading);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-logout:hover {
+            background: var(--neon-red);
+            color: #000;
+        }
+
+        .btn-logout:hover {
+            background: var(--neon-red);
+            color: #000;
+        }
+
+        /* Rocket Management Styles */
+        .rockets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            z-index: 2;
+            position: relative;
+        }
+
+        .rocket-card {
+            background: linear-gradient(145deg, rgba(20, 20, 35, 0.9), rgba(10, 10, 20, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(15px);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            height: 100%;
+        }
+
+        .rocket-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 255, 106, 0.15);
+            border-color: rgba(0, 255, 106, 0.5);
+        }
+
+        .rocket-card.booster:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 107, 53, 0.15);
+            border-color: rgba(255, 107, 53, 0.5);
+        }
+
+        .rocket-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .rocket-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Card Footer & Badges */
+        .card-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 8px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            min-width: 28px;
+            height: 28px;
+            transition: all 0.3s;
+        }
+
+        .badge.active {
+            background: rgba(0, 255, 106, 0.1);
+            color: var(--neon-green);
+            border: 1px solid rgba(0, 255, 106, 0.2);
+        }
+
+        .badge:hover {
+            transform: scale(1.1);
+        }
+
+        .rocket-info h3 {
+            font-family: var(--font-heading);
+            color: var(--neon-red);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .rocket-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spec-item i {
+            color: var(--neon-orange);
+            width: 20px;
+        }
+
+        /* Floating Add Button */
+        .add-rocket-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--neon-green);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 255, 106, 0.4);
+            border: none;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: none;
+            /* Hidden by default */
+        }
+
+        .add-rocket-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Rocket Form Specifics */
+        #rocketModal .login-modal {
+            padding: 20px 30px;
+        }
+
+        #rocketModal h2 {
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
+
+        #rocketForm .form-group {
+            margin-bottom: 10px;
+        }
+
+        #rocketForm label {
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        #rocketForm input {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            resize: vertical;
+            min-height: 50px;
+            font-size: 0.9rem;
+        }
+
+
+
+        /* Gallery Modal Styles */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .gallery-item {
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            border-color: var(--neon-green);
+        }
+
+        .gallery-item.selected {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* CARD CAROUSEL STYLES */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            object-fit: cover;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(0, 255, 106, 0.8);
+            color: black;
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        /* ADMIN CONTROLS */
+        .admin-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .rocket-card:hover .admin-controls {
+            opacity: 1;
+        }
+
+        .admin-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: transform 0.2s, background 0.3s;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .edit-btn {
+            color: #3498db;
+        }
+
+        .edit-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            color: #e74c3c;
+        }
+
+        .delete-btn:hover {
+            background: #e74c3c;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* DETAILS MODAL STYLES */
+        .details-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .details-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .details-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .details-title h2 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .details-specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .details-spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .details-spec-item label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .details-spec-item span {
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .details-spec-item i {
+            color: var(--neon-blue);
+            margin-right: 5px;
+        }
+
+        .details-description {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid var(--neon-green);
+        }
+
+        .details-description h4 {
+            margin-top: 0;
+            color: var(--neon-green);
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .details-description p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 0;
+            white-space: pre-wrap;
+        }
+
+        .details-carousel {
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .details-carousel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Hover effect upgrade for cards */
+        .rocket-card {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .rocket-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 106, 0.2);
+        }
+
+        #detailsModal .login-modal {
+            max-width: 900px;
+            width: 95%;
+            padding: 10px;
+        }
+
+        .gallery-btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-family: var(--font-heading);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* SECTION TITLES */
+        .section-title {
+            color: white;
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 40px 0 20px 0;
+            padding-left: 20px;
+            border-left: 4px solid var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--neon-blue), transparent);
+            margin-left: 20px;
+            opacity: 0.5;
+        }
+
+        /* Specific colorful styling for Boosters title targeting nth-of-type to differentiate */
+        h2.section-title:nth-of-type(2) {
+            border-color: var(--neon-orange);
+            text-shadow: 0 0 10px rgba(255, 157, 0, 0.5);
+        }
+
+        h2.section-title:nth-of-type(2)::after {
+            background: linear-gradient(to right, var(--neon-orange), transparent);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 2.2);
+        }
+
+        /* FLEET LAYOUT */
+        .fleet-layout {
+            display: flex;
+            gap: 40px;
+            padding: 20px 40px;
+            align-items: flex-start;
+        }
+
+        .fleet-column {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fleet-column .section-title {
+            margin-top: 20px;
+            padding-left: 10px;
+        }
+
+        @media (max-width: 1200px) {
+            .fleet-layout {
+                flex-direction: column;
+                gap: 20px;
+                padding: 10px 20px;
+            }
+        }
+
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-rocket">
+                <i class="fas fa-rocket"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exit Transition Overlay -->
+    <div class="exit-overlay" id="exitOverlay"></div>
+
+    <nav class="navbar">
+        <div class="logo">J.S.<span class="highlight">AEROSPACE</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="misiones.html">Misiones</a></li>
+            <li><a href="cohetes.html" class="active">Cohetes</a></li>
+            <li><a href="calendario.html">CALENDARIO</a></li>
+            <li><a href="index.html#about">Nosotros</a></li>
+            <li>
+                <button class="auth-btn" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span id="authBtnText">Iniciar Sesión</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Iniciar Sesión</h2>
+                <p id="modalSubtitle">Accede a tu cuenta de J.S.Aerospace</p>
+            </div>
+
+            <div class="auth-message" id="authMessage"></div>
+
+            <form id="authForm">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="userName">Nombre</label>
+                    <input type="text" id="userName" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Contraseña</label>
+                    <input type="password" id="userPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn" id="submitBtn">Entrar</button>
+            </form>
+
+            <div class="divider"><span>o continuar con</span></div>
+
+            <div class="social-login">
+                <button class="social-btn google" id="googleLogin">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </button>
+            </div>
+
+            <div class="toggle-auth">
+                <span id="toggleText">¿No tienes cuenta?</span>
+                <a href="#" id="toggleLink">Regístrate</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+            <div class="modal-header">
+                <h2>Tu Perfil</h2>
+                <p>Gestiona tu cuenta</p>
+            </div>
+
+            <div class="auth-message" id="profileMessage"></div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-user-edit"></i> Datos Personales</h3>
+                <div class="form-group">
+                    <label for="profileName">Nombre Visible</label>
+                    <input type="text" id="profileName" placeholder="Tu nombre">
+                </div>
+                <button class="login-btn btn-update" id="updateNameBtn">Actualizar Nombre</button>
+            </div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-lock"></i> Seguridad</h3>
+                <div class="form-group">
+                    <label for="newPassword">Nueva Contraseña</label>
+                    <input type="password" id="newPassword" placeholder="••••••••">
+                </div>
+                <button class="login-btn btn-update" id="updatePassBtn">Cambiar Contraseña</button>
+            </div>
+
+            <div class="profile-section">
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="hero-background">
+        <div class="space-layer"></div>
+        <div class="stars"></div>
+        <div class="stars"></div>
+        <div class="grid-overlay"></div>
+        <div class="glow-orb red"></div>
+        <div class="glow-orb orange"></div>
+        <div class="glow-orb purple"></div>
+        <div class="particle-container">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="fleet-layout">
+            <!-- Left Column: Cohetes -->
+            <div class="fleet-column">
+                <h2 class="section-title">COHETES</h2>
+                <div class="rockets-grid" id="rocketsGrid">
+                    <!-- Rockets will be injected here -->
+                </div>
+            </div>
+
+            <!-- Right Column: Boosters -->
+            <div class="fleet-column">
+                <h2 class="section-title">BOOSTERS</h2>
+                <div class="rockets-grid" id="boostersGrid">
+                    <!-- Boosters will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Rocket FAB (Only for Esstor) -->
+        <button class="add-rocket-btn" id="addRocketBtn" title="Añadir Cohete">
+            <i class="fas fa-plus"></i>
+        </button>
+    </main>
+
+    <!-- Add Rocket Modal -->
+    <div class="modal-overlay" id="rocketModal">
+        <div class="login-modal" style="max-width: 450px;">
+            <button class="close-modal" id="closeRocketModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="rocketModalTitle">Nuevo Cohete</h2>
+                <p id="rocketModalSubtitle">Añadir a la flota</p>
+            </div>
+
+            <div class="auth-message" id="rocketMessage"></div>
+
+            <form id="rocketForm">
+                <input type="hidden" id="editingRocketId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="rName" required placeholder="Ej: Vortic 1">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="rType" required
+                            style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 10px; border-radius: 8px; width: 100%;">
+                            <option value="rocket" style="color: black;">Cohete</option>
+                            <option value="booster" style="color: black;">Booster</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Altura (m)</label>
+                        <input type="number" id="rHeight" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Diámetro (m)</label>
+                        <input type="number" id="rDiameter" step="0.1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Peso (Ton)</label>
+                        <input type="number" id="rWeight" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Potencia (kN)</label>
+                        <input type="number" id="rThrust" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Motores</label>
+                        <input type="number" id="rEngines" required>
+                    </div>
+                    <div class="form-group" id="stagesGroup">
+                        <label>Etapas</label>
+                        <input type="number" id="rStages" required>
+                    </div>
+                </div>
+
+                <!-- Booster Specific Fields -->
+                <div id="boosterFields" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nº de Lanzamientos</label>
+                            <input type="number" id="bLaunches" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de Producción</label>
+                            <input type="date" id="bProdDate"
+                                style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; width: 100%; padding: 8px;">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom: 10px;">
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="bStaticFire" style="width: auto;">
+                            <label for="bStaticFire" style="margin: 0;">Encendido Estático</label>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="bFlown" style="width: auto;">
+                            <label for="bFlown" style="margin: 0;">Vuelo Realizado</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <input type="checkbox" id="rReusable" style="width: auto;">
+                    <label for="rReusable" style="margin: 0;">Es Reutilizable</label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo de Combustible</label>
+                        <input type="text" id="rFuel" placeholder="Ej: Metano / LOX">
+                    </div>
+                </div>
+
+                <div id="rocketFields">
+                    <div class="form-group">
+                        <label>Especificaciones 1ª Etapa</label>
+                        <textarea id="rStage1Spec" placeholder="Detalles técnicos..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Especificaciones 2ª Etapa</label>
+                        <textarea id="rStage2Spec" placeholder="Detalles técnicos..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nombres de las Imágenes (una por línea)</label>
+                    <textarea id="rImageName" required placeholder="Ej:
+ASTRO-3.png
+ASTRO-3_launch.png
+..." style="min-height: 100px;"></textarea>
+                    <small style="color: grey; font-size: 0.7em;">Las imágenes deben estar en la carpeta del
+                        proyecto</small>
+                </div>
+
+                <button type="submit" class="login-btn" id="saveRocketBtn">Guardar Cohete</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeDetailsModal">&times;</button>
+            <div id="detailsContent">
+                <!-- Content will be injected via JS -->
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set, get, update, push, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKDQ_LLZGIzFZg_MWIy6mDCJLLMsJ203Q",
+            authDomain: "jsaero-92124.firebaseapp.com",
+            databaseURL: "https://jsaero-92124-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "jsaero-92124",
+            storageBucket: "jsaero-92124.firebasestorage.app",
+            messagingSenderId: "348722939617",
+            appId: "1:348722939617:web:94f1e749d412fc136c19a0",
+            measurementId: "G-DZDZC4NYWQ"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        const googleProvider = new GoogleAuthProvider();
+
+        // CAROUSEL LOGIC
+        window.moveCarousel = (btn, direction) => {
+            const container = btn.closest('.carousel-container');
+            const slides = container.querySelectorAll('.carousel-slide');
+            let activeIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
+
+            // Remove active class
+            slides[activeIndex].classList.remove('active');
+
+            // Calculate new index
+            let newIndex = activeIndex + direction;
+            if (newIndex < 0) newIndex = slides.length - 1;
+            if (newIndex >= slides.length) newIndex = 0;
+
+            // Add active class
+            slides[newIndex].classList.add('active');
+        };
+
+        // Function to save user data to Realtime Database
+        async function saveUserToDatabase(user) {
+            const userRef = ref(database, 'users/' + user.uid);
+
+            // Check if user exists
+            const snapshot = await get(userRef);
+
+            if (snapshot.exists()) {
+                // Update existing user (last login)
+                await update(userRef, {
+                    lastLogin: new Date().toISOString(),
+                    displayName: user.displayName || null,
+                    photoURL: user.photoURL || null
+                });
+                console.log('Usuario actualizado en la base de datos');
+            } else {
+                // Create new user
+                await set(userRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || null,
+                    photoURL: user.photoURL || null,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    provider: user.providerData[0]?.providerId || 'email'
+                });
+                console.log('Nuevo usuario guardado en la base de datos');
+            }
+        }
+
+        // DOM Elements
+        const authBtn = document.getElementById('authBtn');
+        const authBtnText = document.getElementById('authBtnText');
+        const loginModal = document.getElementById('loginModal');
+        const closeModal = document.getElementById('closeModal');
+
+        // Profile Modal Elements
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const profileNameInput = document.getElementById('profileName');
+        const updateNameBtn = document.getElementById('updateNameBtn');
+        const newPasswordInput = document.getElementById('newPassword');
+        const updatePassBtn = document.getElementById('updatePassBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const profileMessage = document.getElementById('profileMessage');
+        const authForm = document.getElementById('authForm');
+        const authMessage = document.getElementById('authMessage');
+        const googleLoginBtn = document.getElementById('googleLogin');
+        const toggleLink = document.getElementById('toggleLink');
+        const toggleText = document.getElementById('toggleText');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const nameGroup = document.getElementById('nameGroup');
+        const userNameInput = document.getElementById('userName');
+        const userEmailInput = document.getElementById('userEmail');
+        const userPasswordInput = document.getElementById('userPassword');
+
+        // Rocket Elements
+        const addRocketBtn = document.getElementById('addRocketBtn');
+        const rocketModal = document.getElementById('rocketModal');
+        const closeRocketModal = document.getElementById('closeRocketModal');
+        const rocketForm = document.getElementById('rocketForm');
+        const rocketMessage = document.getElementById('rocketMessage');
+        const rocketsGrid = document.getElementById('rocketsGrid');
+        const boostersGrid = document.getElementById('boostersGrid');
+
+        // Details Modal Elements
+        const detailsModal = document.getElementById('detailsModal');
+        const closeDetailsModal = document.getElementById('closeDetailsModal');
+        const detailsContent = document.getElementById('detailsContent');
+
+        // Image Elements
+        const rImageName = document.getElementById('rImageName');
+
+        // Dynamic Form Elements
+        const rTypeInput = document.getElementById('rType');
+        const stagesGroup = document.getElementById('stagesGroup');
+        const boosterFields = document.getElementById('boosterFields');
+        const rocketFields = document.getElementById('rocketFields');
+
+        // Handle Type Change
+        if (rTypeInput) {
+            rTypeInput.addEventListener('change', (e) => {
+                const type = e.target.value;
+                if (type === 'booster') {
+                    stagesGroup.style.display = 'none';
+                    document.getElementById('rStages').required = false;
+                    boosterFields.style.display = 'block';
+                    rocketFields.style.display = 'none';
+                } else {
+                    stagesGroup.style.display = 'block';
+                    document.getElementById('rStages').required = true;
+                    boosterFields.style.display = 'none';
+                    rocketFields.style.display = 'block';
+                }
+            });
+        }
+
+        let isLoginMode = true;
+        let currentUser = null;
+
+        // Auth State Observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                updateUIForLoggedInUser(user);
+                await saveUserToDatabase(user);
+                checkAdmin(user);
+            } else {
+                currentUser = null;
+                updateUIForLoggedOutUser();
+                if (addRocketBtn) addRocketBtn.style.display = 'none';
+            }
+        });
+
+        // ADMIN CHECK
+        function checkAdmin(user) {
+            if (user.displayName === 'Esstor') {
+                if (addRocketBtn) addRocketBtn.style.display = 'flex';
+                document.body.classList.add('is-admin');
+            } else {
+                if (addRocketBtn) addRocketBtn.style.display = 'none';
+                document.body.classList.remove('is-admin');
+            }
+        }
+
+        // DELETE ROCKET
+        window.deleteRocket = async (id) => {
+            if (confirm('¿Estás seguro de que deseas eliminar este elemento de la flota?')) {
+                try {
+                    await set(ref(database, 'rockets/' + id), null);
+                    alert('Eliminado correctamente');
+                } catch (error) {
+                    alert('Error al eliminar: ' + error.message);
+                }
+            }
+        };
+
+        // OPEN DETAILS MODAL
+        window.openDetails = (rocketData) => {
+            const rocket = JSON.parse(decodeURIComponent(rocketData));
+            const images = rocket.images || (rocket.image ? [rocket.image] : ['https://via.placeholder.com/300x250?text=Rocket']);
+
+            let carouselHtml = '';
+            if (images.length > 1) {
+                const slides = images.map((img, index) =>
+                    `<img src="${img}" class="carousel-slide ${index === 0 ? 'active' : ''}" alt="${rocket.name}">`
+                ).join('');
+
+                carouselHtml = `
+                    <div class="details-carousel carousel-container">
+                        ${slides}
+                        <button class="carousel-btn prev" onclick="moveCarousel(this, -1)">&#10094;</button>
+                        <button class="carousel-btn next" onclick="moveCarousel(this, 1)">&#10095;</button>
+                    </div>
+                 `;
+            } else {
+                carouselHtml = `<div class="details-carousel"><img src="${images[0]}" alt="${rocket.name}"></div>`;
+            }
+
+            const specItems = `
+                <div class="details-spec-item">
+                    <label><i class="fas fa-ruler-vertical"></i> Altura</label>
+                    <span>${rocket.height}m</span>
+                </div>
+                <div class="details-spec-item">
+                    <label><i class="fas fa-circle-notch"></i> Diámetro</label>
+                    <span>${rocket.diameter}m</span>
+                </div>
+                <div class="details-spec-item">
+                    <label><i class="fas fa-weight-hanging"></i> Peso</label>
+                    <span>${rocket.weight}t</span>
+                </div>
+                <div class="details-spec-item">
+                    <label><i class="fas fa-fire"></i> Potencia</label>
+                    <span>${rocket.thrust}kN</span>
+                </div>
+                <div class="details-spec-item">
+                    <label><i class="fas fa-cogs"></i> Motores</label>
+                    <span>${rocket.engines} Unidades</span>
+                </div>
+                <div class="details-spec-item">
+                    <label><i class="fas fa-gas-pump"></i> Combustible</label>
+                    <span>${rocket.fuel || 'No especificado'}</span>
+                </div>
+                ${rocket.type === 'rocket' ? `
+                    <div class="details-spec-item">
+                        <label><i class="fas fa-layer-group"></i> Etapas</label>
+                        <span>${rocket.stages}</span>
+                    </div>
+                ` : `
+                    <div class="details-spec-item">
+                        <label><i class="fas fa-rocket"></i> Lanzamientos</label>
+                        <span>${rocket.launches || 0}</span>
+                    </div>
+                `}
+            `;
+
+            detailsContent.innerHTML = `
+                <div class="details-container">
+                    ${carouselHtml}
+                    <div class="details-info">
+                        <div class="details-title" style="margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px;">
+                            <h2 style="font-family: 'Orbitron', sans-serif; text-transform: uppercase; margin: 0; color: #ffffff; -webkit-text-fill-color: #ffffff; font-size: 2.4rem; font-weight: 700; letter-spacing: 2px;">${rocket.name}</h2>
+                        </div>
+                        <div class="details-specs-grid">
+                            ${specItems}
+                        </div>
+                        ${rocket.type === 'rocket' ? `
+                            ${rocket.stage1Spec ? `<div class="details-description"><h4>Etapa 1</h4><p>${rocket.stage1Spec}</p></div>` : ''}
+                            ${rocket.stage2Spec ? `<div class="details-description"><h4>Etapa 2</h4><p>${rocket.stage2Spec}</p></div>` : ''}
+                        ` : `
+                             <div class="details-description">
+                                <h4>Historial del Booster</h4>
+                                <p>Producido el: ${rocket.prodDate || 'N/A'}</p>
+                                <p>Encendido Estático: ${rocket.staticFire ? 'Completado' : 'No realizado'}</p>
+                                <p>Vuelo Realizado: ${rocket.flown ? 'Sí' : 'No'}</p>
+                             </div>
+                        `}
+                    </div>
+                </div>
+            `;
+
+            detailsModal.classList.add('active');
+        };
+
+        if (closeDetailsModal) {
+            closeDetailsModal.addEventListener('click', () => {
+                detailsModal.classList.remove('active');
+            });
+        }
+
+        // EDIT ROCKET
+        window.editRocket = async (id) => {
+            try {
+                const snapshot = await get(ref(database, 'rockets/' + id));
+                if (snapshot.exists()) {
+                    const rocket = snapshot.val();
+
+                    // Fill Form
+                    document.getElementById('editingRocketId').value = id;
+                    document.getElementById('rName').value = rocket.name;
+                    document.getElementById('rType').value = rocket.type;
+                    document.getElementById('rHeight').value = rocket.height;
+                    document.getElementById('rDiameter').value = rocket.diameter;
+                    document.getElementById('rWeight').value = rocket.weight;
+                    document.getElementById('rThrust').value = rocket.thrust;
+                    document.getElementById('rEngines').value = rocket.engines;
+                    document.getElementById('rReusable').checked = rocket.reusable;
+                    document.getElementById('rFuel').value = rocket.fuel || '';
+
+                    if (rocket.type === 'rocket') {
+                        document.getElementById('rStages').value = rocket.stages || '';
+                        document.getElementById('rStage1Spec').value = rocket.stage1Spec || '';
+                        document.getElementById('rStage2Spec').value = rocket.stage2Spec || '';
+
+                        stagesGroup.style.display = 'block';
+                        document.getElementById('rStages').required = true;
+                        boosterFields.style.display = 'none';
+                        rocketFields.style.display = 'block';
+                    } else {
+                        document.getElementById('bLaunches').value = rocket.launches || 0;
+                        document.getElementById('bProdDate').value = rocket.prodDate || '';
+                        document.getElementById('bStaticFire').checked = rocket.staticFire || false;
+                        document.getElementById('bFlown').checked = rocket.flown || false;
+
+                        stagesGroup.style.display = 'none';
+                        document.getElementById('rStages').required = false;
+                        boosterFields.style.display = 'block';
+                        rocketFields.style.display = 'none';
+                    }
+
+                    document.getElementById('rImageName').value = (rocket.images || []).join('\n');
+
+                    // Update Modal UI
+                    document.getElementById('rocketModalTitle').textContent = 'Editar Nave';
+                    document.getElementById('rocketModalSubtitle').textContent = 'Modificar datos de ' + rocket.name;
+                    document.getElementById('saveRocketBtn').textContent = 'Actualizar Datos';
+
+                    rocketModal.classList.add('active');
+                }
+            } catch (error) {
+                alert('Error al cargar datos: ' + error.message);
+            }
+        };
+
+        // ROCKET MANAGEMENT
+
+        // Open/Close Rocket Modal
+        if (addRocketBtn) {
+            addRocketBtn.addEventListener('click', () => {
+                rocketForm.reset();
+                document.getElementById('editingRocketId').value = '';
+                document.getElementById('rocketModalTitle').textContent = 'Nuevo Cohete';
+                document.getElementById('rocketModalSubtitle').textContent = 'Añadir a la flota';
+                document.getElementById('saveRocketBtn').textContent = 'Guardar Cohete';
+
+                // Reset dynamic visibility
+                stagesGroup.style.display = 'block';
+                document.getElementById('rStages').required = true;
+                boosterFields.style.display = 'none';
+                rocketFields.style.display = 'block';
+                document.getElementById('rFuel').value = '';
+
+                rocketModal.classList.add('active');
+            });
+        }
+
+        if (closeRocketModal) {
+            closeRocketModal.addEventListener('click', () => {
+                rocketModal.classList.remove('active');
+            });
+        }
+
+        // Add Rocket
+        if (rocketForm) {
+            rocketForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const saveBtn = document.getElementById('saveRocketBtn');
+                const originalBtnText = saveBtn.textContent;
+                saveBtn.disabled = true;
+
+                try {
+                    saveBtn.textContent = 'Guardando datos...';
+
+                    // Handle Multiple Images
+                    const imageInput = document.getElementById('rImageName').value;
+                    let imageList = [];
+                    if (imageInput) {
+                        imageList = imageInput.split(/\r?\n/).map(img => img.trim()).filter(img => img !== '');
+                    }
+                    if (imageList.length === 0) imageList = ['https://via.placeholder.com/300x250?text=Rocket'];
+
+                    // 2. Save Data
+                    const newRocket = {
+                        name: document.getElementById('rName').value,
+                        type: document.getElementById('rType').value,
+                        height: document.getElementById('rHeight').value,
+                        diameter: document.getElementById('rDiameter').value,
+                        weight: document.getElementById('rWeight').value,
+                        thrust: document.getElementById('rThrust').value,
+                        engines: document.getElementById('rEngines').value,
+                        reusable: document.getElementById('rReusable').checked,
+                        fuel: document.getElementById('rFuel').value,
+                        images: imageList,
+                        image: imageList[0],
+                        createdAt: new Date().toISOString(),
+                        createdBy: currentUser.uid
+                    };
+
+                    const type = document.getElementById('rType').value;
+                    if (type === 'rocket') {
+                        newRocket.stages = document.getElementById('rStages').value;
+                        newRocket.stage1Spec = document.getElementById('rStage1Spec').value;
+                        newRocket.stage2Spec = document.getElementById('rStage2Spec').value;
+                    } else {
+                        newRocket.launches = document.getElementById('bLaunches').value;
+                        newRocket.prodDate = document.getElementById('bProdDate').value;
+                        newRocket.staticFire = document.getElementById('bStaticFire').checked;
+                        newRocket.flown = document.getElementById('bFlown').checked;
+                        newRocket.stages = 1; // Default for boosters
+                    }
+
+                    const editingId = document.getElementById('editingRocketId').value;
+
+                    if (editingId) {
+                        // UPDATE
+                        await update(ref(database, 'rockets/' + editingId), newRocket);
+                        alert('Datos actualizados exitosamente');
+                    } else {
+                        // CREATE
+                        const rocketsRef = ref(database, 'rockets');
+                        await push(rocketsRef, newRocket);
+                        alert('Cohete añadido exitosamente');
+                    }
+
+                    rocketModal.classList.remove('active');
+                    rocketForm.reset();
+
+
+                } catch (error) {
+                    console.error(error);
+                    rocketMessage.textContent = 'Error: ' + error.message;
+                    rocketMessage.style.display = 'block';
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalBtnText;
+                }
+            });
+        }
+
+        // Render Rockets and Boosters
+        const rocketsRef = ref(database, 'rockets');
+        onValue(rocketsRef, (snapshot) => {
+            rocketsGrid.innerHTML = '';
+            boostersGrid.innerHTML = '';
+            const data = snapshot.val();
+
+            if (data) {
+                let hasRockets = false;
+                let hasBoosters = false;
+
+                Object.entries(data).forEach(([id, rocket]) => {
+                    const card = document.createElement('div');
+                    card.className = `rocket-card ${rocket.type}`;
+                    card.setAttribute('onclick', `openDetails('${encodeURIComponent(JSON.stringify(rocket))}')`);
+
+                    // Admin Controls HTML
+                    const adminControls = `
+                        <div class="admin-controls">
+                            <button class="admin-btn edit-btn" onclick="event.stopPropagation(); editRocket('${id}')" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="admin-btn delete-btn" onclick="event.stopPropagation(); deleteRocket('${id}')" title="Borrar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    // Normalize images array
+                    let images = rocket.images || (rocket.image ? [rocket.image] : ['https://via.placeholder.com/300x250?text=Rocket']);
+
+                    // Generate Carousel HTML
+                    let carouselHtml = '';
+                    if (images.length > 1) {
+                        const slides = images.map((img, index) =>
+                            `<img src="${img}" class="carousel-slide ${index === 0 ? 'active' : ''}" alt="${rocket.name}">`
+                        ).join('');
+
+                        carouselHtml = `
+                            <div class="carousel-container" id="carousel-${rocket.name.replace(/\s+/g, '-')}">
+                                ${slides}
+                                <button class="carousel-btn prev" onclick="moveCarousel(this, -1)">&#10094;</button>
+                                <button class="carousel-btn next" onclick="moveCarousel(this, 1)">&#10095;</button>
+                            </div>
+                         `;
+                    } else {
+                        carouselHtml = `<img src="${images[0]}" class="rocket-img" alt="${rocket.name}">`;
+                    }
+
+                    if (rocket.type === 'booster') {
+                        card.innerHTML = `
+                            ${adminControls}
+                            ${carouselHtml}
+                            <div class="rocket-info">
+                                <h3>${rocket.name}</h3>
+                                <div class="rocket-specs">
+                                    <span class="spec-item"><i class="fas fa-ruler-vertical"></i> ${rocket.height}m</span>
+                                    <span class="spec-item"><i class="fas fa-circle-notch"></i> ${rocket.diameter}m</span>
+                                    <span class="spec-item"><i class="fas fa-weight-hanging"></i> ${rocket.weight}t</span>
+                                    <span class="spec-item"><i class="fas fa-fire"></i> ${rocket.thrust}kN</span>
+                                    <span class="spec-item"><i class="fas fa-cogs"></i> ${rocket.engines} Motores</span>
+                                    <span class="spec-item"><i class="fas fa-rocket"></i> ${rocket.launches || 0} Lanzamientos</span>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="prod-date" title="Fecha de Producción">
+                                        <i class="fas fa-calendar-alt"></i> ${rocket.prodDate || 'N/A'}
+                                    </div>
+                                    <div class="status-badges">
+                                        ${rocket.staticFire ? '<div class="badge active" title="Static Fire: Completado"><i class="fas fa-burn"></i></div>' : '<div class="badge" title="Static Fire: No realizado"><i class="fas fa-burn"></i></div>'}
+                                        ${rocket.flown ? '<div class="badge active" title="Ha volado"><i class="fas fa-plane-departure"></i></div>' : '<div class="badge" title="No ha volado"><i class="fas fa-plane-departure"></i></div>'}
+                                        ${rocket.reusable ? '<div class="badge active" title="Reutilizable"><i class="fas fa-recycle"></i></div>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        boostersGrid.appendChild(card);
+                        hasBoosters = true;
+                    } else {
+                        card.innerHTML = `
+                            ${adminControls}
+                            ${carouselHtml}
+                            <div class="rocket-info">
+                                <h3>${rocket.name}</h3>
+                                <div class="rocket-specs">
+                                    <span class="spec-item"><i class="fas fa-ruler-vertical"></i> ${rocket.height}m</span>
+                                    <span class="spec-item"><i class="fas fa-circle-notch"></i> ${rocket.diameter}m</span>
+                                    <span class="spec-item"><i class="fas fa-weight-hanging"></i> ${rocket.weight}t</span>
+                                    <span class="spec-item"><i class="fas fa-fire"></i> ${rocket.thrust}kN</span>
+                                    <span class="spec-item"><i class="fas fa-cogs"></i> ${rocket.engines} Motores</span>
+                                    <span class="spec-item"><i class="fas fa-layer-group"></i> ${rocket.stages} Etapas</span>
+                                </div>
+                                <div class="card-footer" style="justify-content: flex-end;">
+                                    <div class="status-badges">
+                                        ${rocket.reusable ? '<div class="badge active" style="width: auto; padding: 4px 12px;" title="Reutilizable"><i class="fas fa-recycle"></i> Reutilizable</div>' : '<div class="badge" style="width: auto; padding: 4px 12px;">No Reutilizable</div>'}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        rocketsGrid.appendChild(card); // Default to rocket for compatibility
+                        hasRockets = true;
+                    }
+                });
+
+                if (!hasRockets) rocketsGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay cohetes activos en la flota.</p>';
+                if (!hasBoosters) boostersGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay boosters activos.</p>';
+
+            } else {
+                rocketsGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay naves activas en la flota.</p>';
+                boostersGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay boosters activos.</p>';
+            }
+        });
+
+        function updateUIForLoggedInUser(user) {
+            const displayName = user.displayName || user.email.split('@')[0];
+            authBtn.classList.add('logged-in');
+            authBtn.innerHTML = `
+                ${user.photoURL ? `<img src="${user.photoURL}" class="user-avatar" alt="Avatar">` : '<i class="fas fa-user-check"></i>'}
+                <span>${displayName}</span>
+            `;
+            // Pre-fill profile name
+            if (profileNameInput) profileNameInput.value = displayName;
+        }
+
+        function updateUIForLoggedOutUser() {
+            authBtn.classList.remove('logged-in');
+            authBtn.innerHTML = '<i class="fas fa-user"></i><span>Iniciar Sesión</span>';
+            if (profileModal && profileModal.classList.contains('active')) {
+                profileModal.classList.remove('active');
+            }
+        }
+
+        // Toggle Modal
+        authBtn.addEventListener('click', () => {
+            if (currentUser) {
+                profileModal.classList.add('active');
+            } else {
+                loginModal.classList.add('active');
+            }
+        });
+
+        closeModal.addEventListener('click', () => {
+            loginModal.classList.remove('active');
+            resetForm();
+        });
+
+        if (closeProfileModal) {
+            closeProfileModal.addEventListener('click', () => {
+                profileModal.classList.remove('active');
+                if (profileMessage) profileMessage.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('active');
+                resetForm();
+            }
+            if (e.target === profileModal) {
+                profileModal.classList.remove('active');
+                if (profileMessage) profileMessage.style.display = 'none';
+            }
+        });
+
+        // UPDATE NAME LOGIC
+        if (updateNameBtn) {
+            updateNameBtn.addEventListener('click', async () => {
+                const newName = profileNameInput.value.trim();
+                if (!newName) return showStylesMessage(profileMessage, 'El nombre no puede estar vacío', 'error');
+
+                updateNameBtn.disabled = true;
+                updateNameBtn.textContent = 'Actualizando...';
+
+                try {
+                    await updateProfile(currentUser, { displayName: newName });
+                    await saveUserToDatabase(currentUser); // Update DB too
+                    updateUIForLoggedInUser(currentUser);
+                    showStylesMessage(profileMessage, 'Nombre actualizado correctamente', 'success');
+                } catch (error) {
+                    showStylesMessage(profileMessage, error.message, 'error');
+                }
+
+                updateNameBtn.disabled = false;
+                updateNameBtn.textContent = 'Actualizar Nombre';
+            });
+        }
+
+        // UPDATE PASSWORD LOGIC
+        if (updatePassBtn) {
+            updatePassBtn.addEventListener('click', async () => {
+                const newPass = newPasswordInput.value;
+                if (newPass.length < 6) return showStylesMessage(profileMessage, 'La contraseña debe tener al menos 6 caracteres', 'error');
+
+                updatePassBtn.disabled = true;
+                updatePassBtn.textContent = 'Actualizando...';
+
+                try {
+                    await updatePassword(currentUser, newPass);
+                    showStylesMessage(profileMessage, 'Contraseña actualizada. Inicia sesión de nuevo.', 'success');
+                    setTimeout(() => signOut(auth), 2000);
+                } catch (error) {
+                    if (error.code === 'auth/requires-recent-login') {
+                        showStylesMessage(profileMessage, 'Por seguridad, debes cerrar sesión y volver a entrar antes de cambiar tu contraseña.', 'error');
+                    } else {
+                        showStylesMessage(profileMessage, error.message, 'error');
+                    }
+                }
+
+                updatePassBtn.disabled = false;
+                updatePassBtn.textContent = 'Cambiar Contraseña';
+            });
+        }
+
+        // LOGOUT LOGIC
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                if (confirm('¿Deseas cerrar sesión?')) {
+                    try {
+                        await signOut(auth);
+                        profileModal.classList.remove('active');
+                    } catch (error) {
+                        showStylesMessage(profileMessage, error.message, 'error');
+                    }
+                }
+            });
+        }
+
+        // Helper for profile messages
+        function showStylesMessage(element, text, type) {
+            if (!element) return;
+            element.textContent = text;
+            element.className = `auth-message ${type}`;
+            element.style.display = 'block';
+        }
+
+        // Toggle between Login and Register
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            updateFormMode();
+        });
+
+        function updateFormMode() {
+            if (isLoginMode) {
+                modalTitle.textContent = 'Iniciar Sesión';
+                modalSubtitle.textContent = 'Accede a tu cuenta de J.S.Aerospace';
+                submitBtn.textContent = 'Entrar';
+                toggleText.textContent = '¿No tienes cuenta?';
+                toggleLink.textContent = 'Regístrate';
+                nameGroup.style.display = 'none';
+            } else {
+                modalTitle.textContent = 'Crear Cuenta';
+                modalSubtitle.textContent = 'Únete a la comunidad J.S.Aerospace';
+                submitBtn.textContent = 'Registrarse';
+                toggleText.textContent = '¿Ya tienes cuenta?';
+                toggleLink.textContent = 'Inicia Sesión';
+                nameGroup.style.display = 'block';
+            }
+            authMessage.className = 'auth-message';
+            authMessage.textContent = '';
+        }
+
+        function resetForm() {
+            authForm.reset();
+            authMessage.className = 'auth-message';
+            authMessage.textContent = '';
+            isLoginMode = true;
+            updateFormMode();
+        }
+
+        function showMessage(message, type) {
+            authMessage.textContent = message;
+            authMessage.className = `auth-message ${type}`;
+        }
+
+        // Form Submit
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Cargando...';
+
+            const email = userEmailInput.value;
+            const password = userPasswordInput.value;
+            const name = userNameInput.value;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showMessage('¡Bienvenido de nuevo!', 'success');
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    if (name) {
+                        await updateProfile(userCredential.user, { displayName: name });
+                    }
+                    showMessage('¡Cuenta creada exitosamente!', 'success');
+                }
+                setTimeout(() => {
+                    loginModal.classList.remove('active');
+                    resetForm();
+                }, 1500);
+            } catch (error) {
+                let errorMessage = 'Error de autenticación';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'Usuario no encontrado';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Contraseña incorrecta';
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'Este email ya está registrado';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Email inválido';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                showMessage(errorMessage, 'error');
+            }
+            submitBtn.disabled = false;
+            submitBtn.textContent = isLoginMode ? 'Entrar' : 'Registrarse';
+        });
+
+        // Google Login
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                showMessage('¡Bienvenido!', 'success');
+                setTimeout(() => {
+                    loginModal.classList.remove('active');
+                    resetForm();
+                }, 1500);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+
+        // Page transitions and loader
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                document.getElementById('pageLoader').classList.add('hidden');
+            }, 400);
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const transitionLinks = document.querySelectorAll('.transition-link');
+            const exitOverlay = document.getElementById('exitOverlay');
+
+            transitionLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetHref = this.getAttribute('data-href');
+                    document.body.classList.add('exiting');
+                    setTimeout(function () {
+                        exitOverlay.classList.add('active');
+                    }, 300);
+                    setTimeout(function () {
+                        window.location.href = targetHref;
+                    }, 700);
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

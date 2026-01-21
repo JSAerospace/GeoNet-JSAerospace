@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.S.Aerospace | Misiones</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --neon-green: #00ff6a;
+            --neon-red: #ff3333;
+            --neon-orange: #ff6b35;
+            --bg-dark: #050510;
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* ===== ENTRY TRANSITION ===== */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-rocket {
+            font-size: 3rem;
+            color: var(--neon-red);
+            animation: rocketPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes rocketPulse {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                text-shadow: 0 0 20px var(--neon-red);
+            }
+
+            50% {
+                transform: translateY(-10px) scale(1.1);
+                text-shadow: 0 0 40px var(--neon-red), 0 20px 30px var(--neon-orange);
+            }
+        }
+
+        /* Navbar entry animation */
+
+
+        .logo {
+            color: #fff;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        .highlight {
+            color: var(--primary-color);
+        }
+
+
+
+
+        /* Accent line under navbar */
+
+
+        /* Hero Background Container */
+        .hero-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 1.5s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Animated space background */
+        .space-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 80%, rgba(255, 51, 51, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, rgba(10, 10, 30, 1) 0%, rgba(5, 5, 16, 1) 100%);
+        }
+
+        /* Stars */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 90px 40px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 160px 120px, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 230px 80px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 300px 150px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 370px 50px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 450px 200px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 520px 100px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 600px 180px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0));
+            background-size: 650px 250px;
+            animation: twinkle 8s ease-in-out infinite;
+        }
+
+        .stars:nth-child(2) {
+            background-position: 50px 50px;
+            animation-delay: -3s;
+            opacity: 0.6;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Animated grid lines */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255, 51, 51, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 51, 51, 0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(80px);
+            }
+        }
+
+        /* Glowing orbs */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0;
+            animation: float 10s ease-in-out infinite, orbAppear 1s ease forwards;
+        }
+
+        .glow-orb.red {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 51, 51, 0.6) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation-delay: 0.5s, 0.5s;
+        }
+
+        .glow-orb.orange {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.5) 0%, transparent 70%);
+            top: 20%;
+            right: -50px;
+            animation-delay: 0.7s, 0.7s;
+        }
+
+        .glow-orb.purple {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(120, 50, 200, 0.3) 0%, transparent 70%);
+            top: 60%;
+            left: 30%;
+            animation-delay: 0.9s, 0.9s;
+        }
+
+        @keyframes orbAppear {
+            to {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* Rocket trail particles */
+        .particle-container {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 60%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-orange);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-orange), 0 0 20px var(--neon-red);
+            animation: rise 4s ease-out infinite;
+        }
+
+        .particle:nth-child(1) {
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .particle:nth-child(2) {
+            left: 35%;
+            animation-delay: 0.5s;
+        }
+
+        .particle:nth-child(3) {
+            left: 50%;
+            animation-delay: 1s;
+        }
+
+        .particle:nth-child(4) {
+            left: 65%;
+            animation-delay: 1.5s;
+        }
+
+        .particle:nth-child(5) {
+            left: 80%;
+            animation-delay: 2s;
+        }
+
+        .particle:nth-child(6) {
+            left: 25%;
+            animation-delay: 2.5s;
+        }
+
+        .particle:nth-child(7) {
+            left: 45%;
+            animation-delay: 3s;
+        }
+
+        .particle:nth-child(8) {
+            left: 70%;
+            animation-delay: 3.5s;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: -10px;
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                bottom: 100%;
+                opacity: 0;
+                transform: scale(0.3);
+            }
+        }
+
+        /* Main content area */
+        .main-content {
+            padding-top: 100px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Exit transition overlay */
+        .exit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .exit-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Exit animations */
+        body.exiting .navbar {
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        body.exiting .hero-background {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .nav-links a {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Profile Modal Specifics */
+        .profile-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .profile-section h3 {
+            font-family: var(--font-heading);
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, var(--primary-color), var(--neon-green));
+            color: #000;
+        }
+
+        .btn-update:hover {
+            box-shadow: 0 10px 30px rgba(0, 255, 106, 0.3);
+        }
+
+        .btn-logout {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: var(--font-heading);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-logout:hover {
+            background: var(--neon-red);
+            color: #000;
+        }
+
+        /* Missions specific styles */
+        .missions-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            gap: 30px;
+        }
+
+        .section-title {
+            color: white;
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--neon-blue);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Stats Panel Compact */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-color);
+        }
+
+        .stat-value {
+            display: block;
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-family: var(--font-heading);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .stat-card.success .stat-value {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 255, 106, 0.3);
+        }
+
+        .stat-card.failed .stat-value {
+            color: var(--neon-red);
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+        }
+
+        .stat-card.total .stat-value {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+
+        .missions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+            z-index: 2;
+            position: relative;
+        }
+
+        /* Mission Card Style (Matched to Image) */
+        .mission-card {
+            background: linear-gradient(145deg, rgba(20, 20, 35, 0.7), rgba(10, 10, 20, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .mission-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 50px rgba(0, 243, 255, 0.2);
+        }
+
+        .mission-image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+            transition: opacity 0.4s;
+        }
+
+        .mission-card:hover .mission-image-container {
+            opacity: 0.6;
+        }
+
+        .mission-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .mission-content-wrapper {
+            position: relative;
+            z-index: 1;
+            padding: 25px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mission-date-overlay {
+            margin-bottom: 20px;
+        }
+
+        .m-day {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #fff;
+            display: block;
+        }
+
+        .m-month {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .mission-card h2 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .status-pill {
+            background: rgba(0, 255, 106, 0.2);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .status-pill.upcoming {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .status-pill.failed {
+            background: rgba(255, 51, 51, 0.2);
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        .mission-time-zone {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: auto;
+        }
+
+        .m-time {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timezone-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .timezone-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Countdown Timer Styles */
+        .countdown-container {
+            margin-bottom: 20px;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        .countdown-unit {
+            text-align: center;
+        }
+
+        .countdown-value {
+            display: block;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            line-height: 1;
+        }
+
+        .countdown-label {
+            display: block;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        .countdown-separator {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 900;
+            opacity: 0.5;
+            margin-bottom: 12px;
+        }
+
+
+
+
+        .mission-details-footer {
+            margin-top: 30px;
+            font-size: 0.95rem;
+        }
+
+        .detail-item {
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-item i {
+            width: 20px;
+            color: var(--neon-red);
+        }
+
+        .detail-item span {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Admin Controls on Card */
+        .admin-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: none;
+            /* Shown via is-admin */
+            gap: 10px;
+            z-index: 10;
+        }
+
+        body.is-admin .admin-controls {
+            display: flex;
+        }
+
+        .admin-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 5px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .edit-btn {
+            background: rgba(50, 50, 50, 0.8);
+        }
+
+        .edit-btn:hover {
+            background: #333;
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            background: rgba(255, 51, 51, 0.8);
+        }
+
+        .delete-btn:hover {
+            background: var(--neon-red);
+            transform: scale(1.1);
+        }
+
+        /* FAB Button */
+        .add-mission-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: #000;
+            display: none;
+            /* Shown via JS for Esstor */
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+            border: none;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .add-mission-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.6);
+        }
+
+        /* Carousel in cards (optional but supported) */
+        .carousel-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            object-fit: cover;
+        }
+
+        .carousel-slide.active {
+            opacity: 0.4;
+        }
+
+        .mission-card:hover .carousel-slide.active {
+            opacity: 0.6;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            z-index: 5;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .mission-card:hover .carousel-btn {
+            display: block;
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        /* Form Row for Modal */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-family: var(--font-body);
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Common Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .login-modal {
+            background: rgba(10, 10, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 243, 255, 0.1);
+        }
+
+        .modal-overlay.active .login-modal {
+            transform: scale(1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            font-family: var(--font-heading);
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .modal-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-family: var(--font-body);
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            background: rgba(10, 10, 20, 0.95);
+            padding: 0 15px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            position: relative;
+        }
+
+        .social-login {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: var(--font-body);
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .toggle-auth {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .toggle-auth a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .toggle-auth a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .auth-message.error {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid rgba(255, 51, 51, 0.3);
+            color: var(--neon-red);
+        }
+
+        .auth-message.success {
+            background: rgba(0, 255, 106, 0.1);
+            border: 1px solid rgba(0, 255, 106, 0.3);
+            color: var(--neon-green);
+        }
+
+
+
+        .user-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-rocket">
+                <i class="fas fa-rocket"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exit Transition Overlay -->
+    <div class="exit-overlay" id="exitOverlay"></div>
+
+    <nav class="navbar">
+        <div class="logo">J.S.<span class="highlight">AEROSPACE</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="misiones.html" class="active">Misiones</a></li>
+            <li><a href="cohetes.html">Cohetes</a></li>
+            <li><a href="calendario.html">CALENDARIO</a></li>
+            <li><a href="index.html#about">Nosotros</a></li>
+            <li>
+                <button class="auth-btn" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span id="authBtnText">Iniciar Sesión</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Iniciar Sesión</h2>
+                <p id="modalSubtitle">Accede a tu cuenta de J.S.Aerospace</p>
+            </div>
+
+            <div class="auth-message" id="authMessage"></div>
+
+            <form id="authForm">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="userName">Nombre</label>
+                    <input type="text" id="userName" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Contraseña</label>
+                    <input type="password" id="userPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn" id="submitBtn">Entrar</button>
+            </form>
+
+            <div class="divider"><span>o continuar con</span></div>
+
+            <div class="social-login">
+                <button class="social-btn google" id="googleLogin">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </button>
+            </div>
+
+            <div class="toggle-auth">
+                <span id="toggleText">¿No tienes cuenta?</span>
+                <a href="#" id="toggleLink">Regístrate</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+            <div class="modal-header">
+                <h2>Tu Perfil</h2>
+                <p>Gestiona tu cuenta</p>
+            </div>
+
+            <div class="auth-message" id="profileMessage"></div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-user-edit"></i> Datos Personales</h3>
+                <div class="form-group">
+                    <label for="profileName">Nombre Visible</label>
+                    <input type="text" id="profileName" placeholder="Tu nombre">
+                </div>
+                <button class="login-btn btn-update" id="updateNameBtn">Actualizar Nombre</button>
+            </div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-lock"></i> Seguridad</h3>
+                <div class="form-group">
+                    <label for="newPassword">Nueva Contraseña</label>
+                    <input type="password" id="newPassword" placeholder="••••••••">
+                </div>
+                <button class="login-btn btn-update" id="updatePassBtn">Cambiar Contraseña</button>
+            </div>
+
+            <div class="profile-section">
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="hero-background">
+        <div class="space-layer"></div>
+        <div class="stars"></div>
+        <div class="stars"></div>
+        <div class="grid-overlay"></div>
+        <div class="glow-orb red"></div>
+        <div class="glow-orb orange"></div>
+        <div class="glow-orb purple"></div>
+        <div class="particle-container">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="missions-container">
+            <h1 class="section-title">Misiones Activas</h1>
+
+            <!-- Statistics Panel -->
+            <div class="stats-panel">
+                <div class="stat-card total">
+                    <span class="stat-value" id="totalLaunches">0</span>
+                    <span class="stat-label">Total Lanzamientos</span>
+                </div>
+                <div class="stat-card success">
+                    <span class="stat-value" id="successCount">0</span>
+                    <span class="stat-label">Éxitos</span>
+                </div>
+                <div class="stat-card failed">
+                    <span class="stat-value" id="failedCount">0</span>
+                    <span class="stat-label">Fallos</span>
+                </div>
+                <div class="stat-card ratio">
+                    <span class="stat-value" id="successRatio">0%</span>
+                    <span class="stat-label">Ratio de Éxito</span>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="success">Éxito</button>
+                <button class="filter-btn" data-filter="upcoming">Próximos</button>
+                <button class="filter-btn" data-filter="failed">Fallidos</button>
+            </div>
+
+            <div id="missionsGrid" class="missions-grid">
+                <!-- Missions will be loaded here -->
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-satellite-dish"></i>
+                <h2>No hay misiones programadas</h2>
+                <p>El calendario de lanzamientos se actualizará pronto. Permanece atento.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- FAB Add Mission -->
+    <button class="add-mission-btn" id="addMissionBtn" title="Añadir Misión">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Mission Management Modal -->
+    <div class="modal-overlay" id="missionModal">
+        <div class="login-modal" style="max-width: 600px;">
+            <button class="close-modal" id="closeMissionModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="missionModalTitle">Nueva Misión</h2>
+                <p id="missionModalSubtitle">Configura los detalles del lanzamiento</p>
+            </div>
+
+            <div class="auth-message" id="missionMessage"></div>
+
+            <form id="missionForm">
+                <input type="hidden" id="editingMissionId">
+
+                <div class="form-group">
+                    <label for="mTitle">Nombre de la Misión</label>
+                    <input type="text" id="mTitle" placeholder="Ej: V O R T I C • GEONET SHELL1--1" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mDate">Fecha</label>
+                        <input type="date" id="mDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mTime">Hora</label>
+                        <input type="time" id="mTime" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mStatus">Estado</label>
+                        <select id="mStatus"
+                            style="width: 100%; padding: 12px; background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff;">
+                            <option value="success">ÉXITO</option>
+                            <option value="upcoming">PRÓXIMO</option>
+                            <option value="failed">FALLIDO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mLocation">Ubicación</label>
+                        <input type="text" id="mLocation" placeholder="Ej: LC-36A de Cabo Cañaveral" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mProvider">Proveedor</label>
+                        <input type="text" id="mProvider" placeholder="Ej: EsZunSpace" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mVehicle">Vehículo</label>
+                        <input type="text" id="mVehicle" placeholder="Ej: V O R T I C" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mLanding">Sitio de Aterrizaje</label>
+                    <input type="text" id="mLanding" placeholder="Ej: EsZunBoat">
+                </div>
+
+                <div class="form-group">
+                    <label for="mImages">Imágenes (Una por línea)</label>
+                    <textarea id="mImages" placeholder="https://ejemplo.com/imagen.jpg"></textarea>
+                </div>
+
+                <button type="submit" class="login-btn" id="saveMissionBtn">Guardar Misión</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set, get, update, push, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKDQ_LLZGIzFZg_MWIy6mDCJLLMsJ203Q",
+            authDomain: "jsaero-92124.firebaseapp.com",
+            databaseURL: "https://jsaero-92124-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "jsaero-92124",
+            storageBucket: "jsaero-92124.firebasestorage.app",
+            messagingSenderId: "348722939617",
+            appId: "1:348722939617:web:94f1e749d412fc136c19a0",
+            measurementId: "G-DZDZC4NYWQ"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        const googleProvider = new GoogleAuthProvider();
+
+        // Function to save user data to Realtime Database
+        async function saveUserToDatabase(user) {
+            const userRef = ref(database, 'users/' + user.uid);
+
+            // Check if user exists
+            const snapshot = await get(userRef);
+
+            if (snapshot.exists()) {
+                // Update existing user (last login)
+                await update(userRef, {
+                    lastLogin: new Date().toISOString(),
+                    displayName: user.displayName || null,
+                    photoURL: user.photoURL || null
+                });
+                console.log('Usuario actualizado en la base de datos');
+            } else {
+                // Create new user
+                await set(userRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || null,
+                    photoURL: user.photoURL || null,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    provider: user.providerData[0]?.providerId || 'email'
+                });
+                console.log('Nuevo usuario guardado en la base de datos');
+            }
+        }
+
+        // DOM Elements
+        const authBtn = document.getElementById('authBtn');
+        const authBtnText = document.getElementById('authBtnText');
+        const loginModal = document.getElementById('loginModal');
+        const closeModal = document.getElementById('closeModal');
+
+        // Missions UI Elements
+        const missionsGrid = document.getElementById('missionsGrid');
+        const emptyState = document.getElementById('emptyState');
+        const addMissionBtn = document.getElementById('addMissionBtn');
+        const missionModal = document.getElementById('missionModal');
+        const closeMissionModal = document.getElementById('closeMissionModal');
+        const missionForm = document.getElementById('missionForm');
+        const missionMessage = document.getElementById('missionMessage');
+        const saveMissionBtn = document.getElementById('saveMissionBtn');
+
+        // Stats Elements
+        const totalLaunchesEl = document.getElementById('totalLaunches');
+        const successCountEl = document.getElementById('successCount');
+        const failedCountEl = document.getElementById('failedCount');
+        const successRatioEl = document.getElementById('successRatio');
+
+        // Filter Elements
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        let currentFilter = 'all';
+        let rawMissionsData = {};
+
+        // Profile Modal Elements
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const profileNameInput = document.getElementById('profileName');
+        const updateNameBtn = document.getElementById('updateNameBtn');
+        const newPasswordInput = document.getElementById('newPassword');
+        const updatePassBtn = document.getElementById('updatePassBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const profileMessage = document.getElementById('profileMessage');
+        const authForm = document.getElementById('authForm');
+        const authMessage = document.getElementById('authMessage');
+        const googleLoginBtn = document.getElementById('googleLogin');
+        const toggleLink = document.getElementById('toggleLink');
+        const toggleText = document.getElementById('toggleText');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const nameGroup = document.getElementById('nameGroup');
+        const userNameInput = document.getElementById('userName');
+        const userEmailInput = document.getElementById('userEmail');
+        const userPasswordInput = document.getElementById('userPassword');
+
+        let isLoginMode = true;
+        let currentUser = null;
+
+        // Auth State Observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                updateUIForLoggedInUser(user);
+                await saveUserToDatabase(user);
+                checkAdmin(user);
+            } else {
+                currentUser = null;
+                updateUIForLoggedOutUser();
+                if (addMissionBtn) addMissionBtn.style.display = 'none';
+                document.body.classList.remove('is-admin');
+            }
+        });
+
+        // ADMIN CHECK
+        function checkAdmin(user) {
+            if (user.displayName === 'Esstor') {
+                if (addMissionBtn) addMissionBtn.style.display = 'flex';
+                document.body.classList.add('is-admin');
+            } else {
+                if (addMissionBtn) addMissionBtn.style.display = 'none';
+                document.body.classList.remove('is-admin');
+            }
+        }
+
+        function updateUIForLoggedInUser(user) {
+            const displayName = user.displayName || user.email.split('@')[0];
+            authBtn.classList.add('logged-in');
+            authBtn.innerHTML = `
+                ${user.photoURL ? `<img src="${user.photoURL}" class="user-avatar" alt="Avatar">` : '<i class="fas fa-user-check"></i>'}
+                <span>${displayName}</span>
+            `;
+            // Pre-fill profile name
+            if (profileNameInput) profileNameInput.value = displayName;
+        }
+
+        function updateUIForLoggedOutUser() {
+            authBtn.classList.remove('logged-in');
+            authBtn.innerHTML = '<i class="fas fa-user"></i><span>Iniciar Sesión</span>';
+            if (profileModal && profileModal.classList.contains('active')) {
+                profileModal.classList.remove('active');
+            }
+        }
+
+        // MISSION MANAGEMENT
+
+        // Open/Close Mission Modal
+        if (addMissionBtn) {
+            addMissionBtn.addEventListener('click', () => {
+                missionForm.reset();
+                document.getElementById('editingMissionId').value = '';
+                document.getElementById('missionModalTitle').textContent = 'Nueva Misión';
+                document.getElementById('missionModalSubtitle').textContent = 'Configura los detalles del lanzamiento';
+                saveMissionBtn.textContent = 'Guardar Misión';
+                missionMessage.style.display = 'none';
+                missionModal.classList.add('active');
+            });
+        }
+
+        if (closeMissionModal) {
+            closeMissionModal.addEventListener('click', () => {
+                missionModal.classList.remove('active');
+            });
+        }
+
+        // Save Mission (Add/Update)
+        if (missionForm) {
+            missionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                saveMissionBtn.disabled = true;
+                const originalText = saveMissionBtn.textContent;
+                saveMissionBtn.textContent = 'Guardando...';
+
+                try {
+                    const missionId = document.getElementById('editingMissionId').value;
+                    const images = document.getElementById('mImages').value.split('\n').map(s => s.trim()).filter(s => s !== '');
+
+                    const missionData = {
+                        title: document.getElementById('mTitle').value,
+                        date: document.getElementById('mDate').value,
+                        time: document.getElementById('mTime').value,
+                        status: document.getElementById('mStatus').value,
+                        location: document.getElementById('mLocation').value,
+                        provider: document.getElementById('mProvider').value,
+                        vehicle: document.getElementById('mVehicle').value,
+                        landing: document.getElementById('mLanding').value,
+                        images: images.length > 0 ? images : ['https://via.placeholder.com/800x600?text=Mission'],
+                        updatedAt: new Date().toISOString()
+                    };
+
+                    if (missionId) {
+                        await update(ref(database, 'missions/' + missionId), missionData);
+                    } else {
+                        missionData.createdAt = new Date().toISOString();
+                        await push(ref(database, 'missions'), missionData);
+                    }
+
+                    missionModal.classList.remove('active');
+                    missionForm.reset();
+                } catch (error) {
+                    missionMessage.textContent = 'Error: ' + error.message;
+                    missionMessage.className = 'auth-message error';
+                    missionMessage.style.display = 'block';
+                } finally {
+                    saveMissionBtn.disabled = false;
+                    saveMissionBtn.textContent = originalText;
+                }
+            });
+        }
+
+        // Global functions for card buttons
+        window.editMission = async (id) => {
+            try {
+                const snapshot = await get(ref(database, 'missions/' + id));
+                if (snapshot.exists()) {
+                    const m = snapshot.val();
+                    document.getElementById('editingMissionId').value = id;
+                    document.getElementById('mTitle').value = m.title;
+                    document.getElementById('mDate').value = m.date;
+                    document.getElementById('mTime').value = m.time;
+                    document.getElementById('mStatus').value = m.status;
+                    document.getElementById('mLocation').value = m.location;
+                    document.getElementById('mProvider').value = m.provider;
+                    document.getElementById('mVehicle').value = m.vehicle;
+                    document.getElementById('mLanding').value = m.landing || '';
+                    document.getElementById('mImages').value = (m.images || []).join('\n');
+
+                    document.getElementById('missionModalTitle').textContent = 'Editar Misión';
+                    saveMissionBtn.textContent = 'Actualizar Misión';
+                    missionModal.classList.add('active');
+                }
+            } catch (error) {
+                alert('Error al cargar datos: ' + error.message);
+            }
+        };
+
+        window.deleteMission = async (id) => {
+            if (confirm('¿Estás seguro de eliminar esta misión?')) {
+                try {
+                    await set(ref(database, 'missions/' + id), null);
+                } catch (error) {
+                    alert('Error al eliminar: ' + error.message);
+                }
+            }
+        };
+
+        // Carousel Navigation
+        window.moveCarousel = (btn, direction) => {
+            const container = btn.parentElement;
+            const slides = container.querySelectorAll('.carousel-slide');
+            let activeIndex = Array.from(slides).findIndex(s => s.classList.contains('active'));
+
+            slides[activeIndex].classList.remove('active');
+            activeIndex = (activeIndex + direction + slides.length) % slides.length;
+            slides[activeIndex].classList.add('active');
+        };
+
+        // Render Missions
+        const missionsRef = ref(database, 'missions');
+        onValue(missionsRef, (snapshot) => {
+            rawMissionsData = snapshot.val() || {};
+            updateStats(rawMissionsData);
+            renderFilteredMissions();
+        });
+
+        function renderFilteredMissions() {
+            missionsGrid.innerHTML = '';
+            const data = rawMissionsData;
+
+            if (Object.keys(data).length > 0) {
+                emptyState.style.display = 'none';
+
+                // Sort and Filter
+                let sortedMissions = Object.entries(data).sort((a, b) => new Date(b[1].date) - new Date(a[1].date));
+
+                if (currentFilter !== 'all') {
+                    sortedMissions = sortedMissions.filter(([id, m]) => m.status === currentFilter);
+                }
+
+                if (sortedMissions.length === 0) {
+                    emptyState.style.display = 'block';
+                    document.querySelector('#emptyState h2').textContent = 'No hay misiones en esta categoría';
+                    return;
+                } else {
+                    document.querySelector('#emptyState h2').textContent = 'No hay misiones programadas';
+                }
+
+                sortedMissions.forEach(([id, m]) => {
+                    const dateObj = new Date(m.date + 'T00:00:00');
+                    const day = dateObj.getDate();
+                    const month = dateObj.toLocaleString('es-ES', { month: 'long' });
+
+                    const statusText = m.status === 'success' ? 'ÉXITO' : (m.status === 'upcoming' ? 'PRÓXIMO' : 'FALLIDO');
+                    const statusClass = m.status;
+
+                    // Carousel Logic
+                    let carouselHtml = '';
+                    const images = m.images || ['https://via.placeholder.com/800x600?text=Mission'];
+                    if (images.length > 1) {
+                        const slides = images.map((img, idx) => `<img src="${img}" class="carousel-slide ${idx === 0 ? 'active' : ''}" alt="Mission">`).join('');
+                        carouselHtml = `
+                            <div class="carousel-container">
+                                ${slides}
+                                <button class="carousel-btn prev" onclick="moveCarousel(this, -1)">&#10094;</button>
+                                <button class="carousel-btn next" onclick="moveCarousel(this, 1)">&#10095;</button>
+                            </div>
+                        `;
+                    } else {
+                        carouselHtml = `<div class="mission-image-container"><img src="${images[0]}" alt="Mission"></div>`;
+                    }
+
+                    // Countdown Logic
+                    let countdownHtml = '';
+                    if (m.status === 'upcoming') {
+                        countdownHtml = `
+                            <div class="countdown-container" data-target="${m.date}T${m.time}:00">
+                                <div class="countdown-unit"><span class="countdown-value">00</span><span class="countdown-label">Días</span></div>
+                                <span class="countdown-separator">:</span>
+                                <div class="countdown-unit"><span class="countdown-value">00</span><span class="countdown-label">Hrs</span></div>
+                                <span class="countdown-separator">:</span>
+                                <div class="countdown-unit"><span class="countdown-value">00</span><span class="countdown-label">Min</span></div>
+                                <span class="countdown-separator">:</span>
+                                <div class="countdown-unit"><span class="countdown-value">00</span><span class="countdown-label">Seg</span></div>
+                            </div>
+                        `;
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'mission-card';
+                    card.innerHTML = `
+                        <div class="admin-controls">
+                            <button class="admin-btn edit-btn" onclick="editMission('${id}')"><i class="fas fa-edit"></i></button>
+                            <button class="admin-btn delete-btn" onclick="deleteMission('${id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                        ${carouselHtml}
+                        <div class="mission-content-wrapper">
+                            <div class="mission-date-overlay">
+                                <span class="m-day">${day}</span>
+                                <span class="m-month">${month}</span>
+                            </div>
+                            <h2>${m.title}</h2>
+                            <div class="status-pill ${statusClass}">${statusText}</div>
+                            ${countdownHtml}
+                            <div class="mission-time-zone">
+                                <div class="m-time"><i class="far fa-clock"></i> ${m.time}</div>
+                                <button class="timezone-btn">Ver en mi zona horaria</button>
+                            </div>
+                            <div class="mission-details-footer">
+                                <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${m.location}</div>
+                                <div class="detail-item">Proveedor de lanzamiento: <span>${m.provider}</span></div>
+                                <div class="detail-item">Vehículo: <span>${m.vehicle}</span></div>
+                                ${m.landing ? `<div class="detail-item">Aterrizaje: <span>${m.landing}</span></div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    missionsGrid.appendChild(card);
+                });
+                startCountdowns();
+            } else {
+                emptyState.style.display = 'block';
+                updateStats({});
+            }
+        }
+
+        // Filter Logic
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.getAttribute('data-filter');
+                renderFilteredMissions();
+            });
+        });
+
+        function updateStats(missions) {
+            const missionArray = Object.values(missions);
+            // Consider only missions that have happened or are failed (not upcoming for success ratio)
+            const completedMissions = missionArray.filter(m => m.status === 'success' || m.status === 'failed');
+            const total = missionArray.length;
+            const successes = missionArray.filter(m => m.status === 'success').length;
+            const failures = missionArray.filter(m => m.status === 'failed').length;
+
+            const ratio = completedMissions.length > 0
+                ? Math.round((successes / completedMissions.length) * 100)
+                : 0;
+
+            totalLaunchesEl.textContent = total;
+            successCountEl.textContent = successes;
+            failedCountEl.textContent = failures;
+            successRatioEl.textContent = ratio + '%';
+        }
+
+        function startCountdowns() {
+            if (window.countdownInterval) clearInterval(window.countdownInterval);
+
+            window.countdownInterval = setInterval(() => {
+                const containers = document.querySelectorAll('.countdown-container');
+                containers.forEach(container => {
+                    const target = new Date(container.getAttribute('data-target')).getTime();
+                    const now = new Date().getTime();
+                    const distance = target - now;
+
+                    if (distance < 0) {
+                        container.innerHTML = `<div class="status-pill" style="margin: 0; background: var(--primary-color); color: #000;">MISIÓN EN CURSO</div>`;
+                        return;
+                    }
+
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    const values = container.querySelectorAll('.countdown-value');
+                    values[0].textContent = String(days).padStart(2, '0');
+                    values[1].textContent = String(hours).padStart(2, '0');
+                    values[2].textContent = String(minutes).padStart(2, '0');
+                    values[3].textContent = String(seconds).padStart(2, '0');
+                });
+            }, 1000);
+        }
+
+        // Toggle Modal
+        authBtn.addEventListener('click', () => {
+            if (currentUser) {
+                profileModal.classList.add('active');
+            } else {
+                loginModal.classList.add('active');
+            }
+        });
+
+        closeModal.addEventListener('click', () => {
+            loginModal.classList.remove('active');
+            resetForm();
+        });
+
+        if (closeProfileModal) {
+            closeProfileModal.addEventListener('click', () => {
+                profileModal.classList.remove('active');
+                if (profileMessage) profileMessage.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('active');
+                resetForm();
+            }
+            if (e.target === profileModal) {
+                profileModal.classList.remove('active');
+                if (profileMessage) profileMessage.style.display = 'none';
+            }
+        });
+
+        // UPDATE NAME LOGIC
+        if (updateNameBtn) {
+            updateNameBtn.addEventListener('click', async () => {
+                const newName = profileNameInput.value.trim();
+                if (!newName) return showStylesMessage(profileMessage, 'El nombre no puede estar vacío', 'error');
+
+                updateNameBtn.disabled = true;
+                updateNameBtn.textContent = 'Actualizando...';
+
+                try {
+                    await updateProfile(currentUser, { displayName: newName });
+                    await saveUserToDatabase(currentUser); // Update DB too
+                    updateUIForLoggedInUser(currentUser);
+                    showStylesMessage(profileMessage, 'Nombre actualizado correctamente', 'success');
+                } catch (error) {
+                    showStylesMessage(profileMessage, error.message, 'error');
+                }
+
+                updateNameBtn.disabled = false;
+                updateNameBtn.textContent = 'Actualizar Nombre';
+            });
+        }
+
+        // UPDATE PASSWORD LOGIC
+        if (updatePassBtn) {
+            updatePassBtn.addEventListener('click', async () => {
+                const newPass = newPasswordInput.value;
+                if (newPass.length < 6) return showStylesMessage(profileMessage, 'La contraseña debe tener al menos 6 caracteres', 'error');
+
+                updatePassBtn.disabled = true;
+                updatePassBtn.textContent = 'Actualizando...';
+
+                try {
+                    await updatePassword(currentUser, newPass);
+                    showStylesMessage(profileMessage, 'Contraseña actualizada. Inicia sesión de nuevo.', 'success');
+                    setTimeout(() => signOut(auth), 2000);
+                } catch (error) {
+                    if (error.code === 'auth/requires-recent-login') {
+                        showStylesMessage(profileMessage, 'Por seguridad, debes cerrar sesión y volver a entrar antes de cambiar tu contraseña.', 'error');
+                    } else {
+                        showStylesMessage(profileMessage, error.message, 'error');
+                    }
+                }
+
+                updatePassBtn.disabled = false;
+                updatePassBtn.textContent = 'Cambiar Contraseña';
+            });
+        }
+
+        // LOGOUT LOGIC
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                if (confirm('¿Deseas cerrar sesión?')) {
+                    try {
+                        await signOut(auth);
+                        profileModal.classList.remove('active');
+                    } catch (error) {
+                        showStylesMessage(profileMessage, error.message, 'error');
+                    }
+                }
+            });
+        }
+
+        // Helper for profile messages
+        function showStylesMessage(element, text, type) {
+            if (!element) return;
+            element.textContent = text;
+            element.className = `auth-message ${type}`;
+            element.style.display = 'block';
+        }
+
+        // Toggle between Login and Register
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            updateFormMode();
+        });
+
+        function updateFormMode() {
+            if (isLoginMode) {
+                modalTitle.textContent = 'Iniciar Sesión';
+                modalSubtitle.textContent = 'Accede a tu cuenta de J.S.Aerospace';
+                submitBtn.textContent = 'Entrar';
+                toggleText.textContent = '¿No tienes cuenta?';
+                toggleLink.textContent = 'Regístrate';
+                nameGroup.style.display = 'none';
+            } else {
+                modalTitle.textContent = 'Crear Cuenta';
+                modalSubtitle.textContent = 'Únete a la comunidad J.S.Aerospace';
+                submitBtn.textContent = 'Registrarse';
+                toggleText.textContent = '¿Ya tienes cuenta?';
+                toggleLink.textContent = 'Inicia Sesión';
+                nameGroup.style.display = 'block';
+            }
+            authMessage.className = 'auth-message';
+            authMessage.textContent = '';
+        }
+
+        function resetForm() {
+            authForm.reset();
+            authMessage.className = 'auth-message';
+            authMessage.textContent = '';
+            isLoginMode = true;
+            updateFormMode();
+        }
+
+        function showMessage(message, type) {
+            authMessage.textContent = message;
+            authMessage.className = `auth-message ${type}`;
+        }
+
+        // Form Submit
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Cargando...';
+
+            const email = userEmailInput.value;
+            const password = userPasswordInput.value;
+            const name = userNameInput.value;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showMessage('¡Bienvenido de nuevo!', 'success');
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    if (name) {
+                        await updateProfile(userCredential.user, { displayName: name });
+                    }
+                    showMessage('¡Cuenta creada exitosamente!', 'success');
+                }
+                setTimeout(() => {
+                    loginModal.classList.remove('active');
+                    resetForm();
+                }, 1500);
+            } catch (error) {
+                let errorMessage = 'Error de autenticación';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'Usuario no encontrado';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Contraseña incorrecta';
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'Este email ya está registrado';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Email inválido';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                showMessage(errorMessage, 'error');
+            }
+            submitBtn.disabled = false;
+            submitBtn.textContent = isLoginMode ? 'Entrar' : 'Registrarse';
+        });
+
+        // Google Login
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                showMessage('¡Bienvenido!', 'success');
+                setTimeout(() => {
+                    loginModal.classList.remove('active');
+                    resetForm();
+                }, 1500);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+
+        // Page transitions and loader
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                document.getElementById('pageLoader').classList.add('hidden');
+            }, 400);
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const transitionLinks = document.querySelectorAll('.transition-link');
+            const exitOverlay = document.getElementById('exitOverlay');
+
+            transitionLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetHref = this.getAttribute('data-href');
+                    document.body.classList.add('exiting');
+                    setTimeout(function () {
+                        exitOverlay.classList.add('active');
+                    }, 300);
+                    setTimeout(function () {
+                        window.location.href = targetHref;
+                    }, 700);
+                });
+            });
+        });
+
+        // Smooth Scroll with Mouse Wheel
+        let currentScroll = window.pageYOffset;
+        let targetScroll = window.pageYOffset;
+        let isScrolling = false;
+
+        window.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY;
+            targetScroll += delta * 1.5; // Sensitivity
+
+            // Clamp target scroll
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+
+            if (!isScrolling) {
+                isScrolling = true;
+                requestAnimationFrame(smoothScrollAnimation);
+            }
+        }, { passive: false });
+
+        function smoothScrollAnimation() {
+            const diff = targetScroll - currentScroll;
+            const speed = diff * 0.1; // Smoothing factor
+
+            if (Math.abs(speed) > 0.5) {
+                currentScroll += speed;
+                window.scrollTo(0, currentScroll);
+                requestAnimationFrame(smoothScrollAnimation);
+            } else {
+                currentScroll = targetScroll;
+                window.scrollTo(0, currentScroll);
+                isScrolling = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

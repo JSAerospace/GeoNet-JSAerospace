@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.S.Aerospace | Calendario</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --neon-green: #00ff6a;
+            --neon-red: #ff3333;
+            --neon-orange: #ff6b35;
+            --bg-dark: #050510;
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+        }
+
+        .user-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .toggle-auth {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .toggle-auth a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .toggle-auth a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .login-modal {
+            background: rgba(10, 10, 30, 0.95);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-heading);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .profile-section h3 {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
+            border-radius: 8px;
+            font-family: var(--font-heading);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: var(--neon-red);
+            color: #fff;
+        }
+
+        .auth-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .auth-message.error {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid rgba(255, 51, 51, 0.3);
+            color: var(--neon-red);
+        }
+
+        .auth-message.success {
+            background: rgba(0, 255, 106, 0.1);
+            border: 1px solid rgba(0, 255, 106, 0.3);
+            color: var(--neon-green);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: var(--font-body);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== BACKGROUND ===== */
+        .hero-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #0a0a20 0%, #050510 100%);
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(1px 1px at 20px 30px, white, rgba(0, 0, 0, 0)),
+                radial-gradient(1px 1px at 40px 70px, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 90px 40px, white, rgba(0, 0, 0, 0));
+            background-size: 200px 200px;
+            opacity: 0.3;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding-top: 120px;
+            padding-bottom: 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-left: 30px;
+            padding-right: 30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .layout-container {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* ===== SIDEBAR UPCOMING ===== */
+        .sidebar-upcoming {
+            width: 350px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            animation: slideLeft 0.8s ease-out;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar-title {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-title i {
+            color: var(--primary-color);
+        }
+
+        .upcoming-card {
+            background: rgba(0, 243, 255, 0.03);
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid var(--neon-orange);
+        }
+
+        .upcoming-card:hover {
+            background: rgba(0, 243, 255, 0.06);
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .card-date-badge {
+            font-size: 0.8rem;
+            color: var(--neon-orange);
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            font-family: var(--font-heading);
+        }
+
+        .card-mission-name {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-countdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .sb-countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sb-val {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .sb-label {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .calendar-wrapper {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.8s ease-out;
+            min-width: 800px;
+        }
+
+        @media (max-width: 1200px) {
+            .layout-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .sidebar-upcoming {
+                width: 100%;
+                margin-bottom: 30px;
+            }
+
+            .calendar-wrapper {
+                min-width: auto;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .current-month {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+
+        /* ===== GRID ===== */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-family: var(--font-heading);
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            padding: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 10px;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .calendar-day.empty {
+            visibility: hidden;
+        }
+
+        .calendar-day.today {
+            border-color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .day-number {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.4);
+            transition: color 0.3s;
+        }
+
+        .calendar-day:hover .day-number {
+            color: #fff;
+        }
+
+        .calendar-day.today .day-number {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        /* ===== EVENTS ===== */
+        .event-dot {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .event-list {
+            position: absolute;
+            top: 35px;
+            left: 8px;
+            right: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .event-tag {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--primary-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-left: 3px solid var(--primary-color);
+            line-height: 1.4;
+            font-family: var(--font-heading);
+            font-weight: 500;
+        }
+
+        .event-tag.success {
+            background: rgba(0, 255, 106, 0.1);
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+
+        .event-tag.failed {
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--neon-red);
+            border-color: var(--neon-red);
+        }
+
+        .event-tag.upcoming {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--neon-orange);
+            border-color: var(--neon-orange);
+        }
+
+        /* ===== MISSION DETAILS MODAL ===== */
+        .day-missions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .day-missions-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .day-missions-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .mission-detail-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .mission-detail-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-color);
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .detail-status {
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+
+        .mission-detail-card.success .detail-status {
+            background: rgba(0, 255, 106, 0.2);
+            color: var(--neon-green);
+        }
+
+        .mission-detail-card.failed .detail-status {
+            background: rgba(255, 51, 51, 0.2);
+            color: var(--neon-red);
+        }
+
+        .mission-detail-card.upcoming .detail-status {
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--neon-orange);
+        }
+
+        .detail-time {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .detail-title {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .detail-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .detail-info p {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-info i {
+            color: var(--primary-color);
+            width: 14px;
+        }
+
+        .countdown-container {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .countdown-val {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .countdown-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+
+        /* ===== LOADER ===== */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbar {
+            padding: 20px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 16, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .logo {
+            color: #fff;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .highlight {
+            color: var(--primary-color);
+        }
+
+        .auth-btn {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auth-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .calendar-grid {
+                gap: 5px;
+            }
+
+            .calendar-day {
+                padding: 5px;
+            }
+
+            .day-number {
+                font-size: 0.9rem;
+            }
+
+            .event-tag {
+                display: none;
+            }
+
+            .event-dot {
+                width: 6px;
+                height: 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="logo">J.S.<span class="highlight">AEROSPACE</span></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">J.S.<span class="highlight">AEROSPACE</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="misiones.html">Misiones</a></li>
+            <li><a href="cohetes.html">Cohetes</a></li>
+            <li><a href="calendario.html" class="active">CALENDARIO</a></li>
+            <li><a href="index.html#about">Nosotros</a></li>
+            <li>
+                <button class="auth-btn" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span id="authBtnText">Iniciar Sesión</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Iniciar Sesión</h2>
+                <p id="modalSubtitle">Accede a tu cuenta de J.S.Aerospace</p>
+            </div>
+
+            <div class="auth-message" id="authMessage"></div>
+
+            <form id="authForm">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="userName">Nombre</label>
+                    <input type="text" id="userName" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Contraseña</label>
+                    <input type="password" id="userPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn" id="submitBtn">Entrar</button>
+            </form>
+
+            <div class="divider"><span>o continuar con</span></div>
+
+            <div class="social-login">
+                <button class="social-btn google" id="googleLogin">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </button>
+            </div>
+
+            <div class="toggle-auth">
+                <span id="toggleText">¿No tienes cuenta?</span>
+                <a href="#" id="toggleLink">Regístrate</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+            <div class="modal-header">
+                <h2>Tu Perfil</h2>
+                <p>Gestiona tu cuenta</p>
+            </div>
+
+            <div class="auth-message" id="profileMessage"></div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-user-edit"></i> Datos Personales</h3>
+                <div class="form-group">
+                    <label for="profileName">Nombre Visible</label>
+                    <input type="text" id="profileName" placeholder="Tu nombre">
+                </div>
+                <button class="login-btn btn-update" id="updateNameBtn">Actualizar Nombre</button>
+            </div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-lock"></i> Seguridad</h3>
+                <div class="form-group">
+                    <label for="newPassword">Nueva Contraseña</label>
+                    <input type="password" id="newPassword" placeholder="••••••••">
+                </div>
+                <button class="login-btn btn-update" id="updatePassBtn">Cambiar Contraseña</button>
+            </div>
+
+            <div class="profile-section">
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission Details Modal -->
+    <div class="modal-overlay" id="missionDetailsModal">
+        <div class="login-modal" style="max-width: 500px;">
+            <button class="close-modal" id="closeDetailsModal">&times;</button>
+            <div class="modal-header">
+                <h2>Detalles del Día</h2>
+                <p id="detailsDateText"></p>
+            </div>
+            <div id="dayMissionsList" class="day-missions-list">
+                <!-- Detailed mission cards will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <header class="section-header">
+            <p class="section-subtitle">Programación Orbital</p>
+            <h1 class="section-title">Calendario</h1>
+        </header>
+
+        <div class="layout-container">
+            <!-- Sidebar: Proximos Lanzamientos -->
+            <aside class="sidebar-upcoming">
+                <h2 class="sidebar-title"><i class="fas fa-clock"></i> Próximos</h2>
+                <div id="sidebarUpcomingList">
+                    <!-- Cards will be injected by JS -->
+                </div>
+            </aside>
+
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <h2 class="current-month" id="monthDisplay">Enero 2026</h2>
+                    <div class="calendar-nav">
+                        <button class="nav-btn" onclick="prevMonth()"><i class="fas fa-chevron-left"></i></button>
+                        <button class="nav-btn" onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid">
+                    <div class="weekday">Lun</div>
+                    <div class="weekday">Mar</div>
+                    <div class="weekday">Mié</div>
+                    <div class="weekday">Jue</div>
+                    <div class="weekday">Vie</div>
+                    <div class="weekday">Sáb</div>
+                    <div class="weekday">Dom</div>
+                    <!-- Days will be injected here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set, get, update, push, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase configuration (from cohetes.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKDQ_LLZGIzFZg_MWIy6mDCJLLMsJ203Q",
+            authDomain: "jsaero-92124.firebaseapp.com",
+            databaseURL: "https://jsaero-92124-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "jsaero-92124",
+            storageBucket: "jsaero-92124.firebasestorage.app",
+            messagingSenderId: "348722939617",
+            appId: "1:348722939617:web:94f1e749d412fc136c19a0",
+            measurementId: "G-DZDZC4NYWQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Elements
+        const authBtn = document.getElementById('authBtn');
+        const authBtnText = document.getElementById('authBtnText');
+        const loginModal = document.getElementById('loginModal');
+        const profileModal = document.getElementById('profileModal');
+        const closeModal = document.getElementById('closeModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const authForm = document.getElementById('authForm');
+        const authMessage = document.getElementById('authMessage');
+        const profileMessage = document.getElementById('profileMessage');
+        const toggleLink = document.getElementById('toggleLink');
+        const submitBtn = document.getElementById('submitBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const updateNameBtn = document.getElementById('updateNameBtn');
+        const updatePassBtn = document.getElementById('updatePassBtn');
+        const profileNameInput = document.getElementById('profileName');
+        const newPasswordInput = document.getElementById('newPassword');
+
+        let currentUser = null;
+        let isLoginMode = true;
+
+        const showMsg = (el, text, type) => {
+            if (!el) return;
+            el.textContent = text;
+            el.className = `auth-message ${type}`;
+            el.style.display = 'block';
+        };
+
+        // Function to save user data to Realtime Database
+        async function saveUserToDatabase(user) {
+            const userRef = ref(database, 'users/' + user.uid);
+            const snapshot = await get(userRef);
+            if (snapshot.exists()) {
+                await update(userRef, {
+                    lastLogin: new Date().toISOString(),
+                    displayName: user.displayName || null,
+                    photoURL: user.photoURL || null
+                });
+            } else {
+                await set(userRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || null,
+                    photoURL: user.photoURL || null,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    provider: user.providerData[0]?.providerId || 'email'
+                });
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user) {
+                const displayName = user.displayName || user.email.split('@')[0];
+                authBtnText.textContent = displayName;
+                const avatar = user.photoURL ? `<img src="${user.photoURL}" class="user-avatar">` : '<i class="fas fa-user-check"></i>';
+                authBtn.querySelector('i')?.remove();
+                authBtn.querySelector('img')?.remove();
+                authBtn.insertAdjacentHTML('afterbegin', avatar);
+                profileNameInput.value = user.displayName || '';
+                await saveUserToDatabase(user);
+            } else {
+                authBtnText.textContent = 'Iniciar Sesión';
+                authBtn.querySelector('img')?.remove();
+                if (!authBtn.querySelector('i')) authBtn.insertAdjacentHTML('afterbegin', '<i class="fas fa-user"></i>');
+            }
+            renderCalendar();
+        });
+
+        authBtn.onclick = () => { if (currentUser) profileModal.classList.add('active'); else loginModal.classList.add('active'); };
+
+        const closeAll = () => {
+            loginModal.classList.remove('active');
+            profileModal.classList.remove('active');
+            authMessage.style.display = 'none';
+            profileMessage.style.display = 'none';
+        };
+
+        closeModal.onclick = closeAll;
+        closeProfileModal.onclick = closeAll;
+        window.onclick = (e) => { if (e.target === loginModal || e.target === profileModal) closeAll(); };
+
+        toggleLink.onclick = (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            document.getElementById('modalTitle').textContent = isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta';
+            submitBtn.textContent = isLoginMode ? 'Entrar' : 'Registrar';
+            document.getElementById('nameGroup').style.display = isLoginMode ? 'none' : 'block';
+        };
+
+        authForm.onsubmit = async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            const email = document.getElementById('userEmail').value;
+            const pass = document.getElementById('userPassword').value;
+            try {
+                if (isLoginMode) await signInWithEmailAndPassword(auth, email, pass);
+                else {
+                    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                    const name = document.getElementById('userName').value;
+                    if (name) await updateProfile(cred.user, { displayName: name });
+                }
+                closeAll();
+            } catch (err) { showMsg(authMessage, err.message, 'error'); }
+            submitBtn.disabled = false;
+        };
+
+        document.getElementById('googleLogin').onclick = () => signInWithPopup(auth, googleProvider).then(closeAll).catch(err => showMsg(authMessage, err.message, 'error'));
+
+        updateNameBtn.onclick = async () => {
+            updateNameBtn.disabled = true;
+            try {
+                await updateProfile(auth.currentUser, { displayName: profileNameInput.value });
+                showMsg(profileMessage, 'Nombre actualizado', 'success');
+            } catch (err) { showMsg(profileMessage, err.message, 'error'); }
+            updateNameBtn.disabled = false;
+        };
+
+        updatePassBtn.onclick = async () => {
+            const pass = newPasswordInput.value;
+            if (pass.length < 6) return showMsg(profileMessage, 'Mínimo 6 caracteres', 'error');
+            updatePassBtn.disabled = true;
+            try {
+                await updatePassword(auth.currentUser, pass);
+                showMsg(profileMessage, 'Contraseña actualizada. Reiniciando sesión...', 'success');
+                setTimeout(() => signOut(auth).then(closeAll), 2000);
+            } catch (err) { showMsg(profileMessage, err.message, 'error'); }
+            updatePassBtn.disabled = false;
+        };
+
+        logoutBtn.onclick = () => { if (confirm('¿Cerrar sesión?')) signOut(auth).then(closeAll); };
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('pageLoader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }
+            }, 800);
+        });
+
+        let currentDate = new Date();
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+        let missionsData = {};
+        const sidebarList = document.getElementById('sidebarUpcomingList');
+        let sidebarInterval = null;
+
+        onValue(ref(database, 'missions'), (snapshot) => {
+            missionsData = snapshot.val() || {};
+            renderCalendar();
+            renderSidebar();
+        });
+
+        function renderSidebar() {
+            if (!sidebarList) return;
+            const upcoming = Object.entries(missionsData)
+                .map(([id, data]) => ({ id, ...data }))
+                .filter(m => m.status === 'upcoming')
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .slice(0, 4);
+
+            if (upcoming.length === 0) {
+                sidebarList.innerHTML = '<p style="opacity:0.5; text-align:center; padding: 20px;">No hay próximos lanzamientos programados.</p>';
+                return;
+            }
+
+            sidebarList.innerHTML = '';
+            upcoming.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'upcoming-card';
+                const timerId = `sb-timer-${m.id}`;
+
+                // Format Date for badge
+                const dateObj = new Date(m.date + 'T00:00:00');
+                const dayOptions = { day: 'numeric', month: 'short' };
+                const dayStr = dateObj.toLocaleDateString('es-ES', dayOptions).toUpperCase();
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <span class="card-date-badge"><i class="far fa-calendar-alt"></i> ${dayStr}</span>
+                        <span style="font-size: 0.7rem; color: rgba(255,255,255,0.4); font-family: var(--font-heading);">${m.time}H</span>
+                    </div>
+                    <h3 class="card-mission-name">${m.title}</h3>
+                    <div class="sidebar-countdown" id="${timerId}">
+                        <div class="sb-countdown-item"><span class="sb-val">--</span><span class="sb-label">D</span></div>
+                        <div class="sb-countdown-item"><span class="sb-val">--</span><span class="sb-label">H</span></div>
+                        <div class="sb-countdown-item"><span class="sb-val">--</span><span class="sb-label">M</span></div>
+                        <div class="sb-countdown-item"><span class="sb-val">--</span><span class="sb-label">S</span></div>
+                    </div>
+                `;
+
+                // Optional: Click to highlight in calendar (if in current month)
+                card.onclick = () => showDayDetails(m.date, [m]);
+                card.style.cursor = 'pointer';
+
+                sidebarList.appendChild(card);
+            });
+
+            updateSidebarCountdowns(upcoming);
+        }
+
+        function updateSidebarCountdowns(missions) {
+            if (sidebarInterval) clearInterval(sidebarInterval);
+            sidebarInterval = setInterval(() => {
+                missions.forEach(m => {
+                    const target = new Date(`${m.date}T${m.time}`);
+                    const now = new Date();
+                    const diff = target - now;
+                    const timerEl = document.getElementById(`sb-timer-${m.id}`);
+
+                    if (timerEl && diff > 0) {
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m_ = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                        timerEl.innerHTML = `
+                            <div class="sb-countdown-item"><span class="sb-val">${d}</span><span class="sb-label">D</span></div>
+                            <div class="sb-countdown-item"><span class="sb-val">${String(h).padStart(2, '0')}</span><span class="sb-label">H</span></div>
+                            <div class="sb-countdown-item"><span class="sb-val">${String(m_).padStart(2, '0')}</span><span class="sb-label">M</span></div>
+                            <div class="sb-countdown-item"><span class="sb-val">${String(s).padStart(2, '0')}</span><span class="sb-label">S</span></div>
+                        `;
+                    } else if (timerEl && diff <= 0) {
+                        timerEl.innerHTML = '<div style="grid-column: span 4; color: var(--neon-green); font-family: var(--font-heading); font-size: 0.8rem; text-align: center;">¡LANZAMIENTO EN CURSO!</div>';
+                    }
+                });
+            }, 1000);
+        }
+
+        const missionDetailsModal = document.getElementById('missionDetailsModal');
+        const closeDetailsModal = document.getElementById('closeDetailsModal');
+        const dayMissionsList = document.getElementById('dayMissionsList');
+        const detailsDateText = document.getElementById('detailsDateText');
+        let countdownInterval = null;
+
+        if (closeDetailsModal) {
+            closeDetailsModal.onclick = () => {
+                missionDetailsModal.classList.remove('active');
+                if (countdownInterval) clearInterval(countdownInterval);
+            };
+        }
+
+        function updateCountdowns(missions) {
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            countdownInterval = setInterval(() => {
+                missions.forEach(m => {
+                    if (m.status === 'upcoming') {
+                        const target = new Date(`${m.date}T${m.time}`);
+                        const now = new Date();
+                        const diff = target - now;
+                        const timerEl = document.getElementById(`timer-${m.title.replace(/\s+/g, '-')}`);
+
+                        if (timerEl && diff > 0) {
+                            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const m_ = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                            timerEl.innerHTML = `
+                                <div class="countdown-item"><span class="countdown-val">${d}</span><span class="countdown-label">Días</span></div>
+                                <div class="countdown-item"><span class="countdown-val">${String(h).padStart(2, '0')}</span><span class="countdown-label">Hrs</span></div>
+                                <div class="countdown-item"><span class="countdown-val">${String(m_).padStart(2, '0')}</span><span class="countdown-label">Min</span></div>
+                                <div class="countdown-item"><span class="countdown-val">${String(s).padStart(2, '0')}</span><span class="countdown-label">Seg</span></div>
+                            `;
+                        } else if (timerEl) {
+                            timerEl.innerHTML = '<span style="color:var(--neon-green)">¡LANZAMIENTO EN CURSO!</span>';
+                        }
+                    }
+                });
+            }, 1000);
+        }
+
+        function showDayDetails(dateStr, missions) {
+            detailsDateText.textContent = dateStr;
+            dayMissionsList.innerHTML = '';
+
+            if (missions.length === 0) {
+                dayMissionsList.innerHTML = '<p style="text-align:center; opacity:0.6;">No hay misiones programadas para este día.</p>';
+            } else {
+                missions.forEach(m => {
+                    const card = document.createElement('div');
+                    card.className = `mission-detail-card ${m.status}`;
+                    const timerId = `timer-${m.title.replace(/\s+/g, '-')}`;
+                    card.innerHTML = `
+                        <div class="detail-header">
+                            <span class="detail-status">${m.status.toUpperCase()}</span>
+                            <span class="detail-time">${m.time}</span>
+                        </div>
+                        <h3 class="detail-title">${m.title}</h3>
+                        <div class="detail-info">
+                            <p><i class="fas fa-rocket"></i> ${m.vehicle}</p>
+                            <p><i class="fas fa-map-marker-alt"></i> ${m.location}</p>
+                            <p><i class="fas fa-satellite"></i> ${m.provider}</p>
+                            <p><i class="fas fa-crosshairs"></i> ${m.landing || 'N/A'}</p>
+                        </div>
+                        ${m.status === 'upcoming' ? `<div class="countdown-container" id="${timerId}">Calculando...</div>` : ''}
+                    `;
+                    dayMissionsList.appendChild(card);
+                });
+                updateCountdowns(missions);
+            }
+            missionDetailsModal.classList.add('active');
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthDisplay = document.getElementById('monthDisplay');
+            if (!grid) return;
+            grid.innerHTML = '<div class="weekday">Lun</div><div class="weekday">Mar</div><div class="weekday">Mié</div><div class="weekday">Jue</div><div class="weekday">Vie</div><div class="weekday">Sáb</div><div class="weekday">Dom</div>';
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            monthDisplay.textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            let startingPoint = firstDay === 0 ? 6 : firstDay - 1;
+
+            for (let i = 0; i < startingPoint; i++) {
+                const div = document.createElement('div');
+                div.className = 'calendar-day empty';
+                grid.appendChild(div);
+            }
+
+            const today = new Date();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const div = document.createElement('div');
+                div.className = 'calendar-day';
+                if (today.getDate() === d && today.getMonth() === month && today.getFullYear() === year) div.classList.add('today');
+
+                div.innerHTML = `<span class="day-number">${d}</span>`;
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const daily = Object.values(missionsData).filter(m => m.date === dateStr);
+
+                div.onclick = () => showDayDetails(dateStr, daily);
+
+                if (daily.length > 0) {
+                    const list = document.createElement('div');
+                    list.className = 'event-list';
+                    daily.forEach(m => {
+                        const t = document.createElement('div');
+                        t.className = `event-tag ${m.status}`;
+                        t.textContent = m.title;
+                        list.appendChild(t);
+                    });
+                    div.appendChild(list);
+                    div.innerHTML += '<div class="event-dot"></div>';
+                }
+                grid.appendChild(div);
+            }
+        }
+
+        window.prevMonth = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
+        window.nextMonth = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
+
+        // Smooth Scroll Logic
+        let currentS = window.pageYOffset;
+        let targetS = window.pageYOffset;
+        let isS = false;
+
+        window.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            targetS += e.deltaY * 1.5;
+            targetS = Math.max(0, Math.min(targetS, document.documentElement.scrollHeight - window.innerHeight));
+            if (!isS) { isS = true; requestAnimationFrame(scrollAnim); }
+        }, { passive: false });
+
+        function scrollAnim() {
+            const diff = targetS - currentS;
+            if (Math.abs(diff) > 0.5) {
+                currentS += diff * 0.1;
+                window.scrollTo(0, currentS);
+                requestAnimationFrame(scrollAnim);
+            } else { currentS = targetS; window.scrollTo(0, currentS); isS = false; }
+        }
+
+        renderCalendar();
+    </script>
+</body>
+
+</html>

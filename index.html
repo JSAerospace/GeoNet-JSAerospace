@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.S.Aerospace | Select Launch</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">J.S.<span class="highlight">AEROSPACE</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">Inicio</a></li>
+            <li><a href="misiones.html">Misiones</a></li>
+            <li><a href="cohetes.html">Cohetes</a></li>
+            <li><a href="calendario.html">CALENDARIO</a></li>
+            <li><a href="#about">Nosotros</a></li>
+            <li>
+                <button class="auth-btn" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span id="authBtnText">Iniciar Sesión</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Split Screen Container -->
+    <div class="split-container">
+
+        <!-- Left Side: GeoNet -->
+        <div class="split left">
+            <div class="split-bg"></div>
+            <div class="content">
+                <h2 class="section-title text-neon-green">CONSTELACIÓN GEONET</h2>
+                <p>La red de datos interplanetaria definitiva.</p>
+                <a href="geonet.html" class="btn btn-green">ACCEDER</a>
+            </div>
+        </div>
+
+        <!-- Right Side: Cohetes -->
+        <div class="split right">
+            <div class="split-bg"></div>
+            <div class="content">
+                <h2 class="section-title text-neon-red">COHETES</h2>
+                <p>Propulsión pesada para nuevas fronteras.</p>
+                <a href="cohetes.html" class="btn btn-red">VER COHETES</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Iniciar Sesión</h2>
+                <p id="modalSubtitle">Accede a tu cuenta de J.S.Aerospace</p>
+            </div>
+
+            <div class="auth-message" id="authMessage"></div>
+
+            <form id="authForm">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="userName">Nombre</label>
+                    <input type="text" id="userName" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Contraseña</label>
+                    <input type="password" id="userPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn" id="submitBtn">Entrar</button>
+            </form>
+
+            <div class="divider"><span>o continuar con</span></div>
+
+            <div class="social-login">
+                <button class="social-btn google" id="googleLogin">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </button>
+            </div>
+
+            <div class="toggle-auth">
+                <span id="toggleText">¿No tienes cuenta?</span>
+                <a href="#" id="toggleLink">Regístrate</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+            <div class="modal-header">
+                <h2>Tu Perfil</h2>
+                <p>Gestiona tu cuenta</p>
+            </div>
+
+            <div class="auth-message" id="profileMessage"></div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-user-edit"></i> Datos Personales</h3>
+                <div class="form-group">
+                    <label for="profileName">Nombre Visible</label>
+                    <input type="text" id="profileName" placeholder="Tu nombre">
+                </div>
+                <button class="login-btn btn-update" id="updateNameBtn">Actualizar Nombre</button>
+            </div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-lock"></i> Seguridad</h3>
+                <div class="form-group">
+                    <label for="newPassword">Nueva Contraseña</label>
+                    <input type="password" id="newPassword" placeholder="••••••••">
+                </div>
+                <button class="login-btn btn-update" id="updatePassBtn">Cambiar Contraseña</button>
+            </div>
+
+            <div class="profile-section">
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transition Overlay -->
+    <div class="page-transition-overlay" id="transition-overlay"></div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKDQ_LLZGIzFZg_MWIy6mDCJLLMsJ203Q",
+            authDomain: "jsaero-92124.firebaseapp.com",
+            databaseURL: "https://jsaero-92124-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "jsaero-92124",
+            storageBucket: "jsaero-92124.firebasestorage.app",
+            messagingSenderId: "348722939617",
+            appId: "1:348722939617:web:94f1e749d412fc136c19a0",
+            measurementId: "G-DZDZC4NYWQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // DOM Elements
+        const authBtn = document.getElementById('authBtn');
+        const authBtnText = document.getElementById('authBtnText');
+        const loginModal = document.getElementById('loginModal');
+        const closeModal = document.getElementById('closeModal');
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const authForm = document.getElementById('authForm');
+        const authMessage = document.getElementById('authMessage');
+        const googleLoginBtn = document.getElementById('googleLogin');
+        const toggleLink = document.getElementById('toggleLink');
+        const toggleText = document.getElementById('toggleText');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const nameGroup = document.getElementById('nameGroup');
+
+        let isLoginMode = true;
+        let currentUser = null;
+
+        // AUTH LOGIC
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                authBtn.classList.add('logged-in');
+                authBtnText.textContent = user.displayName || user.email.split('@')[0];
+                authBtn.innerHTML = `
+                    <img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar">
+                    <span>${user.displayName || user.email.split('@')[0]}</span>
+                `;
+                saveUserToDatabase(user);
+            } else {
+                currentUser = null;
+                authBtn.classList.remove('logged-in');
+                authBtn.innerHTML = `
+                    <i class="fas fa-user"></i>
+                    <span id="authBtnText">Iniciar Sesión</span>
+                `;
+            }
+        });
+
+        async function saveUserToDatabase(user) {
+            const userRef = ref(database, 'users/' + user.uid);
+            await update(userRef, {
+                lastLogin: new Date().toISOString(),
+                displayName: user.displayName || null,
+                photoURL: user.photoURL || null
+            });
+        }
+
+        authBtn.addEventListener('click', () => {
+            if (currentUser) profileModal.classList.add('active');
+            else loginModal.classList.add('active');
+        });
+
+        closeModal.addEventListener('click', () => loginModal.classList.remove('active'));
+        closeProfileModal.addEventListener('click', () => profileModal.classList.remove('active'));
+
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            modalTitle.textContent = isLoginMode ? 'Iniciar Sesión' : 'Registrarse';
+            modalSubtitle.textContent = isLoginMode ? 'Accede a tu cuenta de J.S.Aerospace' : 'Únete a la nueva era espacial';
+            submitBtn.textContent = isLoginMode ? 'Entrar' : 'Crear Cuenta';
+            toggleText.textContent = isLoginMode ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
+            toggleLink.textContent = isLoginMode ? 'Regístrate' : 'Inicia Sesión';
+            nameGroup.style.display = isLoginMode ? 'none' : 'block';
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            const name = document.getElementById('userName').value;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await updateProfile(userCredential.user, { displayName: name });
+                }
+                loginModal.classList.remove('active');
+            } catch (error) {
+                authMessage.textContent = error.message;
+                authMessage.className = 'auth-message error';
+            }
+        });
+
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                loginModal.classList.remove('active');
+            } catch (error) {
+                authMessage.textContent = error.message;
+                authMessage.className = 'auth-message error';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth);
+            profileModal.classList.remove('active');
+        });
+
+        // Profile Updates
+        document.getElementById('updateNameBtn').addEventListener('click', async () => {
+            const newName = document.getElementById('profileName').value;
+            if (!newName) return;
+            try {
+                await updateProfile(auth.currentUser, { displayName: newName });
+                saveUserToDatabase(auth.currentUser);
+                alert('Nombre actualizado');
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // TRANSITION LOGIC
+        document.addEventListener('DOMContentLoaded', function () {
+            const accederBtn = document.querySelector('.split.left .btn-green');
+            const splitContainer = document.querySelector('.split-container');
+            const overlay = document.getElementById('transition-overlay');
+
+            if (accederBtn) {
+                accederBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    splitContainer.classList.add('transitioning-geonet');
+                    setTimeout(() => {
+                        overlay.classList.add('active');
+                        setTimeout(() => { window.location.href = 'geonet.html'; }, 400);
+                    }, 600);
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
