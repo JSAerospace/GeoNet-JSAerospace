@@ -542,52 +542,126 @@
             color: #000;
         }
 
-        /* Rocket Management Styles */
+        /* Fleet Grid & Cards */
         .rockets-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            padding: 40px 20px;
-            max-width: 1400px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 40px;
+            padding: 40px;
+            max-width: 1600px;
             margin: 0 auto;
             z-index: 2;
             position: relative;
+            justify-content: center;
         }
 
         .rocket-card {
-            background: linear-gradient(145deg, rgba(20, 20, 35, 0.9), rgba(10, 10, 20, 0.95));
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+            background: rgba(15, 15, 25, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.4s ease-out;
             backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             position: relative;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            height: 100%;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            height: auto;
+            min-height: 520px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        .rocket-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            z-index: 3;
+            opacity: 0.7;
+            transition: opacity 0.3s;
         }
 
         .rocket-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 255, 106, 0.15);
-            border-color: rgba(0, 255, 106, 0.5);
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 243, 255, 0.15);
+            border-color: rgba(0, 243, 255, 0.5);
+            background: rgba(20, 20, 35, 0.85);
+        }
+
+        .rocket-card:hover::before {
+            opacity: 1;
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        /* Status Colors for Borders on Hover */
+        .rocket-card.status-active:hover {
+            border-color: var(--neon-green);
+        }
+
+        .rocket-card.status-maintenance:hover {
+            border-color: var(--neon-orange);
+        }
+
+        .rocket-card.status-retired:hover {
+            border-color: #777;
+        }
+
+        .rocket-card.status-production:hover {
+            border-color: var(--neon-blue);
+        }
+
+        .rocket-card.status-active::before {
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+        }
+
+        .rocket-card.status-maintenance::before {
+            background: linear-gradient(90deg, transparent, var(--neon-orange), transparent);
+        }
+
+        .rocket-card.status-retired::before {
+            background: linear-gradient(90deg, transparent, #777, transparent);
+        }
+
+        .rocket-card.status-production::before {
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+        }
+
+        .rocket-card.booster::before {
+            background: linear-gradient(90deg, transparent, var(--neon-orange), transparent);
         }
 
         .rocket-card.booster:hover {
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 107, 53, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 107, 53, 0.15);
             border-color: rgba(255, 107, 53, 0.5);
         }
 
-        .rocket-img {
+        .rocket-card.booster:hover::before {
+            box-shadow: 0 0 15px var(--neon-orange);
+        }
+
+        .rocket-img,
+        .carousel-container {
             width: 100%;
-            height: 250px;
+            height: 280px;
+            min-height: 280px;
             object-fit: cover;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: #000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
         }
 
         .rocket-info {
-            padding: 20px;
+            padding: 25px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -635,25 +709,87 @@
 
         .rocket-info h3 {
             font-family: var(--font-heading);
-            color: var(--neon-red);
-            font-size: 1.5rem;
-            margin-bottom: 10px;
+            color: #fff;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .rocket-type-subtitle {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            font-weight: 700;
+        }
+
+        .rocket-card.booster .rocket-type-subtitle {
+            color: var(--neon-orange);
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: 10px;
+            vertical-align: middle;
+            border: 1px solid transparent;
+        }
+
+        .status-pill.active {
+            color: var(--neon-green);
+            border-color: rgba(0, 255, 106, 0.3);
+            background: rgba(0, 255, 106, 0.1);
+        }
+
+        .status-pill.maintenance {
+            color: var(--neon-orange);
+            border-color: rgba(255, 107, 53, 0.3);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .status-pill.retired {
+            color: #aaa;
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-pill.production {
+            color: var(--neon-blue);
+            border-color: rgba(0, 243, 255, 0.3);
+            background: rgba(0, 243, 255, 0.1);
         }
 
         .rocket-specs {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
+            gap: 12px 20px;
+            margin-top: 10px;
         }
 
         .spec-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .spec-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
         }
 
         .spec-item i {
@@ -769,13 +905,16 @@
             box-shadow: 0 0 10px var(--neon-green);
         }
 
-        /* CARD CAROUSEL STYLES */
-        .carousel-container {
-            position: relative;
+        /* CAROUSEL LOGIC */
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 250px;
-            overflow: hidden;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            object-fit: cover;
         }
 
         .carousel-slide {
@@ -983,16 +1122,6 @@
             object-fit: cover;
         }
 
-        /* Hover effect upgrade for cards */
-        .rocket-card {
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .rocket-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 106, 0.2);
-        }
 
         #detailsModal .login-modal {
             max-width: 900px;
@@ -1021,34 +1150,37 @@
         .section-title {
             color: white;
             font-family: var(--font-heading);
-            font-size: 2rem;
+            font-size: 2.5rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 40px 0 20px 0;
-            padding-left: 20px;
-            border-left: 4px solid var(--neon-blue);
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            letter-spacing: 5px;
+            margin: 60px 0 40px 0;
+            text-align: center;
+            width: 100%;
             display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 20px;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
         }
 
+        .section-title::before,
         .section-title::after {
             content: '';
-            flex-grow: 1;
-            height: 1px;
-            background: linear-gradient(to right, var(--neon-blue), transparent);
-            margin-left: 20px;
-            opacity: 0.5;
+            height: 2px;
+            flex: 1;
+            max-width: 150px;
+            background: linear-gradient(to right, transparent, var(--neon-blue), transparent);
+            opacity: 0.6;
         }
 
         /* Specific colorful styling for Boosters title targeting nth-of-type to differentiate */
         h2.section-title:nth-of-type(2) {
-            border-color: var(--neon-orange);
-            text-shadow: 0 0 10px rgba(255, 157, 0, 0.5);
+            text-shadow: 0 0 15px rgba(255, 157, 0, 0.5);
         }
 
+        h2.section-title:nth-of-type(2)::before,
         h2.section-title:nth-of-type(2)::after {
-            background: linear-gradient(to right, var(--neon-orange), transparent);
+            background: linear-gradient(to right, transparent, var(--neon-orange), transparent);
         }
 
         .btn-secondary:hover {
@@ -1058,21 +1190,23 @@
         /* FLEET LAYOUT */
         .fleet-layout {
             display: flex;
-            gap: 40px;
-            padding: 20px 40px;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 60px;
+            padding: 40px 20px;
+            max-width: 1400px;
+            /* Expanded layout */
+            margin: 0 auto;
+            align-items: center;
         }
 
         .fleet-column {
-            flex: 1;
-            min-width: 0;
+            width: 100%;
             display: flex;
             flex-direction: column;
         }
 
         .fleet-column .section-title {
-            margin-top: 20px;
-            padding-left: 10px;
+            margin-top: 40px;
         }
 
         @media (max-width: 1200px) {
@@ -1080,6 +1214,87 @@
                 flex-direction: column;
                 gap: 20px;
                 padding: 10px 20px;
+            }
+        }
+
+        /* SECTION INDICATOR (Scroll Spy) */
+        .section-indicator {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .indicator-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            opacity: 0.3;
+            transition: all 0.4s ease;
+        }
+
+        .indicator-label {
+            color: white;
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transform: translateX(10px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            white-space: nowrap;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            border: 2px solid transparent;
+            transition: all 0.4s ease;
+        }
+
+        .indicator-item:hover,
+        .indicator-item.active {
+            opacity: 1;
+        }
+
+        .indicator-item:hover .indicator-label,
+        .indicator-item.active .indicator-label {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .indicator-item.active[data-target="cohetes-sec"] .indicator-dot {
+            background: var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .indicator-item.active[data-target="boosters-sec"] .indicator-dot {
+            background: var(--neon-orange);
+            box-shadow: 0 0 15px var(--neon-orange);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        @media (max-width: 1400px) {
+            .section-indicator {
+                right: 20px;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .section-indicator {
+                display: none;
             }
         }
 
@@ -1240,7 +1455,7 @@
     <main class="main-content">
         <div class="fleet-layout">
             <!-- Left Column: Cohetes -->
-            <div class="fleet-column">
+            <div class="fleet-column" id="cohetes-sec">
                 <h2 class="section-title">COHETES</h2>
                 <div class="rockets-grid" id="rocketsGrid">
                     <!-- Rockets will be injected here -->
@@ -1248,13 +1463,25 @@
             </div>
 
             <!-- Right Column: Boosters -->
-            <div class="fleet-column">
+            <div class="fleet-column" id="boosters-sec">
                 <h2 class="section-title">BOOSTERS</h2>
                 <div class="rockets-grid" id="boostersGrid">
                     <!-- Boosters will be injected here -->
                 </div>
             </div>
         </div>
+
+        <!-- Section Indicator -->
+        <nav class="section-indicator">
+            <a href="#cohetes-sec" class="indicator-item active" data-target="cohetes-sec">
+                <span class="indicator-label">Cohetes</span>
+                <div class="indicator-dot"></div>
+            </a>
+            <a href="#boosters-sec" class="indicator-item" data-target="boosters-sec">
+                <span class="indicator-label">Boosters</span>
+                <div class="indicator-dot"></div>
+            </a>
+        </nav>
 
         <!-- Add Rocket FAB (Only for Esstor) -->
         <button class="add-rocket-btn" id="addRocketBtn" title="Añadir Cohete">
@@ -1320,6 +1547,19 @@
                     <div class="form-group" id="stagesGroup">
                         <label>Etapas</label>
                         <input type="number" id="rStages" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Estado Actual</label>
+                        <select id="rStatus" required
+                            style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 10px; border-radius: 8px; width: 100%;">
+                            <option value="active" style="color: black;">En Servicio</option>
+                            <option value="maintenance" style="color: black;">En Mantenimiento</option>
+                            <option value="production" style="color: black;">En Producción</option>
+                            <option value="retired" style="color: black;">Retirado</option>
+                        </select>
                     </div>
                 </div>
 
@@ -1708,6 +1948,7 @@ ASTRO-3_launch.png
                     document.getElementById('rEngines').value = rocket.engines;
                     document.getElementById('rReusable').checked = rocket.reusable;
                     document.getElementById('rFuel').value = rocket.fuel || '';
+                    document.getElementById('rStatus').value = rocket.status || 'active'; // Load Status
 
                     if (rocket.type === 'rocket') {
                         document.getElementById('rStages').value = rocket.stages || '';
@@ -1754,6 +1995,7 @@ ASTRO-3_launch.png
                 document.getElementById('rocketModalTitle').textContent = 'Nuevo Cohete';
                 document.getElementById('rocketModalSubtitle').textContent = 'Añadir a la flota';
                 document.getElementById('saveRocketBtn').textContent = 'Guardar Cohete';
+                document.getElementById('rStatus').value = 'active'; // Default status
 
                 // Reset dynamic visibility
                 stagesGroup.style.display = 'block';
@@ -1809,6 +2051,7 @@ ASTRO-3_launch.png
                         engines: document.getElementById('rEngines').value,
                         reusable: document.getElementById('rReusable').checked,
                         fuel: document.getElementById('rFuel').value,
+                        status: document.getElementById('rStatus').value, // Save Status
                         images: imageList,
                         image: imageList[0],
                         createdAt: new Date().toISOString(),
@@ -1868,8 +2111,16 @@ ASTRO-3_launch.png
                 let hasBoosters = false;
 
                 Object.entries(data).forEach(([id, rocket]) => {
+                    const status = rocket.status || 'active';
+                    let statusLabel = 'En Servicio';
+                    let statusClass = 'active';
+
+                    if (status === 'maintenance') { statusLabel = 'Mantenimiento'; statusClass = 'maintenance'; }
+                    if (status === 'retired') { statusLabel = 'Retirado'; statusClass = 'retired'; }
+                    if (status === 'production') { statusLabel = 'En Producción'; statusClass = 'production'; }
+
                     const card = document.createElement('div');
-                    card.className = `rocket-card ${rocket.type}`;
+                    card.className = `rocket-card ${rocket.type} status-${statusClass}`;
                     card.setAttribute('onclick', `openDetails('${encodeURIComponent(JSON.stringify(rocket))}')`);
 
                     // Admin Controls HTML
@@ -1910,7 +2161,13 @@ ASTRO-3_launch.png
                             ${adminControls}
                             ${carouselHtml}
                             <div class="rocket-info">
-                                <h3>${rocket.name}</h3>
+                                <h3>
+                                    ${rocket.name}
+                                </h3>
+                                <div class="rocket-type-subtitle">
+                                    BOOSTER REUTILIZABLE
+                                    <span class="status-pill ${statusClass}">${statusLabel}</span>
+                                </div>
                                 <div class="rocket-specs">
                                     <span class="spec-item"><i class="fas fa-ruler-vertical"></i> ${rocket.height}m</span>
                                     <span class="spec-item"><i class="fas fa-circle-notch"></i> ${rocket.diameter}m</span>
@@ -1938,7 +2195,13 @@ ASTRO-3_launch.png
                             ${adminControls}
                             ${carouselHtml}
                             <div class="rocket-info">
-                                <h3>${rocket.name}</h3>
+                                <h3>
+                                    ${rocket.name}
+                                </h3>
+                                <div class="rocket-type-subtitle">
+                                    VEHÍCULO ORBITAL
+                                    <span class="status-pill ${statusClass}">${statusLabel}</span>
+                                </div>
                                 <div class="rocket-specs">
                                     <span class="spec-item"><i class="fas fa-ruler-vertical"></i> ${rocket.height}m</span>
                                     <span class="spec-item"><i class="fas fa-circle-notch"></i> ${rocket.diameter}m</span>
@@ -1947,9 +2210,12 @@ ASTRO-3_launch.png
                                     <span class="spec-item"><i class="fas fa-cogs"></i> ${rocket.engines} Motores</span>
                                     <span class="spec-item"><i class="fas fa-layer-group"></i> ${rocket.stages} Etapas</span>
                                 </div>
-                                <div class="card-footer" style="justify-content: flex-end;">
+                                <div class="card-footer">
+                                    <div class="prod-date" title="Reutilización">
+                                        <i class="fas fa-recycle"></i> ${rocket.reusable ? 'Reutilizable' : 'Desechable'}
+                                    </div>
                                     <div class="status-badges">
-                                        ${rocket.reusable ? '<div class="badge active" style="width: auto; padding: 4px 12px;" title="Reutilizable"><i class="fas fa-recycle"></i> Reutilizable</div>' : '<div class="badge" style="width: auto; padding: 4px 12px;">No Reutilizable</div>'}
+                                        ${rocket.reusable ? '<div class="badge active" title="Reutilizable"><i class="fas fa-check"></i></div>' : '<div class="badge" title="Desechable"><i class="fas fa-times"></i></div>'}
                                     </div>
                                 </div>
                             </div>
@@ -2220,6 +2486,83 @@ ASTRO-3_launch.png
                     }, 700);
                 });
             });
+        });
+
+        // SMOOTH VERTICAL SCROLL (Identical to misiones.html)
+        let currentScroll = window.pageYOffset;
+        let targetScroll = window.pageYOffset;
+        let isScrolling = false;
+
+        window.addEventListener('wheel', (e) => {
+            if (document.querySelector('.modal-overlay.active')) return;
+
+            e.preventDefault();
+            const delta = e.deltaY;
+            targetScroll += delta * 1.5;
+
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+
+            if (!isScrolling) {
+                isScrolling = true;
+                requestAnimationFrame(smoothScrollAnimation);
+            }
+        }, { passive: false });
+
+        function smoothScrollAnimation() {
+            const diff = targetScroll - currentScroll;
+            const speed = diff * 0.12; // Slightly faster for responsiveness
+
+            if (Math.abs(speed) > 0.5) {
+                currentScroll += speed;
+                window.scrollTo(0, currentScroll);
+                requestAnimationFrame(smoothScrollAnimation);
+            } else {
+                currentScroll = targetScroll;
+                window.scrollTo(0, currentScroll);
+                isScrolling = false;
+            }
+        }
+
+        // SCROLL SPY & INDICATOR LOGIC
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('.fleet-column');
+            const indicators = document.querySelectorAll('.indicator-item');
+
+            // Click navigation
+            indicators.forEach(indicator => {
+                indicator.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = indicator.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        targetScroll = targetElement.offsetTop - 100; // Offset for navbar
+                        if (!isScrolling) {
+                            isScrolling = true;
+                            requestAnimationFrame(smoothScrollAnimation);
+                        }
+                    }
+                });
+            });
+
+            // Intersection Observer for Scroll Spy
+            const observerOptions = {
+                threshold: 0.3,
+                rootMargin: "-100px 0px -20% 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        indicators.forEach(ind => {
+                            ind.classList.toggle('active', ind.getAttribute('data-target') === id);
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => observer.observe(section));
         });
     </script>
 
