@@ -1469,7 +1469,38 @@
                     <!-- Boosters will be injected here -->
                 </div>
             </div>
+
+            <!-- Right Column: Naves -->
+            <div class="fleet-column" id="ships-sec">
+                <h2 class="section-title">NAVES / CÁPSULAS</h2>
+                <div class="rockets-grid" id="shipsGrid">
+                    <!-- Ships will be injected here -->
+                </div>
+            </div>
         </div>
+
+
+        <style>
+            /* Enhanced Scroll Spy Styles */
+            .indicator-item.active .indicator-dot {
+                background: var(--neon-green);
+                box-shadow: 0 0 15px var(--neon-green), 0 0 30px var(--neon-green);
+                transform: scale(1.8);
+                border: 2px solid #fff;
+            }
+
+            .indicator-item.active .indicator-label {
+                opacity: 1;
+                color: var(--neon-green);
+                text-shadow: 0 0 10px var(--neon-green);
+                transform: translateX(-10px) scale(1.1);
+                font-weight: 700;
+            }
+
+            .indicator-item {
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+        </style>
 
         <!-- Section Indicator -->
         <nav class="section-indicator">
@@ -1479,6 +1510,10 @@
             </a>
             <a href="#boosters-sec" class="indicator-item" data-target="boosters-sec">
                 <span class="indicator-label">Boosters</span>
+                <div class="indicator-dot"></div>
+            </a>
+            <a href="#ships-sec" class="indicator-item" data-target="ships-sec">
+                <span class="indicator-label">Naves / Cápsulas</span>
                 <div class="indicator-dot"></div>
             </a>
         </nav>
@@ -1513,6 +1548,7 @@
                             style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 10px; border-radius: 8px; width: 100%;">
                             <option value="rocket" style="color: black;">Cohete</option>
                             <option value="booster" style="color: black;">Booster</option>
+                            <option value="ship" style="color: black;">Nave / Cápsula</option>
                         </select>
                     </div>
                 </div>
@@ -1533,14 +1569,14 @@
                         <label>Peso (Ton)</label>
                         <input type="number" id="rWeight" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="thrustGroup">
                         <label>Potencia (kN)</label>
                         <input type="number" id="rThrust" required>
                     </div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group" id="enginesGroup">
                         <label>Motores</label>
                         <input type="number" id="rEngines" required>
                     </div>
@@ -1585,6 +1621,18 @@
                             <input type="checkbox" id="bFlown" style="width: auto;">
                             <label for="bFlown" style="margin: 0;">Vuelo Realizado</label>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Ship Specific Fields -->
+                <div id="shipFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Capacidad (Tripulación/Carga)</label>
+                        <input type="text" id="sCapacity" placeholder="Ej: 4 Astronautas / 100 Ton">
+                    </div>
+                    <div class="form-group">
+                        <label>Misiones Realizadas</label>
+                        <input type="number" id="sMissions" value="0">
                     </div>
                 </div>
 
@@ -1750,6 +1798,7 @@ ASTRO-3_launch.png
         const rocketMessage = document.getElementById('rocketMessage');
         const rocketsGrid = document.getElementById('rocketsGrid');
         const boostersGrid = document.getElementById('boostersGrid');
+        const shipsGrid = document.getElementById('shipsGrid');
 
         // Details Modal Elements
         const detailsModal = document.getElementById('detailsModal');
@@ -1764,6 +1813,11 @@ ASTRO-3_launch.png
         const stagesGroup = document.getElementById('stagesGroup');
         const boosterFields = document.getElementById('boosterFields');
         const rocketFields = document.getElementById('rocketFields');
+        const shipFields = document.getElementById('shipFields');
+        const thrustGroup = document.getElementById('thrustGroup');
+        const enginesGroup = document.getElementById('enginesGroup');
+        const rThrust = document.getElementById('rThrust');
+        const rEngines = document.getElementById('rEngines');
 
         // Handle Type Change
         if (rTypeInput) {
@@ -1772,13 +1826,34 @@ ASTRO-3_launch.png
                 if (type === 'booster') {
                     stagesGroup.style.display = 'none';
                     document.getElementById('rStages').required = false;
-                    boosterFields.style.display = 'block';
+                    shipFields.style.display = 'none';
+                    // Show common fields
+                    thrustGroup.style.display = 'block';
+                    enginesGroup.style.display = 'block';
+                    rThrust.required = true;
+                    rEngines.required = true;
+                } else if (type === 'ship') {
+                    stagesGroup.style.display = 'none';
+                    document.getElementById('rStages').required = false;
+                    boosterFields.style.display = 'none';
                     rocketFields.style.display = 'none';
+                    shipFields.style.display = 'block';
+                    // Hide spec fields for ships
+                    thrustGroup.style.display = 'none';
+                    enginesGroup.style.display = 'none';
+                    rThrust.required = false;
+                    rEngines.required = false;
                 } else {
                     stagesGroup.style.display = 'block';
                     document.getElementById('rStages').required = true;
                     boosterFields.style.display = 'none';
                     rocketFields.style.display = 'block';
+                    shipFields.style.display = 'none';
+                    // Show common fields
+                    thrustGroup.style.display = 'block';
+                    enginesGroup.style.display = 'block';
+                    rThrust.required = true;
+                    rEngines.required = true;
                 }
             });
         }
@@ -1889,6 +1964,16 @@ ASTRO-3_launch.png
                         <span>${rocket.launches || 0}</span>
                     </div>
                 `}
+                ${rocket.type === 'ship' ? `
+                    <div class="details-spec-item">
+                        <label><i class="fas fa-users"></i> Capacidad</label>
+                        <span>${rocket.capacity || 'N/A'}</span>
+                    </div>
+                    <div class="details-spec-item">
+                        <label><i class="fas fa-globe"></i> Misiones</label>
+                        <span>${rocket.missions || 0}</span>
+                    </div>
+                ` : ''}
             `;
 
             detailsContent.innerHTML = `
@@ -1959,7 +2044,7 @@ ASTRO-3_launch.png
                         document.getElementById('rStages').required = true;
                         boosterFields.style.display = 'none';
                         rocketFields.style.display = 'block';
-                    } else {
+                    } else if (rocket.type === 'booster') {
                         document.getElementById('bLaunches').value = rocket.launches || 0;
                         document.getElementById('bProdDate').value = rocket.prodDate || '';
                         document.getElementById('bStaticFire').checked = rocket.staticFire || false;
@@ -1969,6 +2054,33 @@ ASTRO-3_launch.png
                         document.getElementById('rStages').required = false;
                         boosterFields.style.display = 'block';
                         rocketFields.style.display = 'none';
+                        shipFields.style.display = 'none';
+                        // Show common fields
+                        thrustGroup.style.display = 'block';
+                        enginesGroup.style.display = 'block';
+                        rThrust.required = true;
+                        rEngines.required = true;
+                    } else if (rocket.type === 'ship') {
+                        document.getElementById('sCapacity').value = rocket.capacity || '';
+                        document.getElementById('sMissions').value = rocket.missions || 0;
+
+                        stagesGroup.style.display = 'none';
+                        document.getElementById('rStages').required = false;
+                        boosterFields.style.display = 'none';
+                        rocketFields.style.display = 'none';
+                        shipFields.style.display = 'block';
+                        // Hide spec fields for ships
+                        thrustGroup.style.display = 'none';
+                        enginesGroup.style.display = 'none';
+                        rThrust.required = false;
+                        rEngines.required = false;
+                    } else {
+                        // Fallback/Rocket
+                        // Show common fields
+                        thrustGroup.style.display = 'block';
+                        enginesGroup.style.display = 'block';
+                        rThrust.required = true;
+                        rEngines.required = true;
                     }
 
                     document.getElementById('rImageName').value = (rocket.images || []).join('\n');
@@ -2002,7 +2114,13 @@ ASTRO-3_launch.png
                 document.getElementById('rStages').required = true;
                 boosterFields.style.display = 'none';
                 rocketFields.style.display = 'block';
+                shipFields.style.display = 'none';
                 document.getElementById('rFuel').value = '';
+                // Show common fields by default
+                thrustGroup.style.display = 'block';
+                enginesGroup.style.display = 'block';
+                rThrust.required = true;
+                rEngines.required = true;
 
                 rocketModal.classList.add('active');
             });
@@ -2063,12 +2181,16 @@ ASTRO-3_launch.png
                         newRocket.stages = document.getElementById('rStages').value;
                         newRocket.stage1Spec = document.getElementById('rStage1Spec').value;
                         newRocket.stage2Spec = document.getElementById('rStage2Spec').value;
-                    } else {
+                    } else if (type === 'booster') {
                         newRocket.launches = document.getElementById('bLaunches').value;
                         newRocket.prodDate = document.getElementById('bProdDate').value;
                         newRocket.staticFire = document.getElementById('bStaticFire').checked;
                         newRocket.flown = document.getElementById('bFlown').checked;
-                        newRocket.stages = 1; // Default for boosters
+                        newRocket.stages = 1;
+                    } else if (type === 'ship') {
+                        newRocket.capacity = document.getElementById('sCapacity').value;
+                        newRocket.missions = document.getElementById('sMissions').value;
+                        newRocket.stages = 1;
                     }
 
                     const editingId = document.getElementById('editingRocketId').value;
@@ -2104,27 +2226,61 @@ ASTRO-3_launch.png
         onValue(rocketsRef, (snapshot) => {
             rocketsGrid.innerHTML = '';
             boostersGrid.innerHTML = '';
+            shipsGrid.innerHTML = '';
             const data = snapshot.val();
 
             if (data) {
-                let hasRockets = false;
-                let hasBoosters = false;
+                let rockets = [];
+                let boosters = [];
+                let ships = [];
 
+                // 1. Process data into arrays
                 Object.entries(data).forEach(([id, rocket]) => {
-                    const status = rocket.status || 'active';
-                    let statusLabel = 'En Servicio';
-                    let statusClass = 'active';
+                    const item = { id, ...rocket };
+                    if (rocket.type === 'booster') {
+                        boosters.push(item);
+                    } else if (rocket.type === 'ship') {
+                        ships.push(item);
+                    } else {
+                        rockets.push(item);
+                    }
+                });
 
-                    if (status === 'maintenance') { statusLabel = 'Mantenimiento'; statusClass = 'maintenance'; }
-                    if (status === 'retired') { statusLabel = 'Retirado'; statusClass = 'retired'; }
-                    if (status === 'production') { statusLabel = 'En Producción'; statusClass = 'production'; }
+                // 2. Sort Boosters by Number (extract digits from name)
+                boosters.sort((a, b) => {
+                    const getNum = (str) => {
+                        const match = str.match(/\d+/);
+                        return match ? parseInt(match[0]) : 0;
+                    };
+                    return getNum(a.name) - getNum(b.name);
+                });
 
-                    const card = document.createElement('div');
-                    card.className = `rocket-card ${rocket.type} status-${statusClass}`;
-                    card.setAttribute('onclick', `openDetails('${encodeURIComponent(JSON.stringify(rocket))}')`);
+                // 3. Render function
+                const renderFleet = (items, container) => {
+                    if (items.length === 0) {
+                        return false;
+                    }
 
-                    // Admin Controls HTML
-                    const adminControls = `
+                    items.forEach(rocket => {
+                        const id = rocket.id;
+                        const status = rocket.status || 'active';
+                        let statusLabel = 'En Servicio';
+                        let statusClass = 'active';
+
+                        if (status === 'maintenance') { statusLabel = 'Mantenimiento'; statusClass = 'maintenance'; }
+                        if (status === 'retired') { statusLabel = 'Retirado'; statusClass = 'retired'; }
+                        if (status === 'production') { statusLabel = 'En Producción'; statusClass = 'production'; }
+
+                        const card = document.createElement('div');
+                        card.className = `rocket-card ${rocket.type} status-${statusClass}`;
+                        // We need to remove the ID from the object to match original stringify behavior or just pass the rocket object without ID if preferred, 
+                        // but normally ID isn't part of the firebase value unless added. 
+                        // The original openDetails took the rocket object. Let's create a clean object for that.
+                        const { id: _, ...cleanRocket } = rocket;
+                        card.setAttribute('onclick', `openDetails('${encodeURIComponent(JSON.stringify(cleanRocket))}')`);
+
+                        // Admin Controls HTML
+                        const adminControls = `
                         <div class="admin-controls">
                             <button class="admin-btn edit-btn" onclick="event.stopPropagation(); editRocket('${id}')" title="Editar">
                                 <i class="fas fa-edit"></i>
@@ -2135,29 +2291,29 @@ ASTRO-3_launch.png
                         </div>
                     `;
 
-                    // Normalize images array
-                    let images = rocket.images || (rocket.image ? [rocket.image] : ['https://via.placeholder.com/300x250?text=Rocket']);
+                        // Normalize images array
+                        let images = rocket.images || (rocket.image ? [rocket.image] : ['https://via.placeholder.com/300x250?text=Rocket']);
 
-                    // Generate Carousel HTML
-                    let carouselHtml = '';
-                    if (images.length > 1) {
-                        const slides = images.map((img, index) =>
-                            `<img src="${img}" class="carousel-slide ${index === 0 ? 'active' : ''}" alt="${rocket.name}">`
-                        ).join('');
+                        // Generate Carousel HTML
+                        let carouselHtml = '';
+                        if (images.length > 1) {
+                            const slides = images.map((img, index) =>
+                                `<img src="${img}" class="carousel-slide ${index === 0 ? 'active' : ''}" alt="${rocket.name}">`
+                            ).join('');
 
-                        carouselHtml = `
+                            carouselHtml = `
                             <div class="carousel-container" id="carousel-${rocket.name.replace(/\s+/g, '-')}">
                                 ${slides}
                                 <button class="carousel-btn prev" onclick="moveCarousel(this, -1)">&#10094;</button>
                                 <button class="carousel-btn next" onclick="moveCarousel(this, 1)">&#10095;</button>
                             </div>
                          `;
-                    } else {
-                        carouselHtml = `<img src="${images[0]}" class="rocket-img" alt="${rocket.name}">`;
-                    }
+                        } else {
+                            carouselHtml = `<img src="${images[0]}" class="rocket-img" alt="${rocket.name}">`;
+                        }
 
-                    if (rocket.type === 'booster') {
-                        card.innerHTML = `
+                        if (rocket.type === 'booster') {
+                            card.innerHTML = `
                             ${adminControls}
                             ${carouselHtml}
                             <div class="rocket-info">
@@ -2188,10 +2344,37 @@ ASTRO-3_launch.png
                                 </div>
                             </div>
                         `;
-                        boostersGrid.appendChild(card);
-                        hasBoosters = true;
-                    } else {
-                        card.innerHTML = `
+                        } else if (rocket.type === 'ship') {
+                            card.innerHTML = `
+                            ${adminControls}
+                            ${carouselHtml}
+                            <div class="rocket-info">
+                                <h3>
+                                    ${rocket.name}
+                                </h3>
+                                <div class="rocket-type-subtitle">
+                                    NAVE ESPECIAL / CÁPSULA
+                                    <span class="status-pill ${statusClass}">${statusLabel}</span>
+                                </div>
+                                <div class="rocket-specs">
+                                    <span class="spec-item"><i class="fas fa-ruler-vertical"></i> ${rocket.height}m</span>
+                                    <span class="spec-item"><i class="fas fa-circle-notch"></i> ${rocket.diameter}m</span>
+                                    <span class="spec-item"><i class="fas fa-weight-hanging"></i> ${rocket.weight}t</span>
+                                    <span class="spec-item"><i class="fas fa-users"></i> ${rocket.capacity || 'N/A'}</span>
+                                    <span class="spec-item"><i class="fas fa-globe"></i> ${rocket.missions || 0} Misiones</span>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="prod-date" title="Reutilización">
+                                        <i class="fas fa-recycle"></i> ${rocket.reusable ? 'Reutilizable' : 'Desechable'}
+                                    </div>
+                                    <div class="status-badges">
+                                        ${rocket.reusable ? '<div class="badge active" title="Reutilizable"><i class="fas fa-check"></i></div>' : '<div class="badge" title="Desechable"><i class="fas fa-times"></i></div>'}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        } else {
+                            card.innerHTML = `
                             ${adminControls}
                             ${carouselHtml}
                             <div class="rocket-info">
@@ -2220,17 +2403,24 @@ ASTRO-3_launch.png
                                 </div>
                             </div>
                         `;
-                        rocketsGrid.appendChild(card); // Default to rocket for compatibility
-                        hasRockets = true;
-                    }
-                });
+                        }
+                        container.appendChild(card);
+                    });
+                    return true;
+                };
+
+                const hasRockets = renderFleet(rockets, rocketsGrid);
+                const hasBoosters = renderFleet(boosters, boostersGrid);
+                const hasShips = renderFleet(ships, shipsGrid);
 
                 if (!hasRockets) rocketsGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay cohetes activos en la flota.</p>';
                 if (!hasBoosters) boostersGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay boosters activos.</p>';
+                if (!hasShips) shipsGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay naves activas.</p>';
 
             } else {
                 rocketsGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay naves activas en la flota.</p>';
                 boostersGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay boosters activos.</p>';
+                shipsGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #888;">No hay naves activas.</p>';
             }
         });
 
@@ -2547,8 +2737,8 @@ ASTRO-3_launch.png
 
             // Intersection Observer for Scroll Spy
             const observerOptions = {
-                threshold: 0.3,
-                rootMargin: "-100px 0px -20% 0px"
+                threshold: 0,
+                rootMargin: "-49% 0px -50% 0px" // Creates a thin detection line in the middle of the viewport
             };
 
             const observer = new IntersectionObserver((entries) => {
