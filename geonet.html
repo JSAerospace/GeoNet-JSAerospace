@@ -469,9 +469,15 @@
             </div>
             <div class="tab-content active" id="tab-plane">
                 <form id="adminPlaneForm">
-                    <div class="form-group"><label>Nombre</label><input type="text" id="planeName" required></div>
-                    <div class="form-group"><label>Altitud (km)</label><input type="number" id="planeAlt" value="550"></div>
-                    <div class="form-group"><label>Inclinación (°)</label><input type="number" id="planeInc" value="53"></div>
+                    <div class="form-group"><label>Nombre Plano</label><input type="text" id="planeName" placeholder="Ej: Lunar-L1" required></div>
+                    <div class="form-group"><label>Cuerpo Celeste</label>
+                        <select id="planeBody" style="background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:5px; padding:10px; width:100%; outline:none;">
+                            <option value="earth">Tierra</option>
+                            <option value="moon">Luna</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Altitud (km)</label><input type="number" id="planeAlt" value="500" required></div>
+                    <div class="form-group"><label>Inclinación (°)</label><input type="number" id="planeInc" value="0" required></div>
                     <div class="form-group"><label>Color</label><input type="color" id="planeColor" value="#00d4ff"></div>
                     <button type="submit" class="login-btn">Crear Plano</button>
                 </form>
@@ -838,9 +844,12 @@
         safeGet('focusEarth').onclick = () => focusOn('earth');
         safeGet('focusMoon').onclick = () => focusOn('moon');
         const planeGroups = [];
-        window.createPlane = function(idx, alt, inc, count, color) {
-            const group = new THREE.Group(), radius = 1 + (alt/6371), incRad = inc * Math.PI/180;
-            const points = [], linePoints = [];
+        window.createPlane = function(idx, alt, inc, count, color, body = 'earth') {
+            const group = new THREE.Group();
+            const baseRadius = (body === 'moon') ? 0.27 : 1.0;
+            const radius = baseRadius + (alt/6371); 
+            const incRad = inc * Math.PI/180;
+            const points = [];
             for (let i = 0; i < count; i++) {
                 const a = (i/count)*Math.PI*2, x = radius*Math.cos(a), z = radius*Math.sin(a);
                 points.push(new THREE.Vector3(x, -z*Math.sin(incRad), z*Math.cos(incRad)));
@@ -849,23 +858,30 @@
                 const pGeo = new THREE.BufferGeometry().setFromPoints(points);
                 group.add(new THREE.Points(pGeo, new THREE.PointsMaterial({color: color, size: 0.03})));
             }
+            const linePoints = [];
             for (let i = 0; i <= 64; i++) {
-                const a = (i/64)*Math.PI*2, lx = radius*Math.cos(a), lz = radius*Math.sin(a);
-                linePoints.push(new THREE.Vector3(lx, -lz*Math.sin(incRad), lz*Math.cos(incRad)));
+                const a = (i/64)*Math.PI*2, x = radius*Math.cos(a), z = radius*Math.sin(a);
+                linePoints.push(new THREE.Vector3(x, -z*Math.sin(incRad), z*Math.cos(incRad)));
             }
-            group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(linePoints), new THREE.LineBasicMaterial({color: color, transparent: true, opacity:0.3})));
-            earthGroup.add(group); planeGroups[idx] = group;
-        };
+            group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(linePoints), new THREE.LineBasicMaterial({color: color, transparent: true, opacity: 0.3})));
+            
+            const targetGroup = (body === 'moon') ? moon : earthGroup;
+            targetGroup.add(group);
+            planeGroups.push(group);
+        }
 
-        onValue(ref(database, 'geonet/planes'), (snap) => {
-            planeGroups.forEach(g => earthGroup.remove(g)); planeGroups.length = 0;
+        onValue(ref(database, 'geonet/planes'), snap => {
+            planeGroups.forEach(g => { if(g && g.parent) g.parent.remove(g); });
+            planeGroups.length = 0;
             const planes = snap.val() || {};
             const list = document.getElementById('planes-list'), target = document.getElementById('targetPlane');
             list.innerHTML = ''; target.innerHTML = '';
             Object.keys(planes).forEach((id, i) => {
-                const p = planes[id]; createPlane(i, p.alt, p.inc, p.count, p.color);
-                list.innerHTML += `<div class="plane-item"><div class="plane-header"><span class="plane-name">${p.name}</span> <button onclick="window.deletePlane('${id}')" style="background:none; border:none; color:#ff3333; cursor:pointer;"><i class="fas fa-trash"></i></button></div><div class="plane-grid-info"><span>${p.alt}km</span> <span>${p.count} sats</span></div></div>`;
-                target.innerHTML += `<option value="${id}">${p.name}</option>`;
+                const p = planes[id]; 
+                createPlane(i, p.alt, p.inc, p.count, p.color, p.body || 'earth');
+                const badge = `<span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem; margin-left:5px;">${p.body === 'moon' ? 'Luna' : 'Tierra'}</span>`;
+                list.innerHTML += `<div class="plane-item"><div class="plane-header"><span class="plane-name">${p.name} ${badge}</span> <button onclick="window.deletePlane('${id}')" style="background:none; border:none; color:#ff3333; cursor:pointer;"><i class="fas fa-trash"></i></button></div><div class="plane-grid-info"><span>${p.alt}km</span> <span>${p.count} sats</span></div></div>`;
+                target.innerHTML += `<option value="${id}">${p.name} (${p.body === 'moon' ? 'L' : 'T'})</option>`;
             });
             document.getElementById('stats-active-planes').textContent = Object.keys(planes).length;
             document.getElementById('stats-active-sats').textContent = Object.values(planes).reduce((s,p)=>s+parseInt(p.count), 0);
@@ -878,6 +894,7 @@
             e.preventDefault();
             push(ref(database, 'geonet/planes'), {
                 name: document.getElementById('planeName').value,
+                body: document.getElementById('planeBody').value,
                 alt: parseInt(document.getElementById('planeAlt').value),
                 inc: parseInt(document.getElementById('planeInc').value),
                 count: 0,
