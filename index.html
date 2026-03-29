@@ -28,7 +28,7 @@
             <li><a href="misiones.html">Misiones</a></li>
             <li><a href="cohetes.html">Cohetes</a></li>
             <li><a href="calendario.html">CALENDARIO</a></li>
-            <li><a href="#about">Nosotros</a></li>
+            <li><a href="geonet.html">GEONET</a></li>
             <li>
                 <button class="auth-btn" id="contactBtn">
                     <i class="fas fa-comment"></i>
@@ -205,14 +205,14 @@
         import { getDatabase, ref, set, get, update, push, onValue, onChildAdded } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDKDQ_LLZGIzFZg_MWIy6mDCJLLMsJ203Q",
-            authDomain: "jsaero-92124.firebaseapp.com",
-            databaseURL: "https://jsaero-92124-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "jsaero-92124",
-            storageBucket: "jsaero-92124.firebasestorage.app",
-            messagingSenderId: "348722939617",
-            appId: "1:348722939617:web:94f1e749d412fc136c19a0",
-            measurementId: "G-DZDZC4NYWQ"
+            apiKey: "AIzaSyC6eDNK7CLl_aXEYkwFV97k-2A1axzRAKg",
+            authDomain: "j-saerospace.firebaseapp.com",
+            projectId: "j-saerospace",
+            storageBucket: "j-saerospace.firebasestorage.app",
+            messagingSenderId: "496032189875",
+            appId: "1:496032189875:web:69c591002b8131ed1c0fc6",
+            measurementId: "G-YXWPQWVGDZ",
+            databaseURL: "https://j-saerospace-default-rtdb.firebaseio.com"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -239,11 +239,13 @@
 
         let isLoginMode = true;
         let currentUser = null;
+        let isAdmin = false;
 
         // AUTH LOGIC
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
+                isAdmin = (user.email === 'olanoagus@gmail.com');
                 authBtn.classList.add('logged-in');
                 authBtnText.textContent = user.displayName || user.email.split('@')[0];
                 authBtn.innerHTML = `
@@ -253,6 +255,7 @@
                 saveUserToDatabase(user);
             } else {
                 currentUser = null;
+                isAdmin = false;
                 authBtn.classList.remove('logged-in');
                 authBtn.innerHTML = `
                     <i class="fas fa-user"></i>
