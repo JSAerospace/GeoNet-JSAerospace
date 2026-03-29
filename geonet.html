@@ -664,7 +664,7 @@
                 </form>
             </div>
             <div class="tab-content" id="tab-surface">
-                <p style="font-size: 0.8rem; color: var(--neon-orange); margin-bottom: 10px;"><i class="fas fa-mouse-pointer"></i> Haz clic en el planeta para capturar coordenadas automáticamente.</p>
+                <p style="font-size: 0.8rem; color: var(--neon-orange); margin-bottom: 15px;"><i class="fas fa-info-circle"></i> Usa el botón para elegir la ubicación directamente en el planeta.</p>
                 <form id="adminSurfaceForm">
                     <div class="form-group"><label>Nombre</label><input type="text" id="surfName" placeholder="Ej: Base Alfa" required></div>
                     <div class="form-group"><label>Cuerpo</label>
@@ -674,9 +674,10 @@
                             <option value="laythe">Laythe</option>
                         </select>
                     </div>
-                    <div style="display:flex; gap:10px;">
+                    <div style="display:flex; gap:10px; align-items:flex-end;">
                         <div class="form-group" style="flex:1;"><label>Latitud</label><input type="number" id="surfLat" step="0.000001" value="0" required></div>
                         <div class="form-group" style="flex:1;"><label>Longitud</label><input type="number" id="surfLon" step="0.000001" value="0" required></div>
+                        <button type="button" id="startPickBtn" style="height:45px; background:var(--neon-orange); color:#000; border:none; padding:0 15px; border-radius:5px; cursor:pointer; margin-bottom:15px;" title="Seleccionar en Mapa"><i class="fas fa-crosshairs"></i></button>
                     </div>
                     <div class="form-group"><label>Color</label><input type="color" id="surfColor" value="#ff6b35"></div>
                     <button type="submit" class="login-btn">Añadir Activo</button>
@@ -684,6 +685,13 @@
                 <div id="surface-assets-list" style="margin-top:20px; max-height:150px; overflow-y:auto;"></div>
             </div>
         </div>
+    </div>
+
+    <!-- Picker Instruction Overlay -->
+    <div id="picker-overlay" style="display:none; position:fixed; top:120px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); border:1px solid var(--neon-orange); color:#fff; padding:15px 30px; border-radius:30px; z-index:2000; pointer-events:none; box-shadow:0 0 20px rgba(255,107,53,0.3); align-items:center; gap:15px;">
+        <i class="fas fa-mouse-pointer" style="color:var(--neon-orange); animation: pulse 1.5s infinite;"></i>
+        <span>Haz clic en el planeta para elegir la ubicación</span>
+        <button id="cancelPickBtn" style="background:rgba(255,255,255,0.1); border:none; color:#fff; padding:5px 12px; border-radius:15px; cursor:pointer; font-size:0.8rem; pointer-events:auto;">Cancelar</button>
     </div>
 
     <!-- Standardized Modals -->
@@ -1264,15 +1272,31 @@
         // --- COORDINATE PICKER ---
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
+        let isPicking = false;
+
+        const startPicking = () => {
+            isPicking = true;
+            document.getElementById('adminModal').classList.remove('active');
+            document.getElementById('picker-overlay').style.display = 'flex';
+        };
+
+        const stopPicking = () => {
+            isPicking = false;
+            document.getElementById('picker-overlay').style.display = 'none';
+            document.getElementById('adminModal').classList.add('active');
+        };
+
+        document.getElementById('startPickBtn').onclick = startPicking;
+        document.getElementById('cancelPickBtn').onclick = stopPicking;
 
         container.addEventListener('mousedown', (e) => {
-            if (!document.getElementById('adminModal').classList.contains('active')) return;
-            if (document.querySelector('.admin-tab-btn.active').dataset.tab !== 'tab-surface') return;
+            if (!isPicking) return;
 
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
 
+            // Important: Hit markers as well if we want, but mainly planets
             const intersects = raycaster.intersectObjects([earth, moon, laythe]);
             if (intersects.length > 0) {
                 const hit = intersects[0];
@@ -1291,6 +1315,8 @@
                 document.getElementById('surfLat').value = lat.toFixed(6);
                 document.getElementById('surfLon').value = (lon < -180 ? lon + 360 : (lon > 180 ? lon - 360 : lon)).toFixed(6);
                 document.getElementById('surfBody').value = bodyKey;
+
+                stopPicking();
             }
         });
 
