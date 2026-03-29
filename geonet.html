@@ -61,7 +61,36 @@
             z-index: 100;
             pointer-events: none;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .focus-controls {
+            display: flex;
+            gap: 15px;
+            pointer-events: auto;
+        }
+
+        .focus-btn {
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            color: #00d4ff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .focus-btn:hover, .focus-btn.active {
+            background: #00d4ff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
         }
 
         .sat-header-content {
@@ -379,6 +408,10 @@
 
     <div class="hud-overlay">
         <div class="sat-header-overlay">
+            <div class="focus-controls">
+                <button class="focus-btn active" id="focusEarth">Tierra</button>
+                <button class="focus-btn" id="focusMoon">Luna</button>
+            </div>
             <div class="sat-header-content">
                 <div class="sat-title-group">
                     <h1 class="sat-main-title">CONSTELACIÓN GEONET</h1>
@@ -532,6 +565,8 @@
         const database = getDatabase(app);
         const googleProvider = new GoogleAuthProvider();
 
+        const safeGet = (id) => document.getElementById(id);
+
         let currentUser = null, isLoginMode = true, activeChatUid = null, isChatAdmin = false, chatListeners = [], isAdmin = false;
 
         onAuthStateChanged(auth, (user) => {
@@ -671,10 +706,125 @@
         renderer.setSize(window.innerWidth, window.innerHeight); container.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; controls.autoRotate = true; controls.autoRotateSpeed = 0.8;
-        scene.add(new THREE.AmbientLight(0x444444)); const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(5,3,5); scene.add(sun);
+        scene.add(new THREE.AmbientLight(0x888888, 1.0)); 
+        const sun = new THREE.DirectionalLight(0xffffff, 1.5); sun.position.set(5,3,5); scene.add(sun);
         const earthGroup = new THREE.Group(); scene.add(earthGroup); earthGroup.rotation.z = 0.4;
         const loader = new THREE.TextureLoader();
-        const earth = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), new THREE.MeshPhongMaterial({ map: loader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg') })); earthGroup.add(earth);
+        const moonGroup = new THREE.Group(); scene.add(moonGroup);
+        const moonOrbitRadius = 5; // Closer (was 8)
+        
+        // --- MOON ORBIT LINE ---
+        const orbitGeom = new THREE.RingGeometry(moonOrbitRadius - 0.01, moonOrbitRadius + 0.01, 128);
+        const orbitMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
+        const orbitLine = new THREE.Mesh(orbitGeom, orbitMat);
+        orbitLine.rotation.x = Math.PI/2;
+        scene.add(orbitLine);
+        
+        // --- EARTH MULTI-LAYER (EzSunSpace Style) ---
+        // --- ASSETS LOGIC (EzSunSpace Style) ---
+        const dayTex = loader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+        const nightTex = loader.load('https://unpkg.com/three-globe/example/img/earth-night.jpg');
+        const sunPos = new THREE.Vector3(5, 3, 5); // Fixed for now
+
+        // 1. Earth Shader (Day/Night Blending)
+        const earthMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                dayTexture: { value: dayTex },
+                nightTexture: { value: nightTex },
+                sunDirection: { value: sunPos.clone().normalize() }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                varying vec3 vWorldNormal;
+                varying vec3 vViewPosition;
+                void main() {
+                    vUv = uv;
+                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                    vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                    vViewPosition = normalize(cameraPosition - worldPos.xyz);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D dayTexture;
+                uniform sampler2D nightTexture;
+                uniform vec3 sunDirection;
+                varying vec2 vUv;
+                varying vec3 vWorldNormal;
+                varying vec3 vViewPosition;
+                void main() {
+                    vec3 normal = normalize(vWorldNormal);
+                    vec3 viewDir = normalize(vViewPosition);
+                    vec3 sunDir = normalize(sunDirection);
+                    
+                    // Day/Night 
+                    float diff = dot(normal, sunDir);
+                    float dayIntensity = smoothstep(-0.2, 0.2, diff);
+                    
+                    vec4 dayColor = texture2D(dayTexture, vUv);
+                    vec4 nightColor = texture2D(nightTexture, vUv);
+                    
+                    // Main Earth color
+                    vec3 finalColor = (dayColor.rgb * dayIntensity) + (nightColor.rgb * (1.0 - dayIntensity) * 2.0);
+                    
+                    // --- ATMOSPHERE GLOW (Integrated Rim Lighting) ---
+                    float rim = pow(1.0 - max(dot(normal, viewDir), 0.0), 4.5);
+                    vec3 rimColor = vec3(0.0, 0.8, 1.0) * rim * 0.45;
+                    
+                    // Add glow to final color
+                    gl_FragColor = vec4(finalColor + rimColor, 1.0);
+                }
+            `
+        });
+        const earth = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), earthMaterial);
+        earth.renderOrder = 0;
+        earthGroup.add(earth);
+
+        // 2. Clouds (Rotating layer)
+        const clouds = new THREE.Mesh(new THREE.SphereGeometry(1.015, 64, 64), new THREE.MeshPhongMaterial({
+            map: loader.load('https://unpkg.com/three-globe/example/img/earth-clouds.png'),
+            transparent: true, opacity: 0.45, depthWrite: false
+        })); 
+        clouds.renderOrder = 2;
+        earthGroup.add(clouds);
+        window.cloudLayer = clouds;
+
+        const atmo = null;
+
+        // --- MOON ---
+        const moon = new THREE.Mesh(new THREE.SphereGeometry(0.27, 64, 64), new THREE.MeshPhongMaterial({ 
+            map: loader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Moonmap_from_clementine_data.png/1200px-Moonmap_from_clementine_data.png')
+        }));
+        moon.position.set(moonOrbitRadius, 0, 0); moonGroup.add(moon);
+        
+        // --- NAVIGATION LOGIC ---
+        let trackingTarget = earth;
+        let cameraTransition = null;
+
+        window.focusOn = (targetName) => {
+            document.querySelectorAll('.focus-btn').forEach(b => b.classList.remove('active'));
+            if(targetName === 'earth') {
+                trackingTarget = earth;
+                safeGet('focusEarth').classList.add('active');
+                startTransition(new THREE.Vector3(2, 1, 2.5), new THREE.Vector3(0,0,0));
+            } else {
+                trackingTarget = moon;
+                safeGet('focusMoon').classList.add('active');
+                // Adjust camera for closer moon
+                startTransition(new THREE.Vector3(moonOrbitRadius + 1.2, 0.6, 1.2), moon.position);
+            }
+        };
+
+        function startTransition(pos, target) {
+            cameraTransition = {
+                startPos: camera.position.clone(), endPos: pos,
+                startTarget: controls.target.clone(), endTarget: target.clone(),
+                progress: 0
+            };
+        }
+
+        safeGet('focusEarth').onclick = () => focusOn('earth');
+        safeGet('focusMoon').onclick = () => focusOn('moon');
         const planeGroups = [];
         window.createPlane = function(idx, alt, inc, count, color) {
             const group = new THREE.Group(), radius = 1 + (alt/6371), incRad = inc * Math.PI/180;
@@ -753,7 +903,39 @@
         };
         window.closeSatViewer = () => { document.getElementById('sat-modal').classList.remove('active'); setTimeout(()=>document.getElementById('sat-modal').style.display='none',300); };
 
-        function animate() { requestAnimationFrame(animate); controls.update(); earth.rotation.y += 0.001; renderer.render(scene, camera); }
+        function animate() { 
+            requestAnimationFrame(animate); 
+            const time = Date.now() * 0.001;
+
+            earth.rotation.y += 0.001; 
+            if(window.cloudLayer) window.cloudLayer.rotation.y += 0.0015;
+            
+            if(trackingTarget !== moon) {
+                moonGroup.rotation.y += 0.002;
+            }
+            moon.rotation.y += 0.005;
+
+            if (cameraTransition) {
+                cameraTransition.progress += 0.02;
+                const t = Math.min(cameraTransition.progress, 1);
+                const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; 
+                
+                camera.position.lerpVectors(cameraTransition.startPos, cameraTransition.endPos, ease);
+                controls.target.lerpVectors(cameraTransition.startTarget, cameraTransition.endTarget, ease);
+                
+                if(t >= 1) cameraTransition = null;
+            } else if (trackingTarget === moon) {
+                const moonWorldPos = new THREE.Vector3();
+                moon.getWorldPosition(moonWorldPos);
+                controls.target.copy(moonWorldPos);
+            }
+
+            // Sync shader direction (Using simple sun.position)
+            earth.material.uniforms.sunDirection.value.copy(sun.position);
+
+            controls.update();
+            renderer.render(scene, camera); 
+        }
         animate();
 
         document.getElementById('adminFab').onclick = () => document.getElementById('adminModal').classList.add('active');
