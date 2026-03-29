@@ -1109,6 +1109,19 @@
             border-radius: 4px;
         }
 
+        /* Pulsing status for In Flight */
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 212, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+        }
+
+        .status-badge.in_flight {
+            animation: pulse-blue 2s infinite;
+            background: var(--neon-blue) !important;
+            color: #000 !important;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -1542,6 +1555,7 @@
                             style="width: 100%; padding: 12px; background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff;">
                             <option value="success">ÉXITO</option>
                             <option value="upcoming">PRÓXIMO</option>
+                            <option value="in_flight">EN VUELO</option>
                             <option value="failed">FALLIDO</option>
                         </select>
                     </div>
@@ -2062,10 +2076,20 @@
                     <div class="card-image-container">
                         <img src="${cardImg}" alt="${missionTitle}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
                     </div>
+                    <div class="mission-card-footer">
+                        <div class="card-status">
+                            <span class="status-indicator" style="background: ${statusColors[m.status] || 'var(--primary-color)'}"></span>
+                            <span class="card-status-text" style="color: ${statusColors[m.status] || 'var(--primary-color)'}">${(statusMap[m.status] || m.status).toUpperCase()}</span>
+                        </div>
+                        ${m.status === 'upcoming' || m.status === 'in_flight' ? `
+                            <div class="card-countdown">
+                                <div style="font-size:0.7rem; text-transform:uppercase; color:var(--neon-orange); margin-bottom:5px;">${m.status === 'in_flight' ? 'Tiempo en vuelo' : 'Cuenta Regresiva'}</div>
+                                <div class="countdown-container" style="font-family:var(--font-heading); font-size:1.1rem; color:#fff;" data-target="${targetTimestamp}">00:00:00</div>
+                            </div>
+                        ` : ''}
+                    </div>
                     <div class="card-content">
                         <h2>${missionTitle}</h2>
-                        <span class="card-status-text" style="color:${m.status === 'success' ? 'var(--neon-green)' : (m.status === 'failed' ? 'var(--neon-red)' : 'var(--neon-orange)')}">${statusText}</span>
-                        
                         <div class="card-info-row">
                             <i class="fas fa-calendar-alt"></i>
                             <span>${localDate} | ${localTime} <small style="opacity:0.6; margin-left:5px;">(Local)</small></span>
@@ -2096,8 +2120,8 @@
             if (!m) return;
 
             const modal = safeGet('missionDetailsModal');
-            const statusMap = { 'success': 'COMPLETADA', 'upcoming': 'PRÓXIMA', 'failed': 'FALLIDA' };
-            const statusColors = { 'success': 'var(--neon-green)', 'upcoming': 'var(--neon-orange)', 'failed': 'var(--neon-red)' };
+            const statusMap = { 'success': 'COMPLETADA', 'upcoming': 'PRÓXIMA', 'failed': 'FALLIDA', 'in_flight': 'EN VUELO' };
+            const statusColors = { 'success': 'var(--neon-green)', 'upcoming': 'var(--neon-orange)', 'failed': 'var(--neon-red)', 'in_flight': 'var(--neon-blue)' };
 
             // Gallery setup
             let imgs = m.images || []; 
@@ -2290,6 +2314,11 @@
                 const targetTs = parseInt(el.dataset.target);
                 if (!targetTs) return;
 
+                const card = el.closest('.mission-card');
+                const id = card?.dataset.id;
+                const m = rawMissionsData[id];
+                if (!m) return;
+
                 const now = Date.now();
                 const diff = targetTs - now; // Milliseconds
                 const absDiff = Math.abs(diff);
@@ -2304,18 +2333,38 @@
                     String(mins).padStart(2, '0') + ":" +
                     String(secs).padStart(2, '0');
 
+                const pill = card?.querySelector('.card-status-text');
+                const indicator = card?.querySelector('.status-indicator');
+
                 if (diff > 0) {
                     el.innerText = "T- " + timeStr;
                     el.style.color = "var(--neon-orange)";
                 } else {
                     el.innerText = "T+ " + timeStr;
                     el.style.color = "var(--neon-green)";
-                    // Optional: Change status pill if it was PRÓXIMA
-                    const card = el.closest('.mission-card');
-                    const pill = card?.querySelector('.card-status-text');
-                    if (pill && pill.innerText === 'PRÓXIMA') {
-                        pill.innerText = 'EN CURSO';
-                        pill.style.color = 'var(--neon-green)';
+                    
+                    // Auto-transition to EN VUELO if it was PRÓXIMA
+                    if (m.status === 'upcoming') {
+                        // Update UI immediately
+                        if (pill) {
+                            pill.innerText = 'EN VUELO';
+                            pill.style.color = 'var(--neon-blue)';
+                        }
+                        if (indicator) {
+                            indicator.style.background = 'var(--neon-blue)';
+                            indicator.classList.add('pulse-active'); // We can add a class or style
+                        }
+
+                        // If Admin, update Database to make it permanent
+                        if (isAdmin && id) {
+                            // Prevent multiple updates by checking if we already marked it in-flight locally
+                            if (!m._autoUpdated) {
+                                m._autoUpdated = true;
+                                console.log(`Auto-updating mission ${id} to in_flight...`);
+                                update(ref(database, 'missions/' + id), { status: 'in_flight' })
+                                    .catch(err => console.error("Error auto-updating mission status:", err));
+                            }
+                        }
                     }
                 }
             });

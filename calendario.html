@@ -751,8 +751,8 @@
             if (!m) return;
 
             const modal = safeGet('missionDetailsModal');
-            const statusMap = { 'success': 'COMPLETADA', 'upcoming': 'PRÓXIMA', 'failed': 'FALLIDA' };
-            const statusColors = { 'success': 'var(--neon-green)', 'upcoming': 'var(--neon-orange)', 'failed': 'var(--neon-red)' };
+            const statusMap = { 'success': 'COMPLETADA', 'upcoming': 'PRÓXIMA', 'failed': 'FALLIDA', 'in_flight': 'EN VUELO' };
+            const statusColors = { 'success': 'var(--neon-green)', 'upcoming': 'var(--neon-orange)', 'failed': 'var(--neon-red)', 'in_flight': 'var(--neon-blue)' };
 
             // Gallery setup
             let imgs = m.images || []; 
