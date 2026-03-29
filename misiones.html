@@ -1478,19 +1478,23 @@
 
     <!-- Contact Modal -->
     <div class="modal-overlay" id="contactModal">
-        <div class="login-modal" id="contactModalContent" style="display: flex; flex-direction: column; height: 80vh; max-height: 600px; padding: 20px;">
+        <div class="login-modal" id="contactModalContent"
+            style="display: flex; flex-direction: column; height: 80vh; max-height: 600px; padding: 20px;">
             <button class="close-modal" id="closeContactModal">&times;</button>
-            
+
             <!-- Header -->
-            <div class="contact-header" style="display: flex; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 15px;">
-                <div style="background: var(--neon-red); color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-heading); margin-right: 15px;">
+            <div class="contact-header"
+                style="display: flex; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 15px;">
+                <div
+                    style="background: var(--neon-red); color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-heading); margin-right: 15px;">
                     AG
                 </div>
                 <div>
                     <h2 style="font-family: var(--font-heading); color: #fff; font-size: 1.2rem; margin: 0;">Agus</h2>
                     <p style="color: var(--neon-red); font-size: 0.85rem; margin: 0;">CEO de J.S. Aerospace</p>
                 </div>
-                <button id="chat-back-btn" style="display: none; margin-left: auto; background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 5px 10px; border-radius: 5px;">Volver</button>
+                <button id="chat-back-btn"
+                    style="display: none; margin-left: auto; background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 5px 10px; border-radius: 5px;">Volver</button>
             </div>
 
             <!-- Area de lista de conversaciones (Solo Admin) -->
@@ -1500,21 +1504,27 @@
             </div>
 
             <!-- Login required view -->
-            <div id="contact-login-required" style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div id="contact-login-required"
+                style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                 <i class="fas fa-lock" style="font-size: 3rem; color: rgba(255,51,51,0.5); margin-bottom: 15px;"></i>
                 <h3 style="color: #fff; margin-bottom: 10px;">Inicia sesión para chatear</h3>
-                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 20px;">Necesitas una cuenta para contactar con el CEO.</p>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 20px;">Necesitas una cuenta
+                    para contactar con el CEO.</p>
                 <button class="btn btn-red" id="contactLoginBtn" style="padding: 10px 20px;">Iniciar Sesión</button>
             </div>
 
             <!-- Area de Chat -->
             <div id="contact-chat-area" style="display: none; flex: 1; flex-direction: column; min-height: 0;">
-                <div id="chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; margin-bottom: 15px;">
+                <div id="chat-messages"
+                    style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; margin-bottom: 15px;">
                     <!-- Mensajes irán aquí -->
                 </div>
                 <form id="chat-form" style="display: flex; gap: 10px; margin-top: auto;">
-                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #fff; outline: none;" autocomplete="off">
-                    <button type="submit" style="background: var(--neon-red); border: none; border-radius: 5px; width: 45px; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje..."
+                        style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #fff; outline: none;"
+                        autocomplete="off">
+                    <button type="submit"
+                        style="background: var(--neon-red); border: none; border-radius: 5px; width: 45px; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </form>
@@ -1550,7 +1560,7 @@
             const modal = safeGet(modalId);
             const close = safeGet(closeId);
             if (btn && modal) btn.onclick = () => {
-                if(modalId === 'contactModal') updateChatView();
+                if (modalId === 'contactModal') updateChatView();
                 modal.classList.add('active');
             };
             if (close && modal) close.onclick = () => modal.classList.remove('active');
@@ -1622,8 +1632,8 @@
         };
 
         setupModal(null, 'loginModal', 'closeModal');
-        const closeM = safeGet('closeModal'); if(closeM) closeM.onclick = () => loginModal?.classList.remove('active');
-        const closeP = safeGet('closeProfileModal'); if(closeP) closeP.onclick = () => profileModal?.classList.remove('active');
+        const closeM = safeGet('closeModal'); if (closeM) closeM.onclick = () => loginModal?.classList.remove('active');
+        const closeP = safeGet('closeProfileModal'); if (closeP) closeP.onclick = () => profileModal?.classList.remove('active');
         setupModal('contactBtn', 'contactModal', 'closeContactModal');
 
         if (toggleLink) toggleLink.onclick = (e) => {
@@ -1671,35 +1681,35 @@
         const chatBackBtn = safeGet('chat-back-btn');
 
         if (chatBackBtn) chatBackBtn.onclick = () => { activeChatUid = null; updateChatView(); };
-        const contactL = safeGet('contactLoginBtn'); if(contactL) contactL.onclick = () => { contactModal?.classList.remove('active'); loginModal?.classList.add('active'); };
+        const contactL = safeGet('contactLoginBtn'); if (contactL) contactL.onclick = () => { contactModal?.classList.remove('active'); loginModal?.classList.add('active'); };
 
         function clearChatListeners() { chatListeners.forEach(un => un()); chatListeners = []; }
 
         function updateChatView() {
             if (!currentUser) {
-                if(contactLoginRequired) contactLoginRequired.style.display = 'flex';
-                if(contactChatArea) contactChatArea.style.display = 'none';
-                if(contactConversations) contactConversations.style.display = 'none';
+                if (contactLoginRequired) contactLoginRequired.style.display = 'flex';
+                if (contactChatArea) contactChatArea.style.display = 'none';
+                if (contactConversations) contactConversations.style.display = 'none';
                 return;
             }
-            if(contactLoginRequired) contactLoginRequired.style.display = 'none';
+            if (contactLoginRequired) contactLoginRequired.style.display = 'none';
             const isAgus = isAdmin;
             if (isAgus) {
                 if (!activeChatUid) {
-                    if(contactConversations) contactConversations.style.display = 'block';
-                    if(contactChatArea) contactChatArea.style.display = 'none';
-                    if(chatBackBtn) chatBackBtn.style.display = 'none';
+                    if (contactConversations) contactConversations.style.display = 'block';
+                    if (contactChatArea) contactChatArea.style.display = 'none';
+                    if (chatBackBtn) chatBackBtn.style.display = 'none';
                     loadConversations();
                 } else {
-                    if(contactConversations) contactConversations.style.display = 'none';
-                    if(contactChatArea) contactChatArea.style.display = 'flex';
-                    if(chatBackBtn) chatBackBtn.style.display = 'block';
+                    if (contactConversations) contactConversations.style.display = 'none';
+                    if (contactChatArea) contactChatArea.style.display = 'flex';
+                    if (chatBackBtn) chatBackBtn.style.display = 'block';
                     loadChatMessages(activeChatUid);
                 }
             } else {
-                if(contactConversations) contactConversations.style.display = 'none';
-                if(contactChatArea) contactChatArea.style.display = 'flex';
-                if(chatBackBtn) chatBackBtn.style.display = 'none';
+                if (contactConversations) contactConversations.style.display = 'none';
+                if (contactChatArea) contactChatArea.style.display = 'flex';
+                if (chatBackBtn) chatBackBtn.style.display = 'none';
                 activeChatUid = currentUser.uid;
                 loadChatMessages(currentUser.uid);
             }
@@ -1708,7 +1718,7 @@
         function loadConversations() {
             clearChatListeners();
             const unsub = onValue(ref(database, 'chats'), (snap) => {
-                if(conversationsList) {
+                if (conversationsList) {
                     conversationsList.innerHTML = '';
                     if (!snap.exists()) { conversationsList.innerHTML = '<p>No hay mensajes.</p>'; return; }
                     snap.forEach(child => {
@@ -1716,7 +1726,7 @@
                         const lastMsg = Object.values(child.val()).pop();
                         const el = document.createElement('div');
                         el.style.cssText = 'padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); cursor:pointer;';
-                        el.innerHTML = `<strong>${uid.substring(0,8)}</strong><br><small>${lastMsg.text}</small>`;
+                        el.innerHTML = `<strong>${uid.substring(0, 8)}</strong><br><small>${lastMsg.text}</small>`;
                         el.onclick = () => { activeChatUid = uid; updateChatView(); };
                         conversationsList.appendChild(el);
                     });
@@ -1727,7 +1737,7 @@
 
         function loadChatMessages(uid) {
             clearChatListeners();
-            if(chatMessages) {
+            if (chatMessages) {
                 chatMessages.innerHTML = '';
                 const unsub = onChildAdded(ref(database, 'chats/' + uid), (snap) => renderMessage(snap.val()));
                 chatListeners.push(unsub);
@@ -1738,10 +1748,10 @@
             const isMine = (msg.senderUid === currentUser.uid);
             const msgEl = document.createElement('div');
             msgEl.className = `chat-msg ${isMine ? 'mine' : 'theirs'}`;
-            msgEl.style.cssText = `max-width:80%; padding:10px; border-radius:10px; margin-bottom:5px; align-self:${isMine?'flex-end':'flex-start'}; background:${isMine?'var(--neon-red)':'rgba(255,255,255,0.1)'}; color:${isMine?'#000':'#fff'};`;
+            msgEl.style.cssText = `max-width:80%; padding:10px; border-radius:10px; margin-bottom:5px; align-self:${isMine ? 'flex-end' : 'flex-start'}; background:${isMine ? 'var(--neon-red)' : 'rgba(255,255,255,0.1)'}; color:${isMine ? '#000' : '#fff'};`;
             msgEl.textContent = msg.text;
             chatMessages?.appendChild(msgEl);
-            if(chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         if (chatForm) chatForm.onsubmit = async (e) => {
@@ -1750,7 +1760,7 @@
             if (!text || !currentUser) return;
             const threadUid = (isAdmin && activeChatUid) ? activeChatUid : currentUser.uid;
             await push(ref(database, 'chats/' + threadUid), { text, senderUid: currentUser.uid, timestamp: Date.now() });
-            if(chatInput) chatInput.value = '';
+            if (chatInput) chatInput.value = '';
         };
 
         // --- MISSIONS LOGIC ---
@@ -1764,23 +1774,23 @@
             const arr = Object.values(missions);
             const comp = arr.filter(m => m.status === 'success' || m.status === 'failed');
             const successes = arr.filter(m => m.status === 'success').length;
-            const totalL = safeGet('totalLaunches'); if(totalL) totalL.textContent = arr.length;
-            const sCount = safeGet('successCount'); if(sCount) sCount.textContent = successes;
-            const fCount = safeGet('failedCount'); if(fCount) fCount.textContent = arr.filter(m => m.status === 'failed').length;
-            const sRatio = safeGet('successRatio'); if(sRatio) sRatio.textContent = comp.length ? Math.round((successes / comp.length) * 100) + '%' : '0%';
+            const totalL = safeGet('totalLaunches'); if (totalL) totalL.textContent = arr.length;
+            const sCount = safeGet('successCount'); if (sCount) sCount.textContent = successes;
+            const fCount = safeGet('failedCount'); if (fCount) fCount.textContent = arr.filter(m => m.status === 'failed').length;
+            const sRatio = safeGet('successRatio'); if (sRatio) sRatio.textContent = comp.length ? Math.round((successes / comp.length) * 100) + '%' : '0%';
         }
 
         function renderFilteredMissions() {
-            if(!missionsGrid) return;
+            if (!missionsGrid) return;
             missionsGrid.innerHTML = '';
-            let sorted = Object.entries(rawMissionsData).sort((a,b) => new Date(b[1].date) - new Date(a[1].date));
+            let sorted = Object.entries(rawMissionsData).sort((a, b) => new Date(b[1].date) - new Date(a[1].date));
             if (currentFilter !== 'all') sorted = sorted.filter(([id, m]) => m.status === currentFilter);
-            
+
             if (sorted.length === 0) {
-                if(emptyState) emptyState.style.display = 'block';
+                if (emptyState) emptyState.style.display = 'block';
                 return;
             }
-            if(emptyState) emptyState.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'none';
 
             const statusMap = {
                 'success': 'COMPLETADA',
@@ -1789,10 +1799,23 @@
             };
 
             sorted.forEach(([id, m]) => {
-                // Parse as UTC (ISO 8601 with Z)
-                const utcStr = `${m.date}T${m.time || '00:00'}:00Z`;
-                const dateObj = new Date(utcStr);
-                
+                // Parse Date Robustly (Support DD/MM/YYYY and YYYY-MM-DD)
+                let dateObj;
+                const dStr = m.date || "";
+                const tStr = m.time || "00:00";
+
+                if (dStr.includes('/')) {
+                    const [d, mon, y] = dStr.split('/');
+                    dateObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                } else {
+                    dateObj = new Date(`${dStr}T${tStr}:00`);
+                }
+
+                // If invalid, fallback to now
+                if (isNaN(dateObj.getTime())) dateObj = new Date();
+
+                const targetTimestamp = dateObj.getTime();
+
                 // Format for Local Display
                 const localDate = dateObj.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const localTime = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -1800,10 +1823,13 @@
                 const card = document.createElement('div');
                 card.className = 'mission-card';
                 const statusText = statusMap[m.status] || m.status.toUpperCase();
-                
-                // Image handling: Use m.images[0]
-                const imgs = m.images || ['https://via.placeholder.com/800x600?text=Mission'];
-                const cardImg = imgs[0];
+
+                // Image handling: Use m.images[0] or first value if object
+                let imgs = m.images || ['https://via.placeholder.com/800x600?text=Mission'];
+                if (typeof imgs === 'object' && !Array.isArray(imgs)) imgs = Object.values(imgs);
+                const cardImg = imgs[0] || 'https://via.placeholder.com/800x600?text=Mission';
+
+                const missionTitle = m.title || m.name || 'Misión Programada';
 
                 card.innerHTML = `
                     ${isAdmin ? `<div class="admin-actions">
@@ -1811,10 +1837,10 @@
                         <button class="btn-delete" onclick="window.deleteMission('${id}')"><i class="fas fa-trash"></i></button>
                     </div>` : ''}
                     <div class="card-image-container">
-                        <img src="${cardImg}" alt="${m.title}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+                        <img src="${cardImg}" alt="${missionTitle}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
                     </div>
                     <div class="card-content">
-                        <h2>${m.title}</h2>
+                        <h2>${missionTitle}</h2>
                         <span class="card-status-text">${statusText}</span>
                         
                         <div class="card-info-row">
@@ -1823,13 +1849,13 @@
                         </div>
                         <div class="card-info-row">
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>${m.location}</span>
+                            <span>${m.location || 'Sin ubicación'}</span>
                         </div>
                         
                         ${m.status === 'upcoming' ? `
                             <div style="margin-top:20px; padding:10px; background:rgba(255,107,53,0.1); border-left:3px solid var(--neon-orange); border-radius:4px;">
                                 <div style="font-size:0.7rem; text-transform:uppercase; color:var(--neon-orange); margin-bottom:5px;">Cuenta Regresiva</div>
-                                <div class="countdown-container" style="font-family:var(--font-heading); font-size:1.1rem; color:#fff;" data-target="${utcStr}">...</div>
+                                <div class="countdown-container" style="font-family:var(--font-heading); font-size:1.1rem; color:#fff;" data-target="${targetTimestamp}">00:00:00</div>
                             </div>
                         ` : ''}
                     </div>`;
@@ -1847,14 +1873,14 @@
         });
 
         // --- CRUD OPERATIONS ---
-        if (addMissionBtn) addMissionBtn.onclick = () => { if(missionForm) missionForm.reset(); safeGet('editingMissionId').value = ''; missionModal?.classList.add('active'); };
-        const closeMiss = safeGet('closeMissionModal'); if(closeMiss) closeMiss.onclick = () => missionModal?.classList.remove('active');
+        if (addMissionBtn) addMissionBtn.onclick = () => { if (missionForm) missionForm.reset(); safeGet('editingMissionId').value = ''; missionModal?.classList.add('active'); };
+        const closeMiss = safeGet('closeMissionModal'); if (closeMiss) closeMiss.onclick = () => missionModal?.classList.remove('active');
 
-        if(missionForm) missionForm.onsubmit = async (e) => {
+        if (missionForm) missionForm.onsubmit = async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
             const id = safeGet('editingMissionId')?.value;
-            const imgs = safeGet('mImages')?.value.split('\n').map(s=>s.trim()).filter(s=>s);
+            const imgs = safeGet('mImages')?.value.split('\n').map(s => s.trim()).filter(s => s);
             const data = {
                 title: safeGet('mTitle').value,
                 date: safeGet('mDate').value,
@@ -1894,8 +1920,47 @@
         window.deleteMission = async (id) => { if (isAdmin && confirm('¿Eliminar esta misión?')) await remove(ref(database, 'missions/' + id)); };
 
         // --- PAGE LOADER & TRANSITIONS ---
-        window.addEventListener('load', () => setTimeout(() => safeGet('pageLoader')?.classList.add('hidden'), 800));
-        
+        window.addEventListener('load', () => {
+            setTimeout(() => safeGet('pageLoader')?.classList.add('hidden'), 800);
+            setInterval(updateMissionCountdowns, 1000);
+        });
+
+        function updateMissionCountdowns() {
+            document.querySelectorAll('.countdown-container').forEach(el => {
+                const targetTs = parseInt(el.dataset.target);
+                if (!targetTs) return;
+
+                const now = Date.now();
+                const diff = targetTs - now; // Milliseconds
+                const absDiff = Math.abs(diff);
+
+                const totalSecs = Math.floor(absDiff / 1000);
+                const hrs = Math.floor(totalSecs / 3600);
+                const mins = Math.floor((totalSecs % 3600) / 60);
+                const secs = totalSecs % 60;
+
+                const timeStr =
+                    String(hrs).padStart(2, '0') + ":" +
+                    String(mins).padStart(2, '0') + ":" +
+                    String(secs).padStart(2, '0');
+
+                if (diff > 0) {
+                    el.innerText = "T- " + timeStr;
+                    el.style.color = "var(--neon-orange)";
+                } else {
+                    el.innerText = "T+ " + timeStr;
+                    el.style.color = "var(--neon-green)";
+                    // Optional: Change status pill if it was PRÓXIMA
+                    const card = el.closest('.mission-card');
+                    const pill = card?.querySelector('.card-status-text');
+                    if (pill && pill.innerText === 'PRÓXIMA') {
+                        pill.innerText = 'EN CURSO';
+                        pill.style.color = 'var(--neon-green)';
+                    }
+                }
+            });
+        }
+
         document.querySelectorAll('.transition-link').forEach(link => {
             link.onclick = (e) => {
                 e.preventDefault();
@@ -1908,4 +1973,5 @@
     </script>
 
 </body>
+
 </html>

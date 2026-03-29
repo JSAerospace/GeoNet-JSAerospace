@@ -9,7 +9,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -71,7 +73,9 @@
             gap: 12px;
         }
 
-        .sidebar-title i { color: var(--primary-color); }
+        .sidebar-title i {
+            color: var(--primary-color);
+        }
 
         .upcoming-card {
             background: rgba(0, 243, 255, 0.03);
@@ -121,8 +125,17 @@
             border-radius: 6px;
         }
 
-        .sb-val { font-family: var(--font-heading); font-size: 1rem; color: var(--primary-color); }
-        .sb-label { font-size: 0.5rem; text-transform: uppercase; opacity: 0.7; }
+        .sb-val {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            color: var(--primary-color);
+        }
+
+        .sb-label {
+            font-size: 0.5rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
 
         .calendar-wrapper {
             flex-grow: 1;
@@ -172,10 +185,25 @@
             transition: all 0.3s;
         }
 
-        .calendar-day:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); }
-        .calendar-day.today { border-color: var(--primary-color); background: rgba(0, 243, 255, 0.05); }
-        .day-number { font-family: var(--font-heading); font-size: 1rem; color: rgba(255, 255, 255, 0.4); }
-        .calendar-day.today .day-number { color: var(--primary-color); }
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-3px);
+        }
+
+        .calendar-day.today {
+            border-color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .day-number {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .calendar-day.today .day-number {
+            color: var(--primary-color);
+        }
 
         .event-tag {
             font-size: 0.7rem;
@@ -187,14 +215,36 @@
             text-overflow: ellipsis;
             font-family: var(--font-heading);
         }
-        .event-tag.success { background: rgba(0, 255, 106, 0.1); color: var(--neon-green); }
-        .event-tag.upcoming { background: rgba(255, 107, 53, 0.1); color: var(--neon-orange); }
-        .event-tag.failed { background: rgba(255, 51, 51, 0.1); color: var(--neon-red); }
+
+        .event-tag.success {
+            background: rgba(0, 255, 106, 0.1);
+            color: var(--neon-green);
+        }
+
+        .event-tag.upcoming {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--neon-orange);
+        }
+
+        .event-tag.failed {
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--neon-red);
+        }
 
         @media (max-width: 1100px) {
-            .layout-container { flex-direction: column; }
-            .sidebar-upcoming { width: 100%; order: 2; }
-            .calendar-wrapper { width: 100%; order: 1; }
+            .layout-container {
+                flex-direction: column;
+            }
+
+            .sidebar-upcoming {
+                width: 100%;
+                order: 2;
+            }
+
+            .calendar-wrapper {
+                width: 100%;
+                order: 1;
+            }
         }
 
         /* Calendar Navigation (Arrows) */
@@ -237,7 +287,8 @@
     <div class="page-loader" id="pageLoader">
         <div class="loader-content">
             <i class="fas fa-rocket loader-rocket" style="font-size: 3rem; color: var(--neon-red);"></i>
-            <h2 style="font-family: var(--font-heading); color: #fff; margin-top: 20px; letter-spacing: 4px;">CARGANDO CALENDARIO</h2>
+            <h2 style="font-family: var(--font-heading); color: #fff; margin-top: 20px; letter-spacing: 4px;">CARGANDO
+                CALENDARIO</h2>
         </div>
     </div>
 
@@ -256,8 +307,10 @@
             <li><a href="cohetes.html" class="transition-link">Cohetes</a></li>
             <li><a href="calendario.html" class="transition-link active">Calendario</a></li>
             <li><a href="geonet.html" class="transition-link">GEONET</a></li>
-            <li><button class="auth-btn" id="contactBtn"><i class="fas fa-comment"></i><span>Contacto</span></button></li>
-            <li><button class="auth-btn" id="authBtn"><i class="fas fa-user"></i><span id="authBtnText">Iniciar Sesión</span></button></li>
+            <li><button class="auth-btn" id="contactBtn"><i class="fas fa-comment"></i><span>Contacto</span></button>
+            </li>
+            <li><button class="auth-btn" id="authBtn"><i class="fas fa-user"></i><span id="authBtnText">Iniciar
+                        Sesión</span></button></li>
         </ul>
     </nav>
 
@@ -302,12 +355,14 @@
                     <input type="text" id="userName" placeholder="Tu nombre">
                 </div>
                 <div class="form-group"><label>Email</label><input type="email" id="userEmail" required></div>
-                <div class="form-group"><label>Contraseña</label><input type="password" id="userPassword" required></div>
+                <div class="form-group"><label>Contraseña</label><input type="password" id="userPassword" required>
+                </div>
                 <button type="submit" class="login-btn" id="submitBtn">Entrar</button>
             </form>
             <div class="divider"><span>o continuar con</span></div>
             <div class="social-login">
-                <button class="social-btn google" id="googleLogin"><i class="fab fa-google"></i><span>Google</span></button>
+                <button class="social-btn google" id="googleLogin"><i
+                        class="fab fa-google"></i><span>Google</span></button>
             </div>
             <div class="toggle-auth">
                 <span id="toggleText">¿No tienes cuenta?</span>
@@ -319,15 +374,20 @@
     <div class="modal-overlay" id="profileModal">
         <div class="login-modal">
             <button class="close-modal" id="closeProfileModal">&times;</button>
-            <div class="modal-header"><h2>Mi Perfil</h2><p>Gestiona tu cuenta y seguridad</p></div>
+            <div class="modal-header">
+                <h2>Mi Perfil</h2>
+                <p>Gestiona tu cuenta y seguridad</p>
+            </div>
             <div class="profile-section">
                 <h3><i class="fas fa-user-edit"></i> Información Personal</h3>
-                <div class="form-group"><label>Nombre Público</label><input type="text" id="profileName" placeholder="Tu nombre"></div>
+                <div class="form-group"><label>Nombre Público</label><input type="text" id="profileName"
+                        placeholder="Tu nombre"></div>
                 <button class="login-btn btn-update" id="updateNameBtn">Actualizar Nombre</button>
             </div>
             <div class="profile-section">
                 <h3><i class="fas fa-key"></i> Seguridad</h3>
-                <div class="form-group"><label>Nueva Contraseña</label><input type="password" id="newPassword" placeholder="Mínimo 6 caracteres"></div>
+                <div class="form-group"><label>Nueva Contraseña</label><input type="password" id="newPassword"
+                        placeholder="Mínimo 6 caracteres"></div>
                 <button class="login-btn btn-update" id="updatePassBtn">Cambiar Contraseña</button>
             </div>
             <button class="btn-logout" id="logoutBtn">Cerrar Sesión</button>
@@ -336,30 +396,42 @@
 
     <!-- Contact Modal -->
     <div class="modal-overlay" id="contactModal">
-        <div class="login-modal" id="contactModalContent" style="display: flex; flex-direction: column; height: 80vh; max-height: 600px; padding: 20px;">
+        <div class="login-modal" id="contactModalContent"
+            style="display: flex; flex-direction: column; height: 80vh; max-height: 600px; padding: 20px;">
             <button class="close-modal" id="closeContactModal">&times;</button>
-            <div class="contact-header" style="display: flex; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 15px;">
-                <div style="background: var(--neon-red); color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-heading); margin-right: 15px;">AG</div>
+            <div class="contact-header"
+                style="display: flex; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 15px;">
+                <div
+                    style="background: var(--neon-red); color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-heading); margin-right: 15px;">
+                    AG</div>
                 <div>
                     <h2 style="font-family: var(--font-heading); color: #fff; font-size: 1.2rem; margin: 0;">Agus</h2>
                     <p style="color: var(--neon-red); font-size: 0.85rem; margin: 0;">CEO de J.S. Aerospace</p>
                 </div>
-                <button id="chat-back-btn" style="display: none; margin-left: auto; background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 5px 10px; border-radius: 5px;">Volver</button>
+                <button id="chat-back-btn"
+                    style="display: none; margin-left: auto; background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 5px 10px; border-radius: 5px;">Volver</button>
             </div>
             <div id="contact-conversations" style="display: none; flex: 1; overflow-y: auto;">
                 <h3 style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 10px;">Conversaciones</h3>
                 <div id="conversations-list"></div>
             </div>
-            <div id="contact-login-required" style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div id="contact-login-required"
+                style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                 <i class="fas fa-lock" style="font-size: 3rem; color: rgba(255,51,51,0.5); margin-bottom: 15px;"></i>
                 <h3 style="color: #fff; margin-bottom: 10px;">Inicia sesión para chatear</h3>
                 <button class="login-btn" id="contactLoginBtn" style="padding: 10px 20px;">Iniciar Sesión</button>
             </div>
             <div id="contact-chat-area" style="display: none; flex: 1; flex-direction: column; min-height: 0;">
-                <div id="chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; margin-bottom: 15px;"></div>
+                <div id="chat-messages"
+                    style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; margin-bottom: 15px;">
+                </div>
                 <form id="chat-form" style="display: flex; gap: 10px; margin-top: auto;">
-                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #fff; outline: none;" autocomplete="off">
-                    <button type="submit" style="background: var(--neon-red); border: none; border-radius: 5px; width: 45px; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje..."
+                        style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #fff; outline: none;"
+                        autocomplete="off">
+                    <button type="submit"
+                        style="background: var(--neon-red); border: none; border-radius: 5px; width: 45px; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i
+                            class="fas fa-paper-plane"></i></button>
                 </form>
             </div>
         </div>
@@ -372,7 +444,8 @@
                 <h2 id="detailsDateText">Detalles del Día</h2>
                 <p>Eventos y misiones programadas</p>
             </div>
-            <div id="dayMissionsList" style="display: flex; flex-direction: column; gap: 15px; max-height: 400px; overflow-y: auto;">
+            <div id="dayMissionsList"
+                style="display: flex; flex-direction: column; gap: 15px; max-height: 400px; overflow-y: auto;">
                 <!-- Lista de misiones -->
             </div>
         </div>
@@ -406,7 +479,7 @@
             const btn = safeGet(btnId);
             const modal = safeGet(modalId);
             const close = safeGet(closeId);
-            if (btn && modal) btn.onclick = () => { if(modalId === 'contactModal') updateChatView(); modal.classList.add('active'); };
+            if (btn && modal) btn.onclick = () => { if (modalId === 'contactModal') updateChatView(); modal.classList.add('active'); };
             if (close && modal) close.onclick = () => modal.classList.remove('active');
         };
 
@@ -426,14 +499,14 @@
             const btn = safeGet('authBtn');
             if (user) {
                 isAdmin = (user.email === 'olanoagus@gmail.com');
-                if(btn) {
+                if (btn) {
                     btn.classList.add('logged-in');
                     btn.innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar"><span>${user.displayName || user.email.split('@')[0]}</span>`;
                 }
                 update(ref(database, 'users/' + user.uid), { lastLogin: new Date().toISOString(), displayName: user.displayName, photoURL: user.photoURL });
             } else {
                 isAdmin = false;
-                if(btn) { btn.classList.remove('logged-in'); btn.innerHTML = `<i class="fas fa-user"></i><span id="authBtnText">Iniciar Sesión</span>`; }
+                if (btn) { btn.classList.remove('logged-in'); btn.innerHTML = `<i class="fas fa-user"></i><span id="authBtnText">Iniciar Sesión</span>`; }
             }
             updateChatView();
             renderCalendar();
@@ -442,16 +515,16 @@
 
         // Modals init
         const authBtn = safeGet('authBtn');
-        if(authBtn) authBtn.onclick = () => { if(currentUser) safeGet('profileModal')?.classList.add('active'); else safeGet('loginModal')?.classList.add('active'); };
+        if (authBtn) authBtn.onclick = () => { if (currentUser) safeGet('profileModal')?.classList.add('active'); else safeGet('loginModal')?.classList.add('active'); };
         setupModal(null, 'loginModal', 'closeModal');
-        const cM = safeGet('closeModal'); if(cM) cM.onclick = () => safeGet('loginModal')?.classList.remove('active');
-        const cP = safeGet('closeProfileModal'); if(cP) cP.onclick = () => safeGet('profileModal')?.classList.remove('active');
+        const cM = safeGet('closeModal'); if (cM) cM.onclick = () => safeGet('loginModal')?.classList.remove('active');
+        const cP = safeGet('closeProfileModal'); if (cP) cP.onclick = () => safeGet('profileModal')?.classList.remove('active');
         setupModal('contactBtn', 'contactModal', 'closeContactModal');
-        const cD = safeGet('closeDetailsModal'); if(cD) cD.onclick = () => safeGet('missionDetailsModal')?.classList.remove('active');
+        const cD = safeGet('closeDetailsModal'); if (cD) cD.onclick = () => safeGet('missionDetailsModal')?.classList.remove('active');
 
         // Toggle Login/Register
         const tL = safeGet('toggleLink');
-        if(tL) tL.onclick = (e) => {
+        if (tL) tL.onclick = (e) => {
             e.preventDefault(); isLoginMode = !isLoginMode;
             safeGet('modalTitle').textContent = isLoginMode ? 'Iniciar Sesión' : 'Registrarse';
             safeGet('submitBtn').textContent = isLoginMode ? 'Entrar' : 'Crear Cuenta';
@@ -460,7 +533,7 @@
 
         // Form Auth
         const aF = safeGet('authForm');
-        if(aF) aF.onsubmit = async (e) => {
+        if (aF) aF.onsubmit = async (e) => {
             e.preventDefault();
             const email = safeGet('userEmail').value, pass = safeGet('userPassword').value;
             try {
@@ -480,35 +553,35 @@
         const contactLoginRequired = safeGet('contact-login-required'), contactChatArea = safeGet('contact-chat-area'), contactConversations = safeGet('contact-conversations'), conversationsList = safeGet('conversations-list'), chatMessages = safeGet('chat-messages'), chatForm = safeGet('chat-form'), chatInput = safeGet('chat-input'), chatBackBtn = safeGet('chat-back-btn');
 
         if (chatBackBtn) chatBackBtn.onclick = () => { activeChatUid = null; updateChatView(); };
-        const contactL = safeGet('contactLoginBtn'); if(contactL) contactL.onclick = () => { safeGet('contactModal')?.classList.remove('active'); safeGet('loginModal')?.classList.add('active'); };
+        const contactL = safeGet('contactLoginBtn'); if (contactL) contactL.onclick = () => { safeGet('contactModal')?.classList.remove('active'); safeGet('loginModal')?.classList.add('active'); };
 
         function clearChatListeners() { chatListeners.forEach(un => un()); chatListeners = []; }
 
         function updateChatView() {
             if (!currentUser) {
-                if(contactLoginRequired) contactLoginRequired.style.display = 'flex';
-                if(contactChatArea) contactChatArea.style.display = 'none';
-                if(contactConversations) contactConversations.style.display = 'none';
+                if (contactLoginRequired) contactLoginRequired.style.display = 'flex';
+                if (contactChatArea) contactChatArea.style.display = 'none';
+                if (contactConversations) contactConversations.style.display = 'none';
                 return;
             }
-            if(contactLoginRequired) contactLoginRequired.style.display = 'none';
+            if (contactLoginRequired) contactLoginRequired.style.display = 'none';
             const isAgus = isAdmin;
             if (isAgus) {
                 if (!activeChatUid) {
-                    if(contactConversations) contactConversations.style.display = 'block';
-                    if(contactChatArea) contactChatArea.style.display = 'none';
-                    if(chatBackBtn) chatBackBtn.style.display = 'none';
+                    if (contactConversations) contactConversations.style.display = 'block';
+                    if (contactChatArea) contactChatArea.style.display = 'none';
+                    if (chatBackBtn) chatBackBtn.style.display = 'none';
                     loadConversations();
                 } else {
-                    if(contactConversations) contactConversations.style.display = 'none';
-                    if(contactChatArea) contactChatArea.style.display = 'flex';
-                    if(chatBackBtn) chatBackBtn.style.display = 'block';
+                    if (contactConversations) contactConversations.style.display = 'none';
+                    if (contactChatArea) contactChatArea.style.display = 'flex';
+                    if (chatBackBtn) chatBackBtn.style.display = 'block';
                     loadChatMessages(activeChatUid);
                 }
             } else {
-                if(contactConversations) contactConversations.style.display = 'none';
-                if(contactChatArea) contactChatArea.style.display = 'flex';
-                if(chatBackBtn) chatBackBtn.style.display = 'none';
+                if (contactConversations) contactConversations.style.display = 'none';
+                if (contactChatArea) contactChatArea.style.display = 'flex';
+                if (chatBackBtn) chatBackBtn.style.display = 'none';
                 activeChatUid = currentUser.uid;
                 loadChatMessages(currentUser.uid);
             }
@@ -517,14 +590,14 @@
         function loadConversations() {
             clearChatListeners();
             chatListeners.push(onValue(ref(database, 'chats'), (snap) => {
-                if(conversationsList) {
+                if (conversationsList) {
                     conversationsList.innerHTML = '';
                     if (!snap.exists()) { conversationsList.innerHTML = '<p>No hay mensajes.</p>'; return; }
                     snap.forEach(child => {
                         const uid = child.key, last = Object.values(child.val()).pop();
                         const div = document.createElement('div');
                         div.style.cssText = 'padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); cursor:pointer;';
-                        div.innerHTML = `<strong>${uid.substring(0,8)}</strong><br><small>${last.text}</small>`;
+                        div.innerHTML = `<strong>${uid.substring(0, 8)}</strong><br><small>${last.text}</small>`;
                         div.onclick = () => { activeChatUid = uid; updateChatView(); };
                         conversationsList.appendChild(div);
                     });
@@ -534,32 +607,36 @@
 
         function loadChatMessages(uid) {
             clearChatListeners();
-            const area = safeGet('chat-messages'); if(!area) return;
+            const area = safeGet('chat-messages'); if (!area) return;
             area.innerHTML = '';
             chatListeners.push(onChildAdded(ref(database, 'chats/' + uid), (snap) => {
                 const msg = snap.val();
                 const isMine = (msg.senderUid === currentUser.uid);
                 const msgEl = document.createElement('div');
                 msgEl.className = `chat-msg ${isMine ? 'mine' : 'theirs'}`;
-                msgEl.style.cssText = `max-width:80%; padding:10px; border-radius:10px; margin-bottom:5px; align-self:${isMine?'flex-end':'flex-start'}; background:${isMine?'var(--neon-red)':'rgba(255,255,255,0.1)'}; color:${isMine?'#000':'#fff'};`;
+                msgEl.style.cssText = `max-width:80%; padding:10px; border-radius:10px; margin-bottom:5px; align-self:${isMine ? 'flex-end' : 'flex-start'}; background:${isMine ? 'var(--neon-red)' : 'rgba(255,255,255,0.1)'}; color:${isMine ? '#000' : '#fff'};`;
                 msgEl.textContent = msg.text;
                 area.appendChild(msgEl);
                 area.scrollTop = area.scrollHeight;
             }));
         }
 
-        if(safeGet('chat-form')) safeGet('chat-form').onsubmit = (e) => {
+        if (safeGet('chat-form')) safeGet('chat-form').onsubmit = (e) => {
             e.preventDefault();
             const text = safeGet('chat-input')?.value.trim();
             const threadUid = (isAdmin && activeChatUid) ? activeChatUid : currentUser.uid;
             if (text && threadUid) {
                 push(ref(database, 'chats/' + threadUid), { text, senderUid: currentUser.uid, timestamp: Date.now() });
-                if(safeGet('chat-input')) safeGet('chat-input').value = '';
+                if (safeGet('chat-input')) safeGet('chat-input').value = '';
             }
         };
 
         // Missions & Calendar logic
-        onValue(ref(database, 'missions'), (snap) => { missionsData = snap.val() || {}; renderCalendar(); renderSidebar(); });
+        onValue(ref(database, 'missions'), (snap) => {
+            missionsData = snap.val() || {};
+            renderCalendar();
+            renderSidebar();
+        });
 
         function renderCalendar() {
             const grid = safeGet('calendarGrid'), display = safeGet('monthDisplay');
@@ -574,11 +651,19 @@
                 const div = document.createElement('div'); div.className = 'calendar-day';
                 if (new Date().toDateString() === new Date(year, month, d).toDateString()) div.classList.add('today');
                 div.innerHTML = `<span class="day-number">${d}</span>`;
-                
+
                 const currentGridDate = new Date(year, month, d).toDateString();
                 const daily = Object.values(missionsData).filter(m => {
-                    const localMDate = new Date(`${m.date}T${m.time || '00:00'}:00Z`).toDateString();
-                    return localMDate === currentGridDate;
+                    let dObj;
+                    const dStr = m.date || "";
+                    const tStr = m.time || "00:00";
+                    if (dStr.includes('/')) {
+                        const [d, mon, y] = dStr.split('/');
+                        dObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                    } else {
+                        dObj = new Date(`${dStr}T${tStr}:00`);
+                    }
+                    return dObj.toDateString() === currentGridDate;
                 });
 
                 if (daily.length) {
@@ -595,13 +680,22 @@
         safeGet('monthNext').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
 
         function renderSidebar() {
-            const list = safeGet('sidebarUpcomingList'); if(!list) return;
-            const upcoming = Object.values(missionsData).filter(m => m.status === 'upcoming').sort((a,b) => new Date(a.date)-new Date(b.date)).slice(0, 4);
+            const list = safeGet('sidebarUpcomingList'); if (!list) return;
+            const upcoming = Object.values(missionsData).filter(m => m.status === 'upcoming').sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 4);
             list.innerHTML = upcoming.length ? '' : '<p style="color:rgba(255,255,255,0.4); text-align:center;">No hay próximos lanzamientos.</p>';
             upcoming.forEach(m => {
-                const dateObj = new Date(`${m.date}T${m.time || '00:00'}:00Z`);
-                const card = list.appendChild(Object.assign(document.createElement('div'), { className: 'upcoming-card', innerHTML: `
-                    <div class="card-date-badge">${dateObj.toLocaleDateString('es-ES',{day:'numeric',month:'short'}).toUpperCase()}</div>
+                let dObj;
+                const dStr = m.date || "";
+                const tStr = m.time || "00:00";
+                if (dStr.includes('/')) {
+                    const [d, mon, y] = dStr.split('/');
+                    dObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                } else {
+                    dObj = new Date(`${dStr}T${tStr}:00`);
+                }
+                const card = list.appendChild(Object.assign(document.createElement('div'), {
+                    className: 'upcoming-card', innerHTML: `
+                    <div class="card-date-badge">${dObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }).toUpperCase()}</div>
                     <h3 class="card-mission-name">${m.title}</h3>
                     <div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>
                 ` }));
@@ -610,17 +704,27 @@
             updateSidebarCountdowns(upcoming);
         }
 
-        const idFriendly = (s) => s.replace(/[^a-z0-9]/gi, '_');
+        const idFriendly = (s) => (s || '').replace(/[^a-z0-9]/gi, '_');
         let sbInterval = null;
         function updateSidebarCountdowns(missions) {
-            if(sbInterval) clearInterval(sbInterval);
+            if (sbInterval) clearInterval(sbInterval);
             sbInterval = setInterval(() => {
                 missions.forEach(m => {
-                    const utcStr = `${m.date}T${m.time || '00:00'}:00Z`;
-                    const diff = new Date(utcStr) - new Date(), el = safeGet(`sb-timer-${idFriendly(m.title)}`);
-                    if(!el) return;
-                    if(diff>0) {
-                        const d=Math.floor(diff/864e5), h=Math.floor(diff%864e5/36e5), m_=Math.floor(diff%36e5/6e4), s=Math.floor(diff%6e4/1e3);
+                    let dObj;
+                    const dStr = m.date || "";
+                    const tStr = m.time || "00:00";
+                    if (dStr.includes('/')) {
+                        const [d, mon, y] = dStr.split('/');
+                        dObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                    } else {
+                        dObj = new Date(`${dStr}T${tStr}:00`);
+                    }
+                    const diff = dObj - new Date();
+                    const missionTitle = m.title || m.name || 'Misión Programada';
+                    const el = safeGet(`sb-timer-${idFriendly(missionTitle)}`);
+                    if (!el) return;
+                    if (diff > 0) {
+                        const d = Math.floor(diff / 864e5), h = Math.floor(diff % 864e5 / 36e5), m_ = Math.floor(diff % 36e5 / 6e4), s = Math.floor(diff % 6e4 / 1e3);
                         el.innerHTML = `<div class="sb-countdown-item"><span class="sb-val">${d}</span><span class="sb-label">D</span></div><div class="sb-countdown-item"><span class="sb-val">${h}</span><span class="sb-label">H</span></div><div class="sb-countdown-item"><span class="sb-val">${m_}</span><span class="sb-label">M</span></div><div class="sb-countdown-item"><span class="sb-val">${s}</span><span class="sb-label">S</span></div>`;
                     } else el.innerHTML = '<div style="color:var(--neon-green); font-weight:bold; grid-column: span 4;">EL CURSO DEL LANZAMIENTO</div>';
                 });
@@ -629,18 +733,29 @@
 
         function showDayDetails(date, missions) {
             safeGet('detailsDateText').textContent = new Date(date + 'T12:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
-            const list = safeGet('dayMissionsList'); if(!list) return;
+            const list = safeGet('dayMissionsList'); if (!list) return;
             list.innerHTML = missions.length ? '' : '<p style="text-align:center; color:rgba(255,255,255,0.5);">Sin misiones programadas para este día.</p>';
             missions.forEach(m => {
-                const dateObj = new Date(`${m.date}T${m.time || '00:00'}:00Z`);
-                const localTime = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
-                list.appendChild(Object.assign(document.createElement('div'), { className: `mission-card`, style: 'padding:15px; background:rgba(255,255,255,0.05); border-radius:10px;', innerHTML: `
+                let dObj;
+                const dStr = m.date || "";
+                const tStr = m.time || "00:00";
+                if (dStr.includes('/')) {
+                    const [d, mon, y] = dStr.split('/');
+                    dObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                } else {
+                    dObj = new Date(`${dStr}T${tStr}:00`);
+                }
+                const localTime = dObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+                const missionTitle = m.title || m.name || 'Misión Programada';
+                const vehicleName = m.vehicle || m.provider || 'Vehículo J.S.A.';
+                list.appendChild(Object.assign(document.createElement('div'), {
+                    className: `mission-card`, style: 'padding:15px; background:rgba(255,255,255,0.05); border-radius:10px;', innerHTML: `
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h3 style="color:#fff; font-family:var(--font-heading); font-size:1rem;">${m.title}</h3>
+                        <h3 style="color:#fff; font-family:var(--font-heading); font-size:1rem;">${missionTitle}</h3>
                         <span class="event-tag ${m.status}">${m.status.toUpperCase()}</span>
                     </div>
-                    <p style="font-size:0.85rem; margin-top:10px; color:rgba(255,255,255,0.6);"><i class="fas fa-rocket"></i> ${m.vehicle} | <i class="fas fa-map-marker-alt"></i> ${m.location}</p>
-                    ${m.status==='upcoming'?`<div style="margin-top:10px; font-weight:bold; color:var(--neon-orange);">Hora Local: ${localTime}</div>`:''}
+                    <p style="font-size:0.85rem; margin-top:10px; color:rgba(255,255,255,0.6);"><i class="fas fa-rocket"></i> ${vehicleName} | <i class="fas fa-map-marker-alt"></i> ${m.location || 'Sin ubicación'}</p>
+                    ${m.status === 'upcoming' ? `<div style="margin-top:10px; font-weight:bold; color:var(--neon-orange);">Hora Local: ${localTime}</div>` : ''}
                 ` }));
             });
             safeGet('missionDetailsModal').classList.add('active');
@@ -664,13 +779,14 @@
 
         document.querySelectorAll('.transition-link').forEach(link => {
             link.onclick = (e) => {
-                if(link.hash) return;
+                if (link.hash) return;
                 e.preventDefault();
                 document.body.classList.add('exiting');
-                const ex = safeGet('exitOverlay'); if(ex) ex.classList.add('active');
+                const ex = safeGet('exitOverlay'); if (ex) ex.classList.add('active');
                 setTimeout(() => window.location.href = link.dataset.href || link.href, 700);
             };
         });
     </script>
 </body>
+
 </html>
