@@ -345,7 +345,7 @@
                 return;
             }
             contactLoginRequired.style.display = 'none';
-            const isAgus = (currentUser.displayName === 'Agus');
+            const isAgus = isAdmin;
             if (isAgus) {
                 if (!activeChatUid) {
                     contactConversations.style.display = 'block';

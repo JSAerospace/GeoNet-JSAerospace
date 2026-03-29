@@ -2238,6 +2238,8 @@ ASTRO-3_launch.png
 
         const contactB = safeGet('contactBtn');
         if (contactB) contactB.onclick = () => { safeGet('contactModal')?.classList.add('active'); updateChatView(); };
+        const closeC = safeGet('closeContactModal');
+        if (closeC) closeC.onclick = () => { safeGet('contactModal')?.classList.remove('active'); };
 
         // --- CHAT LOGIC ---
         const contactLoginRequired = safeGet('contact-login-required'), contactChatArea = safeGet('contact-chat-area'), contactConversations = safeGet('contact-conversations'), conversationsList = safeGet('conversations-list'), chatMessages = safeGet('chat-messages'), chatForm = safeGet('chat-form'), chatInput = safeGet('chat-input'), chatBackBtn = safeGet('chat-back-btn');
@@ -2255,7 +2257,7 @@ ASTRO-3_launch.png
                 return;
             }
             if(contactLoginRequired) contactLoginRequired.style.display = 'none';
-            const isAgus = (currentUser.displayName === 'Agus');
+            const isAgus = isAdmin;
             if (isAgus) {
                 if (!activeChatUid) {
                     if(contactConversations) contactConversations.style.display = 'block';

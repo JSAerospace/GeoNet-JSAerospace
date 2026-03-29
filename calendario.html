@@ -492,7 +492,7 @@
                 return;
             }
             if(contactLoginRequired) contactLoginRequired.style.display = 'none';
-            const isAgus = (currentUser.displayName === 'Agus');
+            const isAgus = isAdmin;
             if (isAgus) {
                 if (!activeChatUid) {
                     if(contactConversations) contactConversations.style.display = 'block';
@@ -551,7 +551,7 @@
         if(safeGet('chat-form')) safeGet('chat-form').onsubmit = (e) => {
             e.preventDefault();
             const text = safeGet('chat-input')?.value.trim();
-            const threadUid = (currentUser.displayName === 'Agus' && activeChatUid) ? activeChatUid : currentUser.uid;
+            const threadUid = (isAdmin && activeChatUid) ? activeChatUid : currentUser.uid;
             if (text && threadUid) {
                 push(ref(database, 'chats/' + threadUid), { text, senderUid: currentUser.uid, timestamp: Date.now() });
                 if(safeGet('chat-input')) safeGet('chat-input').value = '';
