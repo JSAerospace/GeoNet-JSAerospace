@@ -54,7 +54,7 @@
 
         .sat-header-overlay {
             position: absolute;
-            top: 100px;
+            top: 110px;
             left: 0;
             right: 0;
             padding: 0 50px;
@@ -63,13 +63,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 10px;
         }
 
         .focus-controls {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             gap: 15px;
             pointer-events: auto;
+            z-index: 1000;
+            background: rgba(5, 15, 30, 0.4);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
         }
 
         .focus-btn {
@@ -408,16 +418,18 @@
 
     <div class="hud-overlay">
         <div class="sat-header-overlay">
-            <div class="focus-controls">
-                <button class="focus-btn active" id="focusEarth">Tierra</button>
-                <button class="focus-btn" id="focusMoon">Luna</button>
-            </div>
             <div class="sat-header-content">
                 <div class="sat-title-group">
                     <h1 class="sat-main-title">CONSTELACIÓN GEONET</h1>
                     <p class="sat-subtitle">VISUALIZACIÓN ORBITAL EN TIEMPO REAL</p>
                 </div>
             </div>
+        </div>
+
+        <!-- Focus Controls Moved to Bottom -->
+        <div class="focus-controls">
+            <button class="focus-btn active" id="focusEarth">Tierra</button>
+            <button class="focus-btn" id="focusMoon">Luna</button>
         </div>
 
         <div class="dashboard-container">
