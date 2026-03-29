@@ -630,6 +630,7 @@
             <div class="admin-tabs">
                 <button class="admin-tab-btn active" data-tab="tab-plane">Plano</button>
                 <button class="admin-tab-btn" data-tab="tab-sat">Satélites</button>
+                <button class="admin-tab-btn" data-tab="tab-surface">Superficie</button>
             </div>
             <div class="tab-content active" id="tab-plane">
                 <form id="adminPlaneForm">
@@ -661,6 +662,26 @@
                     </div>
                     <button type="submit" class="login-btn">Añadir Satélites</button>
                 </form>
+            </div>
+            <div class="tab-content" id="tab-surface">
+                <p style="font-size: 0.8rem; color: var(--neon-orange); margin-bottom: 10px;"><i class="fas fa-mouse-pointer"></i> Haz clic en el planeta para capturar coordenadas automáticamente.</p>
+                <form id="adminSurfaceForm">
+                    <div class="form-group"><label>Nombre</label><input type="text" id="surfName" placeholder="Ej: Base Alfa" required></div>
+                    <div class="form-group"><label>Cuerpo</label>
+                        <select id="surfBody" class="admin-select" style="width:100%; padding:10px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1);">
+                            <option value="earth">Tierra</option>
+                            <option value="moon">Luna</option>
+                            <option value="laythe">Laythe</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-group" style="flex:1;"><label>Latitud</label><input type="number" id="surfLat" step="0.000001" value="0" required></div>
+                        <div class="form-group" style="flex:1;"><label>Longitud</label><input type="number" id="surfLon" step="0.000001" value="0" required></div>
+                    </div>
+                    <div class="form-group"><label>Color</label><input type="color" id="surfColor" value="#ff6b35"></div>
+                    <button type="submit" class="login-btn">Añadir Activo</button>
+                </form>
+                <div id="surface-assets-list" style="margin-top:20px; max-height:150px; overflow-y:auto;"></div>
             </div>
         </div>
     </div>
@@ -1158,6 +1179,121 @@
             document.getElementById('stats-network-status').textContent = 'ONLINE';
         });
 
+        const surfaceMarkers = [];
+        const latLonToVector3 = (lat, lon, radius) => {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lon + 180) * (Math.PI / 180);
+            return new THREE.Vector3(
+                -radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.cos(phi),
+                radius * Math.sin(phi) * Math.sin(theta)
+            );
+        };
+
+        const createMarker = (data, bodyGroup, radius) => {
+            const pos = latLonToVector3(data.lat, data.lon, radius);
+            const group = new THREE.Group();
+            
+            // Marker Mesh (Diamond/Lander style)
+            const g = new THREE.OctahedronGeometry(0.04, 0);
+            const m = new THREE.MeshPhongMaterial({ color: data.color || 0xff6b35, emissive: data.color || 0xff6b35, emissiveIntensity: 0.5 });
+            const mesh = new THREE.Mesh(g, m);
+            mesh.position.copy(pos);
+            group.add(mesh);
+
+            // Pulse Effect
+            const pulseG = new THREE.RingGeometry(0.05, 0.06, 32);
+            const pulseM = new THREE.MeshBasicMaterial({ color: data.color || 0xff6b35, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+            const pulse = new THREE.Mesh(pulseG, pulseM);
+            pulse.position.copy(pos.clone().multiplyScalar(1.01));
+            pulse.lookAt(new THREE.Vector3(0,0,0));
+            group.add(pulse);
+            
+            // Label (Using Canvas Texture for Sprite)
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'white'; ctx.font = 'bold 36px Orbitron, sans-serif'; 
+            ctx.textAlign = 'center'; ctx.fillText(data.name.toUpperCase(), 128, 45);
+            const tex = new THREE.CanvasTexture(canvas);
+            const spriteM = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+            const sprite = new THREE.Sprite(spriteM);
+            sprite.position.copy(pos.clone().multiplyScalar(1.15));
+            sprite.scale.set(0.4, 0.1, 1);
+            group.add(sprite);
+
+            bodyGroup.add(group);
+            surfaceMarkers.push({ group, pulse });
+        };
+
+        onValue(ref(database, 'geonet/surface'), snap => {
+            surfaceMarkers.forEach(s => s.group.parent.remove(s.group));
+            surfaceMarkers.length = 0;
+            const assets = snap.val() || {};
+            const list = document.getElementById('surface-assets-list');
+            list.innerHTML = '';
+            Object.keys(assets).forEach(id => {
+                const a = assets[id];
+                const target = (a.body === 'moon') ? moon : (a.body === 'laythe' ? laythe : earthGroup);
+                const radius = (a.body === 'moon') ? 0.27 : (a.body === 'laythe' ? 0.6 : 1.0);
+                createMarker(a, target, radius);
+                
+                list.innerHTML += `<div class="plane-item" style="border-left-color:${a.color};">
+                    <div class="plane-header">
+                        <span class="plane-name">${a.name} <small>(${a.body})</small></span>
+                        <button onclick="deleteSurfaceAsset('${id}')" style="background:none; border:none; color:#ff3333; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+        });
+
+        window.deleteSurfaceAsset = (id) => confirm('¿Eliminar activo?') && remove(ref(database, `geonet/surface/${id}`));
+
+        document.getElementById('adminSurfaceForm').onsubmit = (e) => {
+            e.preventDefault();
+            push(ref(database, 'geonet/surface'), {
+                name: document.getElementById('surfName').value,
+                body: document.getElementById('surfBody').value,
+                lat: parseFloat(document.getElementById('surfLat').value),
+                lon: parseFloat(document.getElementById('surfLon').value),
+                color: document.getElementById('surfColor').value
+            });
+            document.getElementById('adminModal').classList.remove('active');
+        };
+
+        // --- COORDINATE PICKER ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        container.addEventListener('mousedown', (e) => {
+            if (!document.getElementById('adminModal').classList.contains('active')) return;
+            if (document.querySelector('.admin-tab-btn.active').dataset.tab !== 'tab-surface') return;
+
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects([earth, moon, laythe]);
+            if (intersects.length > 0) {
+                const hit = intersects[0];
+                const obj = hit.object;
+                const point = hit.point.clone();
+                obj.worldToLocal(point);
+                point.normalize();
+
+                const lat = Math.asin(point.y) * (180 / Math.PI);
+                const lon = Math.atan2(point.z, -point.x) * (180 / Math.PI) - 180;
+                
+                let bodyKey = 'earth';
+                if (obj === moon) bodyKey = 'moon';
+                if (obj === laythe) bodyKey = 'laythe';
+
+                document.getElementById('surfLat').value = lat.toFixed(6);
+                document.getElementById('surfLon').value = (lon < -180 ? lon + 360 : (lon > 180 ? lon - 360 : lon)).toFixed(6);
+                document.getElementById('surfBody').value = bodyKey;
+            }
+        });
+
         onValue(ref(database, 'geonet/stats'), snap => document.getElementById('stats-total-launches').textContent = snap.val()?.totalLaunches || '0');
 
         document.getElementById('adminPlaneForm').onsubmit = (e) => {
@@ -1217,6 +1353,12 @@
                     laythe.material.uniforms.time.value = Date.now() * 0.001;
                 }
             }
+
+            // Animate pulses
+            surfaceMarkers.forEach(s => {
+                const scale = 1 + Math.sin(Date.now() * 0.005) * 0.1;
+                s.pulse.scale.set(scale, scale, 1);
+            });
 
             if (cameraTransition) {
                 cameraTransition.progress += 0.02;
