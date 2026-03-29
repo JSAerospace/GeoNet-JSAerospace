@@ -2070,20 +2070,26 @@ ASTRO-3_launch.png
         </div>
     </div>
 
-    <!-- Contact Modal (Standardized) -->
+    <!-- Contact Modal -->
     <div class="modal-overlay" id="contactModal">
         <div class="login-modal" id="contactModalContent" style="display: flex; flex-direction: column; height: 80vh; max-height: 600px; padding: 20px;">
             <button class="close-modal" id="closeContactModal">&times;</button>
-            
-            <div id="contact-login-required" style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; display: none;">
-                <i class="fas fa-lock" style="font-size: 3rem; color: var(--neon-red); margin-bottom: 20px;"></i>
-                <h2 style="font-family: var(--font-heading); color: #fff; margin-bottom: 10px;">Acceso Restringido</h2>
-                <p style="color: rgba(255,255,255,0.6); margin-bottom: 25px;">Debes iniciar sesión para contactar con nosotros.</p>
-                <button class="login-btn" id="contactLoginBtn">Iniciar Sesión Ahora</button>
+            <div class="contact-header" style="display: flex; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 15px;">
+                <div style="background: var(--neon-red); color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-heading); margin-right: 15px;">AG</div>
+                <div>
+                    <h2 style="font-family: var(--font-heading); color: #fff; font-size: 1.2rem; margin: 0;">Agus</h2>
+                    <p style="color: var(--neon-red); font-size: 0.85rem; margin: 0;">CEO de J.S. Aerospace</p>
+                </div>
+                <button id="chat-back-btn" style="display: none; margin-left: auto; background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 5px 10px; border-radius: 5px;">Volver</button>
+            </div>
+            <div id="contact-login-required" style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <i class="fas fa-lock" style="font-size: 3rem; color: rgba(255,51,51,0.5); margin-bottom: 15px;"></i>
+                <h3 style="color: #fff; margin-bottom: 10px;">Inicia sesión para chatear</h3>
+                <button class="login-btn" id="contactLoginBtn" style="padding: 10px 20px;">Iniciar Sesión</button>
             </div>
             
-            <div id="contact-conversations" style="flex: 1; overflow-y: auto; display: none;">
-                <h3 style="font-family: var(--font-heading); color: var(--neon-red); margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase;">Conversaciones Activas</h3>
+            <div id="contact-conversations" style="display: none; flex: 1; overflow-y: auto;">
+                <h3 style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 10px;">Conversaciones</h3>
                 <div id="conversations-list"></div>
             </div>
 
@@ -2150,8 +2156,8 @@ ASTRO-3_launch.png
 
         // AUTH LOGIC
         onAuthStateChanged(auth, (user) => {
+            currentUser = user;
             if (user) {
-                currentUser = user;
                 isAdmin = (user.email === 'olanoagus@gmail.com');
                 if (authBtn) {
                     authBtn.classList.add('logged-in');
@@ -2165,7 +2171,6 @@ ASTRO-3_launch.png
                 const adminControls = document.querySelector('.admin-controls');
                 if (adminControls) adminControls.style.display = isAdmin ? 'flex' : 'none';
             } else {
-                currentUser = null;
                 isAdmin = false;
                 if (authBtn) {
                     authBtn.classList.remove('logged-in');
@@ -2231,25 +2236,11 @@ ASTRO-3_launch.png
         const logoutB = safeGet('logoutBtn');
         if (logoutB) logoutB.onclick = () => { signOut(auth); profileModal?.classList.remove('active'); };
 
-        // CHAT LOGIC
-        const contactBtn = safeGet('contactBtn');
-        const contactModal = safeGet('contactModal');
-        const contactLoginRequired = safeGet('contact-login-required');
-        const contactChatArea = safeGet('contact-chat-area');
-        const contactConversations = safeGet('contact-conversations');
-        const conversationsList = safeGet('conversations-list');
-        const chatMessages = safeGet('chat-messages');
-        const chatForm = safeGet('chat-form');
-        const chatInput = safeGet('chat-input');
-        const chatBackBtn = safeGet('chat-back-btn');
+        // --- CHAT LOGIC ---
+        const contactLoginRequired = safeGet('contact-login-required'), contactChatArea = safeGet('contact-chat-area'), contactConversations = safeGet('contact-conversations'), conversationsList = safeGet('conversations-list'), chatMessages = safeGet('chat-messages'), chatForm = safeGet('chat-form'), chatInput = safeGet('chat-input'), chatBackBtn = safeGet('chat-back-btn');
 
-        let activeChatUid = null;
-        let chatListeners = [];
-
-        if (contactBtn) contactBtn.onclick = () => { contactModal?.classList.add('active'); updateChatView(); };
-        const closeC = safeGet('closeContactModal'); if(closeC) closeC.onclick = () => contactModal?.classList.remove('active');
-        const contactL = safeGet('contactLoginBtn'); if(contactL) contactL.onclick = () => { contactModal?.classList.remove('active'); loginModal?.classList.add('active'); };
         if (chatBackBtn) chatBackBtn.onclick = () => { activeChatUid = null; updateChatView(); };
+        const contactL = safeGet('contactLoginBtn'); if(contactL) contactL.onclick = () => { safeGet('contactModal')?.classList.remove('active'); safeGet('loginModal')?.classList.add('active'); };
 
         function clearChatListeners() { chatListeners.forEach(un => un()); chatListeners = []; }
 
@@ -2285,51 +2276,46 @@ ASTRO-3_launch.png
 
         function loadConversations() {
             clearChatListeners();
-            const unsub = onValue(ref(database, 'chats'), (snap) => {
+            chatListeners.push(onValue(ref(database, 'chats'), (snap) => {
                 if(conversationsList) {
                     conversationsList.innerHTML = '';
                     if (!snap.exists()) { conversationsList.innerHTML = '<p>No hay mensajes.</p>'; return; }
                     snap.forEach(child => {
-                        const uid = child.key;
-                        const lastMsg = Object.values(child.val()).pop();
-                        const el = document.createElement('div');
-                        el.className = 'conversation-item';
-                        el.style.cssText = 'padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); cursor:pointer;';
-                        el.innerHTML = `<strong>${uid.substring(0,8)}</strong><br><small>${lastMsg.text}</small>`;
-                        el.onclick = () => { activeChatUid = uid; updateChatView(); };
-                        conversationsList.appendChild(el);
+                        const uid = child.key, last = Object.values(child.val()).pop();
+                        const div = document.createElement('div');
+                        div.style.cssText = 'padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); cursor:pointer;';
+                        div.innerHTML = `<strong>${uid.substring(0,8)}</strong><br><small>${last.text}</small>`;
+                        div.onclick = () => { activeChatUid = uid; updateChatView(); };
+                        conversationsList.appendChild(div);
                     });
                 }
-            });
-            chatListeners.push(unsub);
+            }));
         }
 
         function loadChatMessages(uid) {
             clearChatListeners();
-            if(chatMessages) {
-                chatMessages.innerHTML = '';
-                const unsub = onChildAdded(ref(database, 'chats/' + uid), (snap) => renderMessage(snap.val()));
-                chatListeners.push(unsub);
-            }
+            const area = safeGet('chat-messages'); if(!area) return;
+            area.innerHTML = '';
+            chatListeners.push(onChildAdded(ref(database, 'chats/' + uid), (snap) => {
+                const msg = snap.val();
+                const isMine = (msg.senderUid === currentUser.uid);
+                const msgEl = document.createElement('div');
+                msgEl.className = `chat-msg ${isMine ? 'mine' : 'theirs'}`;
+                msgEl.style.cssText = `max-width:80%; padding:10px; border-radius:10px; margin-bottom:5px; align-self:${isMine?'flex-end':'flex-start'}; background:${isMine?'var(--neon-red)':'rgba(255,255,255,0.1)'}; color:${isMine?'#000':'#fff'};`;
+                msgEl.textContent = msg.text;
+                area.appendChild(msgEl);
+                area.scrollTop = area.scrollHeight;
+            }));
         }
 
-        function renderMessage(msg) {
-            const isMine = (msg.senderUid === currentUser.uid);
-            const msgEl = document.createElement('div');
-            msgEl.className = `chat-msg ${isMine ? 'mine' : 'theirs'}`;
-            msgEl.style.cssText = `max-width:80%; padding:10px; border-radius:10px; margin-bottom:5px; align-self:${isMine?'flex-end':'flex-start'}; background:${isMine?'var(--neon-red)':'rgba(255,255,255,0.1)'}; color:${isMine?'#000':'#fff'};`;
-            msgEl.textContent = msg.text;
-            chatMessages?.appendChild(msgEl);
-            if(chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        if (chatForm) chatForm.onsubmit = async (e) => {
+        if(safeGet('chat-form')) safeGet('chat-form').onsubmit = (e) => {
             e.preventDefault();
-            const text = chatInput?.value.trim();
-            if (!text || !currentUser) return;
+            const text = safeGet('chat-input')?.value.trim();
             const threadUid = (currentUser.displayName === 'Agus' && activeChatUid) ? activeChatUid : currentUser.uid;
-            await push(ref(database, 'chats/' + threadUid), { text, senderUid: currentUser.uid, timestamp: Date.now() });
-            if(chatInput) chatInput.value = '';
+            if (text && threadUid) {
+                push(ref(database, 'chats/' + threadUid), { text, senderUid: currentUser.uid, timestamp: Date.now() });
+                if(safeGet('chat-input')) safeGet('chat-input').value = '';
+            }
         };
 
         // ===== ROCKET INTERACTIVE VIEWER LOGIC =====

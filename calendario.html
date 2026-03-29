@@ -334,31 +334,32 @@
         </div>
     </div>
 
-    <!-- Contact Modal (Standardized) -->
+    <!-- Contact Modal -->
     <div class="modal-overlay" id="contactModal">
         <div class="login-modal" id="contactModalContent" style="display: flex; flex-direction: column; height: 80vh; max-height: 600px; padding: 20px;">
             <button class="close-modal" id="closeContactModal">&times;</button>
-            <div id="contact-login-required" style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; display: none;">
-                <i class="fas fa-lock" style="font-size: 3rem; color: var(--neon-red); margin-bottom: 20px;"></i>
-                <h2 style="font-family: var(--font-heading); color: #fff; margin-bottom: 10px;">Acceso Restringido</h2>
-                <p style="color: rgba(255,255,255,0.6); margin-bottom: 25px;">Debes iniciar sesión para contactar con nosotros.</p>
-                <button class="login-btn" id="contactLoginBtn">Iniciar Sesión Ahora</button>
+            <div class="contact-header" style="display: flex; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 15px;">
+                <div style="background: var(--neon-red); color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-heading); margin-right: 15px;">AG</div>
+                <div>
+                    <h2 style="font-family: var(--font-heading); color: #fff; font-size: 1.2rem; margin: 0;">Agus</h2>
+                    <p style="color: var(--neon-red); font-size: 0.85rem; margin: 0;">CEO de J.S. Aerospace</p>
+                </div>
+                <button id="chat-back-btn" style="display: none; margin-left: auto; background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 5px 10px; border-radius: 5px;">Volver</button>
             </div>
-            <div id="contact-conversations" style="flex: 1; overflow-y: auto; display: none;">
-                <h3 style="font-family: var(--font-heading); color: var(--neon-red); margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase;">Conversaciones Activas</h3>
+            <div id="contact-conversations" style="display: none; flex: 1; overflow-y: auto;">
+                <h3 style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 10px;">Conversaciones</h3>
                 <div id="conversations-list"></div>
             </div>
-            <div id="contact-chat-area" style="flex: 1; display: flex; flex-direction: column; height: 100%; display: none;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <button id="chat-back-btn" style="background: none; border: none; color: #fff; cursor: pointer; display: none;"><i class="fas fa-arrow-left"></i></button>
-                        <span style="font-family: var(--font-heading); font-weight: bold; color: #fff;" id="chat-title">Chat con J.S.Aerospace</span>
-                    </div>
-                </div>
-                <div id="chat-messages" style="flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 15px;"></div>
-                <form id="chat-form" style="display: flex; gap: 10px;">
-                    <input type="text" id="chat-input" placeholder="Escribe un mensaje..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; padding: 10px;" required>
-                    <button type="submit" style="background: var(--neon-red); border: none; color: #000; width: 40px; height: 40px; border-radius: 8px; cursor: pointer;"><i class="fas fa-paper-plane"></i></button>
+            <div id="contact-login-required" style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <i class="fas fa-lock" style="font-size: 3rem; color: rgba(255,51,51,0.5); margin-bottom: 15px;"></i>
+                <h3 style="color: #fff; margin-bottom: 10px;">Inicia sesión para chatear</h3>
+                <button class="login-btn" id="contactLoginBtn" style="padding: 10px 20px;">Iniciar Sesión</button>
+            </div>
+            <div id="contact-chat-area" style="display: none; flex: 1; flex-direction: column; min-height: 0;">
+                <div id="chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; margin-bottom: 15px;"></div>
+                <form id="chat-form" style="display: flex; gap: 10px; margin-top: auto;">
+                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #fff; outline: none;" autocomplete="off">
+                    <button type="submit" style="background: var(--neon-red); border: none; border-radius: 5px; width: 45px; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-paper-plane"></i></button>
                 </form>
             </div>
         </div>
@@ -422,17 +423,16 @@
         // Auth Logic
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
+            const btn = safeGet('authBtn');
             if (user) {
                 isAdmin = (user.email === 'olanoagus@gmail.com');
-                const btn = safeGet('authBtn');
                 if(btn) {
                     btn.classList.add('logged-in');
-                    btn.innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar"><span>${user.displayName || user.email.split('@')[0]}</span>`;
+                    btn.innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar"><span>${user.displayName || user.email.split('@')[0]}</span>`;
                 }
                 update(ref(database, 'users/' + user.uid), { lastLogin: new Date().toISOString(), displayName: user.displayName, photoURL: user.photoURL });
             } else {
                 isAdmin = false;
-                const btn = safeGet('authBtn');
                 if(btn) { btn.classList.remove('logged-in'); btn.innerHTML = `<i class="fas fa-user"></i><span id="authBtnText">Iniciar Sesión</span>`; }
             }
             updateChatView();
@@ -476,31 +476,59 @@
         safeGet('googleLogin').onclick = () => signInWithPopup(auth, googleProvider).then(() => safeGet('loginModal').classList.remove('active'));
         safeGet('logoutBtn').onclick = () => signOut(auth).then(() => safeGet('profileModal').classList.remove('active'));
 
-        // Chat Logic (Standardized)
-        function clearChatListeners() { chatListeners.forEach(u => u()); chatListeners = []; }
+        // --- CHAT LOGIC ---
+        const contactLoginRequired = safeGet('contact-login-required'), contactChatArea = safeGet('contact-chat-area'), contactConversations = safeGet('contact-conversations'), conversationsList = safeGet('conversations-list'), chatMessages = safeGet('chat-messages'), chatForm = safeGet('chat-form'), chatInput = safeGet('chat-input'), chatBackBtn = safeGet('chat-back-btn');
+
+        if (chatBackBtn) chatBackBtn.onclick = () => { activeChatUid = null; updateChatView(); };
+        const contactL = safeGet('contactLoginBtn'); if(contactL) contactL.onclick = () => { safeGet('contactModal')?.classList.remove('active'); safeGet('loginModal')?.classList.add('active'); };
+
+        function clearChatListeners() { chatListeners.forEach(un => un()); chatListeners = []; }
+
         function updateChatView() {
-            const req = safeGet('contact-login-required'), area = safeGet('contact-chat-area'), convs = safeGet('contact-conversations');
-            if (!currentUser) { if(req) req.style.display = 'flex'; if(area) area.style.display = 'none'; if(convs) convs.style.display = 'none'; return; }
-            if(req) req.style.display = 'none';
-            const isAgus = currentUser.displayName === 'Agus';
-            if (isAgus && !activeChatUid) { if(convs) convs.style.display = 'block'; if(area) area.style.display = 'none'; loadConversations(); }
-            else { if(convs) convs.style.display = 'none'; if(area) area.style.display = 'flex'; loadChatMessages(isAgus ? activeChatUid : currentUser.uid); }
+            if (!currentUser) {
+                if(contactLoginRequired) contactLoginRequired.style.display = 'flex';
+                if(contactChatArea) contactChatArea.style.display = 'none';
+                if(contactConversations) contactConversations.style.display = 'none';
+                return;
+            }
+            if(contactLoginRequired) contactLoginRequired.style.display = 'none';
+            const isAgus = (currentUser.displayName === 'Agus');
+            if (isAgus) {
+                if (!activeChatUid) {
+                    if(contactConversations) contactConversations.style.display = 'block';
+                    if(contactChatArea) contactChatArea.style.display = 'none';
+                    if(chatBackBtn) chatBackBtn.style.display = 'none';
+                    loadConversations();
+                } else {
+                    if(contactConversations) contactConversations.style.display = 'none';
+                    if(contactChatArea) contactChatArea.style.display = 'flex';
+                    if(chatBackBtn) chatBackBtn.style.display = 'block';
+                    loadChatMessages(activeChatUid);
+                }
+            } else {
+                if(contactConversations) contactConversations.style.display = 'none';
+                if(contactChatArea) contactChatArea.style.display = 'flex';
+                if(chatBackBtn) chatBackBtn.style.display = 'none';
+                activeChatUid = currentUser.uid;
+                loadChatMessages(currentUser.uid);
+            }
         }
 
         function loadConversations() {
             clearChatListeners();
             chatListeners.push(onValue(ref(database, 'chats'), (snap) => {
-                const list = safeGet('conversations-list'); if(!list) return;
-                list.innerHTML = '';
-                if (!snap.exists()) return;
-                snap.forEach(child => {
-                    const uid = child.key, last = Object.values(child.val()).pop();
-                    const div = document.createElement('div');
-                    div.style.cssText = 'padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); cursor:pointer;';
-                    div.innerHTML = `<strong>User: ${uid.substring(0,8)}</strong><br><small>${last.text}</small>`;
-                    div.onclick = () => { activeChatUid = uid; updateChatView(); };
-                    list.appendChild(div);
-                });
+                if(conversationsList) {
+                    conversationsList.innerHTML = '';
+                    if (!snap.exists()) { conversationsList.innerHTML = '<p>No hay mensajes.</p>'; return; }
+                    snap.forEach(child => {
+                        const uid = child.key, last = Object.values(child.val()).pop();
+                        const div = document.createElement('div');
+                        div.style.cssText = 'padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); cursor:pointer;';
+                        div.innerHTML = `<strong>${uid.substring(0,8)}</strong><br><small>${last.text}</small>`;
+                        div.onclick = () => { activeChatUid = uid; updateChatView(); };
+                        conversationsList.appendChild(div);
+                    });
+                }
             }));
         }
 
@@ -509,21 +537,24 @@
             const area = safeGet('chat-messages'); if(!area) return;
             area.innerHTML = '';
             chatListeners.push(onChildAdded(ref(database, 'chats/' + uid), (snap) => {
-                const m = snap.val();
-                const div = document.createElement('div');
-                div.style.cssText = `max-width:80%; padding:10px; border-radius:10px; margin-bottom:5px; align-self:${m.senderUid === currentUser.uid ? 'flex-end' : 'flex-start'}; background:${m.senderUid === currentUser.uid ? 'var(--neon-red)' : 'rgba(255,255,255,0.1)'}; color:${m.senderUid === currentUser.uid ? '#000' : '#fff'};`;
-                div.textContent = m.text;
-                area.appendChild(div);
+                const msg = snap.val();
+                const isMine = (msg.senderUid === currentUser.uid);
+                const msgEl = document.createElement('div');
+                msgEl.className = `chat-msg ${isMine ? 'mine' : 'theirs'}`;
+                msgEl.style.cssText = `max-width:80%; padding:10px; border-radius:10px; margin-bottom:5px; align-self:${isMine?'flex-end':'flex-start'}; background:${isMine?'var(--neon-red)':'rgba(255,255,255,0.1)'}; color:${isMine?'#000':'#fff'};`;
+                msgEl.textContent = msg.text;
+                area.appendChild(msgEl);
                 area.scrollTop = area.scrollHeight;
             }));
         }
 
-        safeGet('chat-form').onsubmit = (e) => {
+        if(safeGet('chat-form')) safeGet('chat-form').onsubmit = (e) => {
             e.preventDefault();
-            const input = safeGet('chat-input'), uid = (currentUser.displayName === 'Agus' && activeChatUid) ? activeChatUid : currentUser.uid;
-            if (input.value.trim() && uid) {
-                push(ref(database, 'chats/' + uid), { text: input.value, senderUid: currentUser.uid, timestamp: Date.now() });
-                input.value = '';
+            const text = safeGet('chat-input')?.value.trim();
+            const threadUid = (currentUser.displayName === 'Agus' && activeChatUid) ? activeChatUid : currentUser.uid;
+            if (text && threadUid) {
+                push(ref(database, 'chats/' + threadUid), { text, senderUid: currentUser.uid, timestamp: Date.now() });
+                if(safeGet('chat-input')) safeGet('chat-input').value = '';
             }
         };
 
