@@ -1494,9 +1494,10 @@
             </div>
 
             <!-- Filter Bar -->
-            <div class="filter-bar" id="filterBar">
+            <div class="filter-tabs">
                 <button class="filter-btn active" data-filter="all">Todos</button>
                 <button class="filter-btn" data-filter="success">Éxito</button>
+                <button class="filter-btn" data-filter="in_flight">En Vuelo</button>
                 <button class="filter-btn" data-filter="upcoming">Próximos</button>
                 <button class="filter-btn" data-filter="failed">Fallidos</button>
             </div>
@@ -1829,6 +1830,21 @@
         const missionsGrid = safeGet('missionsGrid');
         const emptyState = safeGet('emptyState');
 
+        // --- CONSTANTS ---
+        const STATUS_MAP = {
+            'success': 'COMPLETADA',
+            'upcoming': 'PRÓXIMA',
+            'failed': 'FALLIDA',
+            'in_flight': 'EN VUELO'
+        };
+
+        const STATUS_COLORS = {
+            'success': 'var(--neon-green)',
+            'upcoming': 'var(--neon-orange)',
+            'failed': 'var(--neon-red)',
+            'in_flight': 'var(--neon-blue)'
+        };
+
         // --- AUTH LOGIC ---
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
@@ -2020,48 +2036,44 @@
         function renderFilteredMissions() {
             if (!missionsGrid) return;
             missionsGrid.innerHTML = '';
-            let sorted = Object.entries(rawMissionsData).sort((a, b) => new Date(b[1].date) - new Date(a[1].date));
-            if (currentFilter !== 'all') sorted = sorted.filter(([id, m]) => m.status === currentFilter);
-
-            if (sorted.length === 0) {
-                if (emptyState) emptyState.style.display = 'block';
-                return;
-            }
-            if (emptyState) emptyState.style.display = 'none';
-
-            const statusMap = {
-                'success': 'COMPLETADA',
-                'upcoming': 'PRÓXIMA',
-                'failed': 'FALLIDA'
-            };
-
-            sorted.forEach(([id, m]) => {
-                // Parse Date Robustly (Support DD/MM/YYYY and YYYY-MM-DD)
+            
+            // Prepare missions with their calculated timestamps
+            let missionsArr = Object.entries(rawMissionsData).map(([id, m]) => {
                 let dateObj;
                 const dStr = m.date || "";
                 const tStr = m.time || "00:00";
-
                 if (dStr.includes('/')) {
                     const [d, mon, y] = dStr.split('/');
                     dateObj = new Date(`${y}-${mon}-${d}T${tStr}:00Z`);
                 } else {
                     dateObj = new Date(`${dStr}T${tStr}:00Z`);
                 }
-
-                // If invalid, fallback to now
                 if (isNaN(dateObj.getTime())) dateObj = new Date();
+                return { id, data: m, timestamp: dateObj.getTime(), dateObj };
+            });
 
-                const targetTimestamp = dateObj.getTime();
+            // Sort by date (newest first)
+            missionsArr.sort((a, b) => b.timestamp - a.timestamp);
 
-                // Format for Local Display
+            // Filter
+            if (currentFilter !== 'all') {
+                missionsArr = missionsArr.filter(item => item.data.status === currentFilter);
+            }
+
+            if (missionsArr.length === 0) {
+                if (emptyState) emptyState.style.display = 'block';
+                return;
+            }
+            if (emptyState) emptyState.style.display = 'none';
+
+            missionsArr.forEach(({ id, data: m, timestamp: targetTimestamp, dateObj }) => {
                 const localDate = dateObj.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const localTime = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
 
                 const card = document.createElement('div');
                 card.className = 'mission-card';
-                const statusText = statusMap[m.status] || m.status.toUpperCase();
+                card.dataset.id = id;
 
-                // Image handling: Use m.images[0] or first value if object
                 let imgs = m.images || ['https://via.placeholder.com/800x600?text=Mission'];
                 if (typeof imgs === 'object' && !Array.isArray(imgs)) imgs = Object.values(imgs);
                 const cardImg = imgs[0] || 'https://via.placeholder.com/800x600?text=Mission';
@@ -2078,10 +2090,10 @@
                     </div>
                     <div class="mission-card-footer">
                         <div class="card-status">
-                            <span class="status-indicator" style="background: ${statusColors[m.status] || 'var(--primary-color)'}"></span>
-                            <span class="card-status-text" style="color: ${statusColors[m.status] || 'var(--primary-color)'}">${(statusMap[m.status] || m.status).toUpperCase()}</span>
+                            <span class="status-indicator" style="background: ${STATUS_COLORS[m.status] || 'var(--primary-color)'}"></span>
+                            <span class="card-status-text" style="color: ${STATUS_COLORS[m.status] || 'var(--primary-color)'}">${(STATUS_MAP[m.status] || m.status).toUpperCase()}</span>
                         </div>
-                        ${m.status === 'upcoming' || m.status === 'in_flight' ? `
+                        ${(m.status === 'upcoming' || m.status === 'in_flight') && m.showCountdown !== false ? `
                             <div class="card-countdown">
                                 <div style="font-size:0.7rem; text-transform:uppercase; color:var(--neon-orange); margin-bottom:5px;">${m.status === 'in_flight' ? 'Tiempo en vuelo' : 'Cuenta Regresiva'}</div>
                                 <div class="countdown-container" style="font-family:var(--font-heading); font-size:1.1rem; color:#fff;" data-target="${targetTimestamp}">00:00:00</div>
@@ -2098,13 +2110,6 @@
                             <i class="fas fa-map-marker-alt"></i>
                             <span>${m.location || 'Sin ubicación'}</span>
                         </div>
-                        
-                        ${(m.status === 'upcoming' && m.showCountdown !== false) ? `
-                            <div style="margin-top:20px; padding:10px; background:rgba(255,107,53,0.1); border-left:3px solid var(--neon-orange); border-radius:4px;">
-                                <div style="font-size:0.7rem; text-transform:uppercase; color:var(--neon-orange); margin-bottom:5px;">Cuenta Regresiva</div>
-                                <div class="countdown-container" style="font-family:var(--font-heading); font-size:1.1rem; color:#fff;" data-target="${targetTimestamp}">00:00:00</div>
-                            </div>
-                        ` : ''}
                     </div>`;
                 
                 card.onclick = () => window.viewMissionDetails(id);
@@ -2120,8 +2125,7 @@
             if (!m) return;
 
             const modal = safeGet('missionDetailsModal');
-            const statusMap = { 'success': 'COMPLETADA', 'upcoming': 'PRÓXIMA', 'failed': 'FALLIDA', 'in_flight': 'EN VUELO' };
-            const statusColors = { 'success': 'var(--neon-green)', 'upcoming': 'var(--neon-orange)', 'failed': 'var(--neon-red)', 'in_flight': 'var(--neon-blue)' };
+            // Using global STATUS_MAP and STATUS_COLORS
 
             // Gallery setup
             let imgs = m.images || []; 
@@ -2155,8 +2159,8 @@
             safeGet('detailsTitle').textContent = m.title || m.name || 'Misión Programada';
             
             const badge = safeGet('detailsStatusBadge');
-            badge.textContent = statusMap[m.status] || m.status.toUpperCase();
-            badge.style.background = statusColors[m.status] || 'rgba(0,212,255,0.2)';
+            badge.textContent = STATUS_MAP[m.status] || m.status.toUpperCase();
+            badge.style.background = STATUS_COLORS[m.status] || 'rgba(0,212,255,0.2)';
             badge.style.color = m.status === 'upcoming' ? '#000' : '#fff';
 
             // Main Info
@@ -2347,12 +2351,12 @@
                     if (m.status === 'upcoming') {
                         // Update UI immediately
                         if (pill) {
-                            pill.innerText = 'EN VUELO';
-                            pill.style.color = 'var(--neon-blue)';
+                            pill.innerText = STATUS_MAP['in_flight'];
+                            pill.style.color = STATUS_COLORS['in_flight'];
                         }
                         if (indicator) {
-                            indicator.style.background = 'var(--neon-blue)';
-                            indicator.classList.add('pulse-active'); // We can add a class or style
+                            indicator.style.background = STATUS_COLORS['in_flight'];
+                            indicator.classList.add('pulse-active'); 
                         }
 
                         // If Admin, update Database to make it permanent
