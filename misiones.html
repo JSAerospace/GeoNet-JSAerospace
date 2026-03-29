@@ -1468,7 +1468,12 @@
                 </div>
                 <div class="form-group">
                     <label for="mImages">Imágenes (Una por línea)</label>
-                    <textarea id="mImages" placeholder="https://ejemplo.com/imagen.jpg"></textarea>
+                    <textarea id="mImages" placeholder="https://ejemplo.com/imagen.jpg" style="width: 100%; padding: 12px; background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; height: 100px;"></textarea>
+                </div>
+
+                <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <input type="checkbox" id="mShowCountdown" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--neon-orange);">
+                    <label for="mShowCountdown" style="margin-bottom: 0; cursor: pointer; color: #fff; font-size: 0.9rem;">Mostrar Cuenta Regresiva</label>
                 </div>
 
                 <button type="submit" class="login-btn" id="saveMissionBtn">Guardar Misión</button>
@@ -1806,9 +1811,9 @@
 
                 if (dStr.includes('/')) {
                     const [d, mon, y] = dStr.split('/');
-                    dateObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                    dateObj = new Date(`${y}-${mon}-${d}T${tStr}:00Z`);
                 } else {
-                    dateObj = new Date(`${dStr}T${tStr}:00`);
+                    dateObj = new Date(`${dStr}T${tStr}:00Z`);
                 }
 
                 // If invalid, fallback to now
@@ -1852,7 +1857,7 @@
                             <span>${m.location || 'Sin ubicación'}</span>
                         </div>
                         
-                        ${m.status === 'upcoming' ? `
+                        ${(m.status === 'upcoming' && m.showCountdown !== false) ? `
                             <div style="margin-top:20px; padding:10px; background:rgba(255,107,53,0.1); border-left:3px solid var(--neon-orange); border-radius:4px;">
                                 <div style="font-size:0.7rem; text-transform:uppercase; color:var(--neon-orange); margin-bottom:5px;">Cuenta Regresiva</div>
                                 <div class="countdown-container" style="font-family:var(--font-heading); font-size:1.1rem; color:#fff;" data-target="${targetTimestamp}">00:00:00</div>
@@ -1891,6 +1896,7 @@
                 vehicle: safeGet('mVehicle').value,
                 landing: safeGet('mLanding').value,
                 images: imgs.length ? imgs : ['https://via.placeholder.com/800x600?text=Mission'],
+                showCountdown: safeGet('mShowCountdown').checked,
                 updatedAt: new Date().toISOString()
             };
             if (id) await update(ref(database, 'missions/' + id), data);
@@ -1913,6 +1919,7 @@
                 safeGet('mVehicle').value = m.vehicle;
                 safeGet('mLanding').value = m.landing || '';
                 safeGet('mImages').value = (m.images || []).join('\n');
+                safeGet('mShowCountdown').checked = m.showCountdown !== false;
                 missionModal?.classList.add('active');
             }
         };

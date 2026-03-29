@@ -659,9 +659,9 @@
                     const tStr = m.time || "00:00";
                     if (dStr.includes('/')) {
                         const [d, mon, y] = dStr.split('/');
-                        dObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                        dObj = new Date(`${y}-${mon}-${d}T${tStr}:00Z`);
                     } else {
-                        dObj = new Date(`${dStr}T${tStr}:00`);
+                        dObj = new Date(`${dStr}T${tStr}:00Z`);
                     }
                     return dObj.toDateString() === currentGridDate;
                 });
@@ -697,7 +697,7 @@
                     className: 'upcoming-card', innerHTML: `
                     <div class="card-date-badge">${dObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }).toUpperCase()}</div>
                     <h3 class="card-mission-name">${m.title}</h3>
-                    <div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>
+                    ${m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : ''}
                 ` }));
                 card.onclick = () => showDayDetails(m.date, [m]);
             });
@@ -715,9 +715,9 @@
                     const tStr = m.time || "00:00";
                     if (dStr.includes('/')) {
                         const [d, mon, y] = dStr.split('/');
-                        dObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                        dObj = new Date(`${y}-${mon}-${d}T${tStr}:00Z`);
                     } else {
-                        dObj = new Date(`${dStr}T${tStr}:00`);
+                        dObj = new Date(`${dStr}T${tStr}:00Z`);
                     }
                     const diff = dObj - new Date();
                     const missionTitle = m.title || m.name || 'Misión Programada';
@@ -741,21 +741,21 @@
                 const tStr = m.time || "00:00";
                 if (dStr.includes('/')) {
                     const [d, mon, y] = dStr.split('/');
-                    dObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                    dObj = new Date(`${y}-${mon}-${d}T${tStr}:00Z`);
                 } else {
-                    dObj = new Date(`${dStr}T${tStr}:00`);
+                    dObj = new Date(`${dStr}T${tStr}:00Z`);
                 }
                 const localTime = dObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
                 const missionTitle = m.title || m.name || 'Misión Programada';
                 const vehicleName = m.vehicle || m.provider || 'Vehículo J.S.A.';
                 list.appendChild(Object.assign(document.createElement('div'), {
-                    className: `mission-card`, style: 'padding:15px; background:rgba(255,255,255,0.05); border-radius:10px;', innerHTML: `
+                    className: `mission-card`, style: 'padding:15px; background:rgba(255,107,53,0.05); border-radius:10px; border-left:4px solid var(--neon-orange);', innerHTML: `
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <h3 style="color:#fff; font-family:var(--font-heading); font-size:1rem;">${missionTitle}</h3>
                         <span class="event-tag ${m.status}">${m.status.toUpperCase()}</span>
                     </div>
                     <p style="font-size:0.85rem; margin-top:10px; color:rgba(255,255,255,0.6);"><i class="fas fa-rocket"></i> ${vehicleName} | <i class="fas fa-map-marker-alt"></i> ${m.location || 'Sin ubicación'}</p>
-                    ${m.status === 'upcoming' ? `<div style="margin-top:10px; font-weight:bold; color:var(--neon-orange);">Hora Local: ${localTime}</div>` : ''}
+                    ${(m.status === 'upcoming' && m.showCountdown !== false) ? `<div style="margin-top:10px; font-weight:bold; color:var(--neon-orange);">Hora Local: ${localTime}</div>` : ''}
                 ` }));
             });
             safeGet('missionDetailsModal').classList.add('active');
