@@ -532,7 +532,7 @@
         const database = getDatabase(app);
         const googleProvider = new GoogleAuthProvider();
 
-        let currentUser = null, isLoginMode = true, activeChatUid = null, isChatAdmin = false, chatListeners = [];
+        let currentUser = null, isLoginMode = true, activeChatUid = null, isChatAdmin = false, chatListeners = [], isAdmin = false;
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
@@ -599,7 +599,7 @@
                 return;
             }
             if(contactLoginRequired) contactLoginRequired.style.display = 'none';
-            const isAgus = (currentUser.displayName === 'Agus');
+            const isAgus = isAdmin;
             if (isAgus) {
                 if (!activeChatUid) {
                     if(contactConversations) contactConversations.style.display = 'block';

@@ -2236,6 +2236,9 @@ ASTRO-3_launch.png
         const logoutB = safeGet('logoutBtn');
         if (logoutB) logoutB.onclick = () => { signOut(auth); profileModal?.classList.remove('active'); };
 
+        const contactB = safeGet('contactBtn');
+        if (contactB) contactB.onclick = () => { safeGet('contactModal')?.classList.add('active'); updateChatView(); };
+
         // --- CHAT LOGIC ---
         const contactLoginRequired = safeGet('contact-login-required'), contactChatArea = safeGet('contact-chat-area'), contactConversations = safeGet('contact-conversations'), conversationsList = safeGet('conversations-list'), chatMessages = safeGet('chat-messages'), chatForm = safeGet('chat-form'), chatInput = safeGet('chat-input'), chatBackBtn = safeGet('chat-back-btn');
 
