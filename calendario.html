@@ -437,9 +437,10 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="missionDetailsModal">
+    <!-- Day Details Modal (List of missions for a day) -->
+    <div class="modal-overlay" id="dayDetailsModal">
         <div class="login-modal" style="max-width: 500px;">
-            <button class="close-modal" id="closeDetailsModal">&times;</button>
+            <button class="close-modal" id="closeDayDetailsModal">&times;</button>
             <div class="modal-header">
                 <h2 id="detailsDateText">Detalles del Día</h2>
                 <p>Eventos y misiones programadas</p>
@@ -447,6 +448,81 @@
             <div id="dayMissionsList"
                 style="display: flex; flex-direction: column; gap: 15px; max-height: 400px; overflow-y: auto;">
                 <!-- Lista de misiones -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission Rich Details Modal (Public View) -->
+    <div class="modal-overlay" id="missionDetailsModal">
+        <div class="login-modal" style="max-width: 700px; padding: 0; overflow: hidden; border: 1px solid rgba(0,212,255,0.1); background: #0b0b1a;">
+            <button class="close-modal" id="closeDetailsModal" style="top: 15px; right: 15px; z-index: 10;">&times;</button>
+            
+            <div id="detailsHero" style="height: 250px; width: 100%; background-size: cover; background-position: center; position: relative;">
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 150px; background: linear-gradient(to top, #0b0b1a, transparent);"></div>
+                <div style="position: absolute; bottom: 20px; left: 30px;">
+                    <span id="detailsStatusBadge" style="padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase;"></span>
+                    <h2 id="detailsTitle" style="font-family: 'Orbitron', sans-serif; font-size: 1.8rem; margin: 10px 0 0 0; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5);"></h2>
+                </div>
+            </div>
+
+            <div style="padding: 30px; display: grid; grid-template-columns: 1fr 220px; gap: 30px;">
+                <div class="details-main">
+                    <div id="detailsDescriptionContainer" style="margin-bottom: 25px;">
+                        <h3 style="color: var(--neon-orange); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Descripción</h3>
+                        <p id="detailsDescription" style="color: rgba(255,255,255,0.8); line-height: 1.6; font-size: 0.95rem;"></p>
+                    </div>
+
+                    <div id="detailsCargaContainer" style="margin-bottom: 25px;">
+                        <h3 style="color: var(--neon-blue); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Información de Carga</h3>
+                        <div style="display: flex; gap: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="flex: 1;">
+                                <small style="color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">CARGA ÚTIL</small>
+                                <span id="detailsPayload" style="color: #fff; font-weight: 500;"></span>
+                            </div>
+                            <div style="flex: 1;">
+                                <small style="color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">DESTINO</small>
+                                <span id="detailsDestination" style="color: #fff; font-weight: 500;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="detailsCrewContainer" style="display: none; margin-bottom: 25px;">
+                        <h3 style="color: var(--neon-red); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Tripulación</h3>
+                        <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,51,51,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,51,51,0.1);">
+                            <i class="fas fa-user-astronaut" style="color: var(--neon-red); font-size: 1.5rem;"></i>
+                            <span id="detailsCrew" style="color: #fff; font-weight: 500;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-sidebar" style="border-left: 1px solid rgba(255,255,255,0.05); padding-left: 30px;">
+                    <div style="margin-bottom: 20px;">
+                        <small style="color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">FECHA Y HORA</small>
+                        <span id="detailsDateTime" style="color: #fff; font-weight: 500; display: block; margin-bottom: 4px;"></span>
+                        <small id="detailsTimeType" style="color: rgba(0,212,255,0.6);"></small>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <small style="color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">VEHÍCULO</small>
+                        <span id="detailsVehicle" style="color: #fff; font-weight: 500; display: block;"></span>
+                        <small id="detailsBooster" style="color: rgba(255,255,255,0.5);"></small>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <small style="color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">PROVEEDOR</small>
+                        <span id="detailsProvider" style="color: #fff; font-weight: 500;"></span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <small style="color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">LUGAR DE LANZAMIENTO</small>
+                        <span id="detailsLocation" style="color: #fff; font-weight: 500; font-size: 0.9rem;"></span>
+                    </div>
+
+                    <div id="detailsLandingContainer" style="margin-bottom: 20px; display: none;">
+                        <small style="color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">ATERRIZAJE</small>
+                        <span id="detailsLanding" style="color: #fff; font-weight: 500;"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -520,7 +596,67 @@
         const cM = safeGet('closeModal'); if (cM) cM.onclick = () => safeGet('loginModal')?.classList.remove('active');
         const cP = safeGet('closeProfileModal'); if (cP) cP.onclick = () => safeGet('profileModal')?.classList.remove('active');
         setupModal('contactBtn', 'contactModal', 'closeContactModal');
+        
+        // Close for both detail modals
+        const cDD = safeGet('closeDayDetailsModal'); if (cDD) cDD.onclick = () => safeGet('dayDetailsModal')?.classList.remove('active');
         const cD = safeGet('closeDetailsModal'); if (cD) cD.onclick = () => safeGet('missionDetailsModal')?.classList.remove('active');
+
+        window.viewMissionDetails = (m) => {
+            if (!m) return;
+            const modal = safeGet('missionDetailsModal');
+            const statusMap = { 'success': 'COMPLETADA', 'upcoming': 'PRÓXIMA', 'failed': 'FALLIDA' };
+            const statusColors = { 'success': 'var(--neon-green)', 'upcoming': 'var(--neon-orange)', 'failed': 'var(--neon-red)' };
+
+            let imgs = m.images || []; if (typeof imgs === 'object' && !Array.isArray(imgs)) imgs = Object.values(imgs);
+            safeGet('detailsHero').style.backgroundImage = `url(${imgs[0] || 'https://via.placeholder.com/800x600?text=Mission'})`;
+            safeGet('detailsTitle').textContent = m.title || m.name || 'Misión Programada';
+            
+            const badge = safeGet('detailsStatusBadge');
+            badge.textContent = statusMap[m.status] || m.status.toUpperCase();
+            badge.style.background = statusColors[m.status] || 'rgba(0,212,255,0.2)';
+            badge.style.color = m.status === 'upcoming' ? '#000' : '#fff';
+
+            const descCont = safeGet('detailsDescriptionContainer');
+            if (m.description) {
+                descCont.style.display = 'block';
+                safeGet('detailsDescription').textContent = m.description;
+            } else descCont.style.display = 'none';
+
+            const cargaCont = safeGet('detailsCargaContainer');
+            if (m.payload || m.destination) {
+                cargaCont.style.display = 'block';
+                safeGet('detailsPayload').textContent = m.payload || 'No especificada';
+                safeGet('detailsDestination').textContent = m.destination || 'No especificado';
+            } else cargaCont.style.display = 'none';
+
+            const crewCont = safeGet('detailsCrewContainer');
+            if (m.isManned && m.crew) {
+                crewCont.style.display = 'block';
+                safeGet('detailsCrew').textContent = m.crew;
+            } else crewCont.style.display = 'none';
+
+            let dateObj;
+            if ((m.date || "").includes('/')) {
+                const [d, mon, y] = m.date.split('/');
+                dateObj = new Date(`${y}-${mon}-${d}T${m.time || '00:00'}:00Z`);
+            } else dateObj = new Date(`${m.date}T${m.time || '00:00'}:00Z`);
+            
+            safeGet('detailsDateTime').textContent = isNaN(dateObj.getTime()) ? (m.date + ' ' + m.time) : (dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}));
+            safeGet('detailsTimeType').textContent = '(Hora Local)';
+            
+            safeGet('detailsVehicle').textContent = m.vehicle || 'Vehículo J.S.A.';
+            safeGet('detailsBooster').textContent = m.booster ? `Booster: ${m.booster}` : '';
+            safeGet('detailsProvider').textContent = m.provider || 'EsZunSpace';
+            safeGet('detailsLocation').textContent = m.location || 'Sin ubicación';
+
+            const landCont = safeGet('detailsLandingContainer');
+            if (m.landing) {
+                landCont.style.display = 'block';
+                safeGet('detailsLanding').textContent = m.landing;
+            } else landCont.style.display = 'none';
+
+            modal?.classList.add('active');
+        };
 
         // Toggle Login/Register
         const tL = safeGet('toggleLink');
@@ -671,7 +807,10 @@
                     daily.forEach(m => list.appendChild(Object.assign(document.createElement('div'), { className: `event-tag ${m.status}`, textContent: m.title })));
                 }
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                div.onclick = () => showDayDetails(dateStr, daily);
+                div.onclick = () => {
+                    if (daily.length === 1) window.viewMissionDetails(daily[0]);
+                    else showDayDetails(dateStr, daily);
+                };
                 grid.appendChild(div);
             }
         }
@@ -699,7 +838,9 @@
                     <h3 class="card-mission-name">${m.title}</h3>
                     ${m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : ''}
                 ` }));
-                card.onclick = () => showDayDetails(m.date, [m]);
+                card.onclick = () => {
+                    if (window.viewMissionDetails) window.viewMissionDetails(m);
+                };
             });
             updateSidebarCountdowns(upcoming);
         }
@@ -735,6 +876,7 @@
             safeGet('detailsDateText').textContent = new Date(date + 'T12:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
             const list = safeGet('dayMissionsList'); if (!list) return;
             list.innerHTML = missions.length ? '' : '<p style="text-align:center; color:rgba(255,255,255,0.5);">Sin misiones programadas para este día.</p>';
+            
             missions.forEach(m => {
                 let dObj;
                 const dStr = m.date || "";
@@ -748,17 +890,27 @@
                 const localTime = dObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
                 const missionTitle = m.title || m.name || 'Misión Programada';
                 const vehicleName = m.vehicle || m.provider || 'Vehículo J.S.A.';
-                list.appendChild(Object.assign(document.createElement('div'), {
-                    className: `mission-card`, style: 'padding:15px; background:rgba(255,107,53,0.05); border-radius:10px; border-left:4px solid var(--neon-orange);', innerHTML: `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h3 style="color:#fff; font-family:var(--font-heading); font-size:1rem;">${missionTitle}</h3>
-                        <span class="event-tag ${m.status}">${m.status.toUpperCase()}</span>
+                
+                let imgs = m.images || []; 
+                if (typeof imgs === 'object' && !Array.isArray(imgs)) imgs = Object.values(imgs);
+                
+                const div = list.appendChild(Object.assign(document.createElement('div'), {
+                    className: 'event-details-card',
+                    style: 'display: flex; gap: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; cursor: pointer; transition: background 0.2s; border: 1px solid rgba(255,255,255,0.05);',
+                    innerHTML: `
+                    <div style="width: 70px; height: 50px; background-size: cover; background-position: center; border-radius: 4px; background-image: url(${imgs[0] || 'https://via.placeholder.com/100x100?text=Mission'})"></div>
+                    <div style="flex: 1;">
+                        <div style="color: var(--neon-orange); font-size: 0.7rem; font-family: 'Orbitron';">${localTime}</div>
+                        <h4 style="margin: 3px 0; color: #fff; font-size: 0.9rem; font-family: 'Orbitron';">${missionTitle}</h4>
+                        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5);">${vehicleName}</div>
                     </div>
-                    <p style="font-size:0.85rem; margin-top:10px; color:rgba(255,255,255,0.6);"><i class="fas fa-rocket"></i> ${vehicleName} | <i class="fas fa-map-marker-alt"></i> ${m.location || 'Sin ubicación'}</p>
-                    ${(m.status === 'upcoming' && m.showCountdown !== false) ? `<div style="margin-top:10px; font-weight:bold; color:var(--neon-orange);">Hora Local: ${localTime}</div>` : ''}
                 ` }));
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    window.viewMissionDetails(m);
+                };
             });
-            safeGet('missionDetailsModal').classList.add('active');
+            safeGet('dayDetailsModal').classList.add('active');
         }
 
         // Transitions & Loader (Reliable Fix)
