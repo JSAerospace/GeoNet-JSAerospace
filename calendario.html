@@ -789,9 +789,16 @@
             safeGet('detailsTitle').textContent = m.title || m.name || 'Misión Programada';
             
             const badge = safeGet('detailsStatusBadge');
-            badge.textContent = statusMap[m.status] || m.status.toUpperCase();
-            badge.style.background = statusColors[m.status] || 'rgba(0,212,255,0.2)';
-            badge.style.color = m.status === 'upcoming' ? '#000' : '#fff';
+            const sCol = statusColors[m.status] || 'var(--primary-color)';
+            badge.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px; padding:6px 15px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:20px;">
+                    <span style="width:8px; height:8px; border-radius:50%; background:${sCol}; box-shadow: 0 0 10px ${sCol}; ${m.status === 'in_flight' ? 'animation: pulse-active 2s infinite;' : ''}"></span>
+                    <span style="color:${sCol}; font-family:'Orbitron'; font-size:0.75rem; letter-spacing:2px; font-weight:700; line-height:1;">${(statusMap[m.status] || m.status).toUpperCase()}</span>
+                    ${m.status === 'success' ? '<i class="fas fa-check-circle" style="color:var(--neon-green); font-size:0.9rem; margin-left:5px;"></i>' : ''}
+                    ${m.status === 'failed' ? '<i class="fas fa-times-circle" style="color:var(--neon-red); font-size:0.9rem; margin-left:5px;"></i>' : ''}
+                </div>`;
+            badge.style.background = 'none';
+            badge.style.padding = '0';
 
             // Main Info
             const descCont = safeGet('detailsDescriptionContainer');
@@ -1034,10 +1041,14 @@
                 } else {
                     dObj = new Date(`${dStr}T${tStr}:00`);
                 }
-                const card = list.appendChild(Object.assign(document.createElement('div'), {
+                card.appendChild(Object.assign(document.createElement('div'), {
                     className: 'upcoming-card', innerHTML: `
                     <div class="card-date-badge">${dObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }).toUpperCase()}</div>
                     <h3 class="card-mission-name">${m.title}</h3>
+                    <div class="sidebar-status" style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; box-shadow: 0 0 8px ${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'};"></span>
+                        <span style="font-size:0.6rem; font-family:'Orbitron'; color:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; letter-spacing:1px;">${m.status === 'in_flight' ? 'EN VUELO' : 'PRÓXIMA'}</span>
+                    </div>
                     ${m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : ''}
                 ` }));
                 card.onclick = () => {
@@ -1062,14 +1073,16 @@
                     } else {
                         dObj = new Date(`${dStr}T${tStr}:00Z`);
                     }
-                    const diff = dObj - new Date();
-                    const missionTitle = m.title || m.name || 'Misión Programada';
-                    const el = safeGet(`sb-timer-${idFriendly(missionTitle)}`);
-                    if (!el) return;
                     if (diff > 0) {
-                        const d = Math.floor(diff / 864e5), h = Math.floor(diff % 864e5 / 36e5), m_ = Math.floor(diff % 36e5 / 6e4), s = Math.floor(diff % 6e4 / 1e3);
+                        const d = Math.floor(totalSecs / 86400), h = Math.floor(totalSecs % 86400 / 3600), m_ = Math.floor(totalSecs % 3600 / 60), s = totalSecs % 60;
                         el.innerHTML = `<div class="sb-countdown-item"><span class="sb-val">${d}</span><span class="sb-label">D</span></div><div class="sb-countdown-item"><span class="sb-val">${h}</span><span class="sb-label">H</span></div><div class="sb-countdown-item"><span class="sb-val">${m_}</span><span class="sb-label">M</span></div><div class="sb-countdown-item"><span class="sb-val">${s}</span><span class="sb-label">S</span></div>`;
-                    } else el.innerHTML = '<div style="color:var(--neon-green); font-weight:bold; grid-column: span 4;">EL CURSO DEL LANZAMIENTO</div>';
+                    } else {
+                        const totalSecs = Math.floor(Math.abs(diff) / 1000);
+                        const d = Math.floor(totalSecs / 86400), h = Math.floor(totalSecs % 86400 / 3600), m_ = Math.floor(totalSecs % 3600 / 60), s = totalSecs % 60;
+                        el.innerHTML = `<div style="grid-column: span 4; display:flex; gap:5px; align-items:center; justify-content:center; color:var(--neon-green); font-family:'Orbitron'; font-size:0.8rem;">
+                            <span style="opacity:0.6;">T+</span> <span>${d > 0 ? d + 'd' : ''} ${String(h).padStart(2, '0')}:${String(m_).padStart(2, '0')}:${String(s).padStart(2, '0')}</span>
+                        </div>`;
+                    }
                 });
             }, 1000);
         }
