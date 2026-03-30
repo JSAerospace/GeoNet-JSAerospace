@@ -2131,20 +2131,23 @@
                         </div>
                     </div>
                     <div class="mission-card-footer" style="padding: 20px; margin-top:auto; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);">
-                        <div class="card-status" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: ${(m.status === 'upcoming' || m.status === 'in_flight') && m.showCountdown !== false ? '15px' : '0'};">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="status-indicator ${m.status === 'in_flight' ? 'pulse-active' : ''}" style="width: 8px; height: 8px; border-radius: 50%; background: ${STATUS_COLORS[m.status] || 'var(--primary-color)'}; box-shadow: 0 0 10px ${STATUS_COLORS[m.status] || 'var(--primary-color)'};"></span>
-                                <span class="card-status-text" style="color: ${STATUS_COLORS[m.status] || 'var(--primary-color)'}; font-family: var(--font-heading); font-size: 0.75rem; letter-spacing: 2px; font-weight: 700;">${(STATUS_MAP[m.status] || m.status).toUpperCase()}</span>
-                            </div>
-                            ${m.status === 'success' ? '<i class="fas fa-check-circle" style="color: var(--neon-green); font-size: 0.9rem;"></i>' : ''}
-                            ${m.status === 'failed' ? '<i class="fas fa-times-circle" style="color: var(--neon-red); font-size: 0.9rem;"></i>' : ''}
-                        </div>
                         ${(m.status === 'upcoming' || m.status === 'in_flight') && m.showCountdown !== false ? `
-                            <div class="card-countdown" style="padding: 10px; background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.1); border-radius: 8px; text-align: center;">
-                                <div style="font-size:0.6rem; text-transform:uppercase; color:var(--neon-orange); margin-bottom:5px; letter-spacing: 1px;">${m.status === 'in_flight' ? 'Tiempo en vuelo' : 'Cuenta Regresiva'}</div>
-                                <div class="countdown-container" style="font-family:var(--font-heading); font-size: 1.1rem; color:#fff;" data-target="${targetTimestamp}">00:00:00</div>
+                            <div class="active-status-container" style="background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.1); border-radius: 12px; padding: 15px; text-align: center;">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
+                                    <span class="status-indicator ${m.status === 'in_flight' ? 'pulse-active' : ''}" style="width: 8px; height: 8px; border-radius: 50%; background: ${STATUS_COLORS[m.status]}; box-shadow: 0 0 10px ${STATUS_COLORS[m.status]}; display: inline-block;"></span>
+                                    <span class="card-status-text" style="color: ${STATUS_COLORS[m.status]}; font-family: var(--font-heading); font-size: 0.7rem; letter-spacing: 2px; font-weight: 700; line-height: 1; margin: 0; padding: 0;">${(STATUS_MAP[m.status] || m.status).toUpperCase()}</span>
+                                </div>
+                                <div style="font-size:0.55rem; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px; letter-spacing: 1px;">${m.status === 'in_flight' ? 'Tiempo en vuelo' : 'Cuenta Regresiva'}</div>
+                                <div class="countdown-container" style="font-family:var(--font-heading); font-size: 1.2rem; color:#fff; line-height: 1;" data-target="${targetTimestamp}">00:00:00</div>
                             </div>
-                        ` : ''}
+                        ` : `
+                            <div class="card-status" style="display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 12px;">
+                                <span class="status-indicator" style="width: 8px; height: 8px; border-radius: 50%; background: ${STATUS_COLORS[m.status] || 'var(--primary-color)'}; box-shadow: 0 0 10px ${STATUS_COLORS[m.status] || 'var(--primary-color)'}; display: inline-block;"></span>
+                                <span class="card-status-text" style="color: ${STATUS_COLORS[m.status] || 'var(--primary-color)'}; font-family: var(--font-heading); font-size: 0.8rem; letter-spacing: 2px; font-weight: 700; line-height: 1; margin: 0; padding: 0;">${(STATUS_MAP[m.status] || m.status).toUpperCase()}</span>
+                                ${m.status === 'success' ? `<i class="fas fa-check-circle" style="color: var(--neon-green); font-size: 0.9rem; line-height: 1; display: flex; align-items: center;"></i>` : ''}
+                                ${m.status === 'failed' ? `<i class="fas fa-times-circle" style="color: var(--neon-red); font-size: 0.9rem; line-height: 1; display: flex; align-items: center;"></i>` : ''}
+                            </div>
+                        `}
                     </div>`;
                 
                 card.onclick = () => window.viewMissionDetails(id);
@@ -2385,26 +2388,14 @@
                     
                     // Auto-transition to EN VUELO only if it was PRÓXIMA
                     if (m.status === 'upcoming') {
-                        // Update UI immediately (Local visual only, then DB confirmed)
-                        if (pill) {
-                            pill.innerText = STATUS_MAP['in_flight'];
-                            pill.style.color = STATUS_COLORS['in_flight'];
-                        }
-                        if (indicator) {
-                            indicator.style.background = STATUS_COLORS['in_flight'];
-                            indicator.classList.add('pulse-active'); 
-                        }
-
-                        // If Admin, update Database to make it permanent
-                        if (isAdmin && id) {
-                            if (!m._autoUpdated) {
-                                m._autoUpdated = true; // Local flag to prevent repeat calls in current session
-                                update(ref(database, 'missions/' + id), { status: 'in_flight' })
-                                    .catch(err => console.error("Error auto-updating mission status:", err));
-                            }
+                        // For auto-update we just trigger a data refresh from Firebase 
+                        // by updating the DB. The onValue listener will handle re-rendering.
+                        if (isAdmin && id && !m._autoUpdated) {
+                            m._autoUpdated = true;
+                            update(ref(database, 'missions/' + id), { status: 'in_flight' })
+                                .catch(err => console.error("Error auto-updating mission status:", err));
                         }
                     }
-
                 }
             });
         }
