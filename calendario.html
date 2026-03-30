@@ -362,6 +362,11 @@
             display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .gallery-nav {
             position: absolute;
             top: 50%;
@@ -381,13 +386,41 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            cursor: pointer;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            cursor: pointer;
             pointer-events: auto;
-            transition: all 0.2s;
-            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .gallery-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 5;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #fff;
+            transform: scale(1.2);
         }
 
         .gallery-btn:hover {
@@ -781,14 +814,11 @@
                 const imgEl = document.createElement('img');
                 imgEl.src = img;
                 imgEl.className = `gallery-img ${idx === 0 ? 'active' : ''}`;
-                imgEl.style.cssText = 'width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s;';
-                if(idx === 0) imgEl.style.opacity = '1';
                 imgEl.onerror = () => { imgEl.src = 'https://via.placeholder.com/800x600?text=Imagen+no+disponible'; };
                 tracks.appendChild(imgEl);
                 
                 const dot = document.createElement('div');
                 dot.className = `dot ${idx === 0 ? 'active' : ''}`;
-                dot.style.cssText = 'width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer;';
                 dot.onclick = () => showGalleryImage(idx);
                 dots.appendChild(dot);
             });
@@ -859,8 +889,8 @@
             const imgs = document.querySelectorAll('#galleryTracks .gallery-img');
             const dots = document.querySelectorAll('#galleryDots .dot');
             
-            imgs.forEach((img, i) => img.style.opacity = (i === index ? '1' : '0'));
-            dots.forEach((dot, i) => dot.style.background = (i === index ? '#fff' : 'rgba(255,255,255,0.3)'));
+            imgs.forEach((img, i) => img.classList.toggle('active', i === index));
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
         }
 
         safeGet('prevGallery').onclick = (e) => {
