@@ -137,6 +137,16 @@
             opacity: 0.7;
         }
 
+        @keyframes pulse-active {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 10px var(--neon-blue); }
+            50% { transform: scale(1.2); opacity: 0.8; box-shadow: 0 0 20px var(--neon-blue); }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 10px var(--neon-blue); }
+        }
+
+        .pulse-active {
+            animation: pulse-active 2s infinite;
+        }
+
         .calendar-wrapper {
             flex-grow: 1;
             background: rgba(255, 255, 255, 0.03);
@@ -998,18 +1008,20 @@
                 div.innerHTML = `<span class="day-number">${d}</span>`;
 
                 const currentGridDate = new Date(year, month, d).toDateString();
-                const daily = Object.values(missionsData).filter(m => {
-                    let dObj;
-                    const dStr = m.date || "";
-                    const tStr = m.time || "00:00";
-                    if (dStr.includes('/')) {
-                        const [d, mon, y] = dStr.split('/');
-                        dObj = new Date(`${y}-${mon}-${d}T${tStr}:00Z`);
-                    } else {
-                        dObj = new Date(`${dStr}T${tStr}:00Z`);
-                    }
-                    return dObj.toDateString() === currentGridDate;
-                });
+                const daily = Object.entries(missionsData)
+                    .map(([id, data]) => ({ id, ...data }))
+                    .filter(m => {
+                        let dObj;
+                        const dStr = m.date || "";
+                        const tStr = m.time || "00:00";
+                        if (dStr.includes('/')) {
+                            const [d, mon, y] = dStr.split('/');
+                            dObj = new Date(`${y}-${mon}-${d}T${tStr}:00Z`);
+                        } else {
+                            dObj = new Date(`${dStr}T${tStr}:00Z`);
+                        }
+                        return dObj.toDateString() === currentGridDate;
+                    });
 
                 if (daily.length) {
                     const list = div.appendChild(Object.assign(document.createElement('div'), { className: 'event-list', style: 'margin-top:5px;' }));
@@ -1017,7 +1029,7 @@
                 }
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 div.onclick = () => {
-                    if (daily.length === 1) window.viewMissionDetails(daily[0]);
+                    if (daily.length === 1) window.viewMissionDetails(daily[0].id);
                     else showDayDetails(dateStr, daily);
                 };
                 grid.appendChild(div);
@@ -1029,31 +1041,43 @@
 
         function renderSidebar() {
             const list = safeGet('sidebarUpcomingList'); if (!list) return;
-            const upcoming = Object.values(missionsData).filter(m => m.status === 'upcoming').sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 4);
-            list.innerHTML = upcoming.length ? '' : '<p style="color:rgba(255,255,255,0.4); text-align:center;">No hay próximos lanzamientos.</p>';
+            const upcoming = Object.entries(missionsData)
+                .map(([id, data]) => ({ id, ...data }))
+                .filter(m => m.status === 'upcoming' || m.status === 'in_flight')
+                .sort((a, b) => {
+                    let da, db;
+                    if ((a.date||"").includes('/')) { const [d,m,y]=a.date.split('/'); da=new Date(`${y}-${m}-${d}T${a.time||'00:00'}:00Z`); } else da=new Date(`${a.date}T${a.time||'00:00'}:00Z`);
+                    if ((b.date||"").includes('/')) { const [d,m,y]=b.date.split('/'); db=new Date(`${y}-${m}-${d}T${b.time||'00:00'}:00Z`); } else db=new Date(`${b.date}T${b.time||'00:00'}:00Z`);
+                    return da - db;
+                }).slice(0, 4);
+
+            list.innerHTML = upcoming.length ? '' : '<p style="color:rgba(255,255,255,0.4); text-align:center;">No hay lanzamientos activos.</p>';
+            
             upcoming.forEach(m => {
                 let dObj;
                 const dStr = m.date || "";
                 const tStr = m.time || "00:00";
                 if (dStr.includes('/')) {
                     const [d, mon, y] = dStr.split('/');
-                    dObj = new Date(`${y}-${mon}-${d}T${tStr}:00`);
+                    dObj = new Date(`${y}-${mon}-${d}T${tStr}:00Z`);
                 } else {
-                    dObj = new Date(`${dStr}T${tStr}:00`);
+                    dObj = new Date(`${dStr}T${tStr}:00Z`);
                 }
-                card.appendChild(Object.assign(document.createElement('div'), {
-                    className: 'upcoming-card', innerHTML: `
-                    <div class="card-date-badge">${dObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }).toUpperCase()}</div>
+                
+                const card = document.createElement('div');
+                card.className = 'upcoming-card';
+                card.style.borderLeftColor = m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)';
+                card.innerHTML = `
+                    <div class="card-date-badge" style="color:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}">${dObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }).toUpperCase()}</div>
                     <h3 class="card-mission-name">${m.title}</h3>
                     <div class="sidebar-status" style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                        <span style="width:6px; height:6px; border-radius:50%; background:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; box-shadow: 0 0 8px ${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'};"></span>
-                        <span style="font-size:0.6rem; font-family:'Orbitron'; color:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; letter-spacing:1px;">${m.status === 'in_flight' ? 'EN VUELO' : 'PRÓXIMA'}</span>
+                        <span style="width:6px; height:6px; border-radius:50%; background:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; box-shadow: 0 0 8px ${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; ${m.status === 'in_flight' ? 'animation: pulse-active 2s infinite;' : ''}"></span>
+                        <span style="font-size:0.6rem; font-family:'Orbitron'; color:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; letter-spacing:1px;">${(m.status === 'in_flight' ? 'EN VUELO' : 'PRÓXIMA')}</span>
                     </div>
                     ${m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : ''}
-                ` }));
-                card.onclick = () => {
-                    if (window.viewMissionDetails) window.viewMissionDetails(m);
-                };
+                `;
+                card.onclick = () => window.viewMissionDetails(m.id);
+                list.appendChild(card);
             });
             updateSidebarCountdowns(upcoming);
         }
@@ -1073,11 +1097,18 @@
                     } else {
                         dObj = new Date(`${dStr}T${tStr}:00Z`);
                     }
+                    const diff = dObj - new Date();
+                    const missionTitle = m.title || m.name || 'Misión Programada';
+                    const el = safeGet(`sb-timer-${idFriendly(missionTitle)}`);
+                    if (!el) return;
+                    
+                    const absDiff = Math.abs(diff);
+                    const totalSecs = Math.floor(absDiff / 1000);
+
                     if (diff > 0) {
                         const d = Math.floor(totalSecs / 86400), h = Math.floor(totalSecs % 86400 / 3600), m_ = Math.floor(totalSecs % 3600 / 60), s = totalSecs % 60;
                         el.innerHTML = `<div class="sb-countdown-item"><span class="sb-val">${d}</span><span class="sb-label">D</span></div><div class="sb-countdown-item"><span class="sb-val">${h}</span><span class="sb-label">H</span></div><div class="sb-countdown-item"><span class="sb-val">${m_}</span><span class="sb-label">M</span></div><div class="sb-countdown-item"><span class="sb-val">${s}</span><span class="sb-label">S</span></div>`;
                     } else {
-                        const totalSecs = Math.floor(Math.abs(diff) / 1000);
                         const d = Math.floor(totalSecs / 86400), h = Math.floor(totalSecs % 86400 / 3600), m_ = Math.floor(totalSecs % 3600 / 60), s = totalSecs % 60;
                         el.innerHTML = `<div style="grid-column: span 4; display:flex; gap:5px; align-items:center; justify-content:center; color:var(--neon-green); font-family:'Orbitron'; font-size:0.8rem;">
                             <span style="opacity:0.6;">T+</span> <span>${d > 0 ? d + 'd' : ''} ${String(h).padStart(2, '0')}:${String(m_).padStart(2, '0')}:${String(s).padStart(2, '0')}</span>
@@ -1122,7 +1153,7 @@
                 ` }));
                 div.onclick = (e) => {
                     e.stopPropagation();
-                    window.viewMissionDetails(m);
+                    window.viewMissionDetails(m.id);
                 };
             });
             safeGet('dayDetailsModal').classList.add('active');
