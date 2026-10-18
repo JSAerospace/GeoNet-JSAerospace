@@ -232,7 +232,10 @@
 
         /* Next Mission Ticker (Ezsunspace style) */
         .next-mission-ticker {
-            display: none;
+            display: inline-flex;
+            /* Espacio SIEMPRE reservado: usar visibilidad, no display, para que
+               al aparecer el ticker de próxima misión no desplace y corte la galería */
+            visibility: hidden;
             align-items: center;
             gap: 12px;
             background: rgba(255, 255, 255, 0.06);
@@ -969,7 +972,7 @@
             <div class="hero-bg-rotate"></div>
             <div class="hero-content">
                 <!-- Next Mission Ticker -->
-                <a href="calendario.html" id="homepage-next-launch-ticker" class="next-mission-ticker" style="display: none;">
+                <a href="calendario.html" id="homepage-next-launch-ticker" class="next-mission-ticker" style="visibility: hidden;">
                     <span class="ticker-label">PRÓXIMA MISIÓN</span>
                     <span id="homepage-next-launch-mission" class="ticker-mission-name"></span>
                     <span id="homepage-next-launch-net" class="net-badge" style="display: none;">NET</span>
@@ -1629,7 +1632,7 @@
                 clearInterval(countdownTimer);
                 countdownTimer = null;
             }
-            if (tickerEl) tickerEl.style.display = 'none';
+            if (tickerEl) tickerEl.style.visibility = 'hidden';
             const tickerNetEl = document.getElementById('homepage-next-launch-net');
             if (tickerNetEl) tickerNetEl.style.display = 'none';
         }
@@ -1708,7 +1711,7 @@
                     tickerNet.textContent = 'NET';
                     tickerNet.title = closestMission.net ? (closestMission.netNote || 'No Earlier Than: la fecha puede moverse') : '';
                 }
-                if (tickerEl) tickerEl.style.display = 'inline-flex';
+                if (tickerEl) tickerEl.style.visibility = 'visible';
                 updateCountdown();
                 if (!countdownTimer) {
                     countdownTimer = setInterval(updateCountdown, 1000);
