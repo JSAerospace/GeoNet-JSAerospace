@@ -110,6 +110,7 @@
             justify-content: flex-start;
             padding-left: 10vw;
             padding-right: 10vw;
+            padding-top: 100px;
             box-sizing: border-box;
         }
 
@@ -231,7 +232,7 @@
 
         /* Next Mission Ticker (Ezsunspace style) */
         .next-mission-ticker {
-            display: inline-flex;
+            display: none;
             align-items: center;
             gap: 12px;
             background: rgba(255, 255, 255, 0.06);
@@ -240,6 +241,7 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 8px 18px;
             border-radius: 40px;
+            margin-top: 15px;
             margin-bottom: 24px;
             animation: fadeInDown 0.8s ease-out;
             cursor: pointer;
@@ -345,7 +347,7 @@
                 padding-right: 20px;
                 height: auto !important;
                 min-height: 100svh;
-                padding-top: 85px;
+                padding-top: 95px;
                 padding-bottom: 40px;
             }
 
@@ -375,6 +377,7 @@
                 flex-wrap: wrap;
                 gap: 8px;
                 padding: 6px 12px;
+                margin-top: 10px;
                 margin-bottom: 18px;
             }
 
@@ -965,10 +968,10 @@
             <div class="hero-bg-rotate"></div>
             <div class="hero-content">
                 <!-- Next Mission Ticker -->
-                <a href="calendario.html" id="homepage-next-launch-ticker" class="next-mission-ticker">
+                <a href="calendario.html" id="homepage-next-launch-ticker" class="next-mission-ticker" style="display: none;">
                     <span class="ticker-label">PRÓXIMA MISIÓN</span>
-                    <span id="homepage-next-launch-mission" class="ticker-mission-name">TOMCAT IFT</span>
-                    <span id="homepage-next-launch-countdown" class="ticker-countdown">T- 00:00:00</span>
+                    <span id="homepage-next-launch-mission" class="ticker-mission-name"></span>
+                    <span id="homepage-next-launch-countdown" class="ticker-countdown"></span>
                 </a>
 
                 <div class="hero-subtitle">TOMCAT / COHETE INSIGNIA</div>
@@ -1583,41 +1586,51 @@
         });
 
         // --- TICKER COUNTDOWN & FIREBASE MISSIONS ---
+        const tickerEl = document.getElementById('homepage-next-launch-ticker');
         const tickerMission = document.getElementById('homepage-next-launch-mission');
         const tickerCountdown = document.getElementById('homepage-next-launch-countdown');
 
-        let targetLaunchDate = new Date(Date.now() + 4 * 24 * 3600 * 1000 + 12 * 3600 * 1000); // fallback: ~4 days
+        let targetLaunchDate = null;
+        let countdownTimer = null;
 
-        onValue(ref(database, 'missions'), (snapshot) => {
-            if (snapshot.exists()) {
-                const missions = snapshot.val();
-                let closestDate = null;
-                let closestMission = null;
-                const now = new Date();
-
-                Object.values(missions).forEach(m => {
-                    if (m.date) {
-                        const mDate = new Date(m.date);
-                        if (mDate > now && (!closestDate || mDate < closestDate)) {
-                            closestDate = mDate;
-                            closestMission = m;
-                        }
-                    }
-                });
-
-                if (closestMission && closestDate) {
-                    targetLaunchDate = closestDate;
-                    if (tickerMission) tickerMission.textContent = (closestMission.title || closestMission.name || 'TRANSPORTER-1').toUpperCase();
+        function parseLaunchDate(m) {
+            if (!m || !m.date) return null;
+            const dStr = String(m.date).trim();
+            const tStr = String(m.time || '00:00').trim();
+            let dObj = null;
+            if (dStr.includes('/')) {
+                const parts = dStr.split('/');
+                if (parts.length === 3) {
+                    const [d, mon, y] = parts;
+                    dObj = new Date(`${y}-${mon.padStart(2, '0')}-${d.padStart(2, '0')}T${tStr.length === 5 ? tStr : '00:00'}:00Z`);
                 }
+            } else if (dStr.includes('-')) {
+                dObj = new Date(`${dStr}T${tStr.length === 5 ? tStr : '00:00'}:00Z`);
+            } else {
+                dObj = new Date(dStr);
             }
-        });
+            return (dObj && !isNaN(dObj.getTime())) ? dObj : null;
+        }
+
+        function hideTicker() {
+            targetLaunchDate = null;
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            if (tickerEl) tickerEl.style.display = 'none';
+        }
 
         function updateCountdown() {
-            const now = new Date().getTime();
+            if (!targetLaunchDate) {
+                hideTicker();
+                return;
+            }
+            const now = Date.now();
             const distance = targetLaunchDate.getTime() - now;
 
-            if (distance < 0) {
-                if (tickerCountdown) tickerCountdown.textContent = 'T- 00:00:00 (Lanzado)';
+            if (distance <= 0) {
+                hideTicker();
                 return;
             }
 
@@ -1628,15 +1641,55 @@
 
             const pad = (n) => String(n).padStart(2, '0');
 
-            if (days > 0) {
-                tickerCountdown.textContent = `T- ${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-            } else {
-                tickerCountdown.textContent = `T- ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+            if (tickerCountdown) {
+                if (days > 0) {
+                    tickerCountdown.textContent = `T- ${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+                } else {
+                    tickerCountdown.textContent = `T- ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+                }
             }
         }
 
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
+        onValue(ref(database, 'missions'), (snapshot) => {
+            if (!snapshot.exists()) {
+                hideTicker();
+                return;
+            }
+
+            const missions = snapshot.val() || {};
+            let closestDate = null;
+            let closestMission = null;
+            const now = Date.now();
+
+            Object.values(missions).forEach(m => {
+                if (!m) return;
+                const isUpcomingStatus = (m.status === 'upcoming' || m.status === 'in_flight');
+                if (!isUpcomingStatus) return;
+
+                const mDate = parseLaunchDate(m);
+                if (mDate) {
+                    const timeDiff = mDate.getTime() - now;
+                    if (timeDiff > 0 && (!closestDate || mDate.getTime() < closestDate.getTime())) {
+                        closestDate = mDate;
+                        closestMission = m;
+                    }
+                }
+            });
+
+            if (closestMission && closestDate) {
+                targetLaunchDate = closestDate;
+                if (tickerMission) {
+                    tickerMission.textContent = (closestMission.title || closestMission.name || 'MISIÓN').toUpperCase();
+                }
+                if (tickerEl) tickerEl.style.display = 'inline-flex';
+                updateCountdown();
+                if (!countdownTimer) {
+                    countdownTimer = setInterval(updateCountdown, 1000);
+                }
+            } else {
+                hideTicker();
+            }
+        });
     </script>
 
     <script src="nav-mobile.js"></script>
