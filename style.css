@@ -1143,3 +1143,50 @@ body.nav-open {
 .card-badges .status-badge {
     margin-bottom: 0 !important;
 }
+
+/* NET con precisión de año / mes / día */
+.card-date-badge.net {
+    color: var(--net-color);
+    letter-spacing: 1px;
+}
+
+.net-date-label {
+    font-family: var(--font-heading);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--net-color);
+    vertical-align: middle;
+    text-shadow: 0 0 12px rgba(255, 179, 0, 0.4);
+}
+
+.date-badge.net {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 10px;
+    border-radius: 6px;
+    background: rgba(8, 8, 18, 0.7);
+    border: 1px solid rgba(255, 179, 0, 0.55);
+    box-shadow: 0 0 14px rgba(255, 179, 0, 0.15);
+    backdrop-filter: blur(6px);
+}
+
+.date-badge.net .date-text {
+    font-family: var(--font-heading);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--net-color);
+}
+
+.net-countdown {
+    display: block !important;
+    font-family: var(--font-heading);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--net-color);
+}

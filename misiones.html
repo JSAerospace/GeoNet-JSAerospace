@@ -1438,6 +1438,18 @@
                     </small>
                 </div>
 
+                <div class="form-group" id="mNetPrecisionGroup" style="display: none;">
+                    <label for="mNetPrecision">Precisión de la fecha NET</label>
+                    <select id="mNetPrecision">
+                        <option value="year">Solo año (ej: 2027)</option>
+                        <option value="month">Año y mes (ej: NOV 2027)</option>
+                        <option value="day">Año, mes y día (fecha completa)</option>
+                    </select>
+                    <small style="display: block; margin-top: 6px; color: rgba(255,255,255,0.45); font-size: 0.72rem; line-height: 1.4;">
+                        La fecha guardada se usa para ordenar, pero solo se publica hasta la precisión elegida.
+                    </small>
+                </div>
+
                 <div class="form-group" id="mNetNoteGroup" style="display: none;">
                     <label for="mNetNote">Nota NET (opcional)</label>
                     <input type="text" id="mNetNote" placeholder="Ej: Pendiente de licencia de lanzamiento">
@@ -1611,6 +1623,9 @@
             © <span id="year">2026</span> J.S. Aerospace – Todos los derechos reservados
         </div>
     </footer>
+
+    <!-- Fechas NET -->
+    <script src="net.js"></script>
 
     <!-- Firebase SDK & Modular Logic -->
     <script type="module">
@@ -1929,6 +1944,14 @@
                 const time = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
                 const isUpcoming = (launch.status === 'upcoming' || launch.status === 'in_flight' || (!launch.status && d > now));
 
+                // NET: precisión publicada (año / año+mes / fecha completa)
+                const netPrec = window.JSANet.precisionOf(launch);
+                const netCoarse = !!launch.net && netPrec !== 'day';
+                const netTxt = launch.net ? window.JSANet.label(d, netPrec) : '';
+                const dateBadgeHtml = netCoarse
+                    ? `<div class="date-badge net"><span class="date-text">${netTxt}</span></div>`
+                    : `<div class="date-badge"><span class="date-day">${day}</span><span class="date-month">${monthShort}</span></div>`;
+
                 // Images helper — resolve bare filenames to Imagenes/ folder
                 function resolveImg(path) {
                     if (!path) return 'Imagenes/Tomcat 4.png';
@@ -1970,9 +1993,9 @@
                     hero.innerHTML = `
                         ${adminBtn}
                         <div class="hero-launch-content">
-                            <div class="hero-launch-subtitle">${launch.vehicle || 'COHETE'}${launch.net ? ' <span class="net-badge" style="margin-left: 8px;" title="No Earlier Than: la fecha puede moverse">NET</span>' : ''}</div>
+                            <div class="hero-launch-subtitle">${launch.vehicle || 'COHETE'}${launch.net ? ' <span class="net-badge" style="margin-left: 8px;" title="No Earlier Than: la fecha puede moverse">NET</span>' : ''}${netCoarse ? ` <span class="net-date-label">${netTxt}</span>` : ''}</div>
                             <h2 class="hero-launch-title">${launch.mission}</h2>
-                            <p class="hero-launch-desc">${launch.description || `Programado para el ${day} de ${monthShort} a las ${time}. Misión operada desde ${launch.location || launch.site || 'J.S. Aerospace Launch Pad'}.`}</p>
+                            <p class="hero-launch-desc">${launch.description || (netCoarse ? `Ventana NET ${netTxt}. Misión operada desde ${launch.location || launch.site || 'J.S. Aerospace Launch Pad'}.` : `Programado para el ${day} de ${monthShort} a las ${time}. Misión operada desde ${launch.location || launch.site || 'J.S. Aerospace Launch Pad'}.`)}</p>
                             <div class="hero-launch-countdown">
                                 <span class="hero-countdown-label">T-MINUS</span>
                                 <div class="hero-countdown-time" data-live-countdown="${launch.datetimeISO}">${countdownText}</div>
@@ -2011,15 +2034,12 @@
                     statusBadge = '<div class="status-badge upcoming">PROGRAMADO</div>';
                 }
 
-                const badges = `<div class="card-badges" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;">${statusBadge}${launch.net ? `<span class="net-badge" title="${escapeAttr(launch.netNote || 'No Earlier Than: la fecha puede moverse')}">NET</span>` : ''}</div>`;
+                const badges = `<div class="card-badges" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;">${statusBadge}${launch.net ? `<span class="net-badge" title="${escapeAttr(launch.netNote || 'No Earlier Than: la fecha puede moverse')}">NET${netCoarse ? ' ' + netTxt : ''}</span>` : ''}</div>`;
 
                 card.innerHTML = `
                     ${adminBtns}
                     <div class="card-content">
-                        <div class="date-badge">
-                            <span class="date-day">${day}</span>
-                            <span class="date-month">${monthShort}</span>
-                        </div>
+                        ${dateBadgeHtml}
                         <div class="rocket-mission">${launch.vehicle || 'COHETE'} <span class="separator">•</span> ${launch.mission}</div>
                         ${badges}
                         <div class="time-row"><div class="launch-time">🕒 ${time} (Local)</div></div>
@@ -2086,7 +2106,11 @@
             safeGet('detailsDestination').textContent = m.destination || m.orbit || 'No especificado';
 
             const d = m.dateObj;
-            safeGet('detailsDateTime').textContent = `${d.toLocaleDateString()} • ${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}${m.net ? ' · NET' : ''}`;
+            const netPrec = window.JSANet.precisionOf(m);
+            const netCoarse = !!m.net && netPrec !== 'day';
+            safeGet('detailsDateTime').textContent = netCoarse
+                ? `NET · ${window.JSANet.label(d, netPrec)}`
+                : `${d.toLocaleDateString()} • ${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}${m.net ? ' · NET' : ''}`;
             safeGet('detailsVehicle').textContent = m.vehicle || 'Tomcat';
             safeGet('detailsBooster').textContent = m.booster ? `Booster: ${m.booster}` : '';
             safeGet('detailsProvider').textContent = m.provider || 'J.S. Aerospace';
@@ -2159,6 +2183,8 @@
             safeGet('mStatus').value = m.status || 'upcoming';
             if (safeGet('mNet')) safeGet('mNet').checked = !!m.net;
             if (safeGet('mNetNoteGroup')) safeGet('mNetNoteGroup').style.display = m.net ? 'block' : 'none';
+            if (safeGet('mNetPrecisionGroup')) safeGet('mNetPrecisionGroup').style.display = m.net ? 'block' : 'none';
+            if (safeGet('mNetPrecision')) safeGet('mNetPrecision').value = m.netPrecision || 'day';
             if (safeGet('mNetNote')) safeGet('mNetNote').value = m.netNote || '';
             safeGet('mLocation').value = m.location || m.site || '';
             safeGet('mProvider').value = m.provider || 'J.S. Aerospace';
@@ -2203,8 +2229,10 @@
         const netCheckbox = safeGet('mNet');
         if (netCheckbox) {
             netCheckbox.onchange = () => {
-                const group = safeGet('mNetNoteGroup');
-                if (group) group.style.display = netCheckbox.checked ? 'block' : 'none';
+                const nota = safeGet('mNetNoteGroup');
+                const precision = safeGet('mNetPrecisionGroup');
+                if (nota) nota.style.display = netCheckbox.checked ? 'block' : 'none';
+                if (precision) precision.style.display = netCheckbox.checked ? 'block' : 'none';
             };
         }
 
@@ -2223,6 +2251,7 @@
                     time: safeGet('mTime').value,
                     status: safeGet('mStatus').value,
                     net: !!(safeGet('mNet') && safeGet('mNet').checked),
+                    netPrecision: (safeGet('mNet') && safeGet('mNet').checked && safeGet('mNetPrecision')) ? safeGet('mNetPrecision').value : '',
                     netNote: (safeGet('mNet') && safeGet('mNet').checked && safeGet('mNetNote')) ? safeGet('mNetNote').value.trim() : '',
                     location: safeGet('mLocation').value.trim(),
                     provider: safeGet('mProvider').value.trim(),
@@ -2245,6 +2274,7 @@
                     missionForm.reset();
                     safeGet('editingMissionId').value = '';
                     if (safeGet('mNetNoteGroup')) safeGet('mNetNoteGroup').style.display = 'none';
+                    if (safeGet('mNetPrecisionGroup')) safeGet('mNetPrecisionGroup').style.display = 'none';
                 } catch (err) {
                     alert('Error al guardar: ' + err.message);
                 }

@@ -39,10 +39,19 @@ El workflow copia la raíz del repositorio a `_site` (excluyendo `.git`, `.githu
 
 ## Fechas NET (No Earlier Than)
 
-Los lanzamientos admiten la marca **NET** (*no antes de*): la fecha es una estimación que puede deslizarse. Cada misión guarda `net: true` y, opcionalmente, `netNote` con el motivo.
+Los lanzamientos admiten la marca **NET** (*no antes de*): la fecha es una estimación que puede deslizarse. Cada misión guarda `net: true`, la precisión publicada `netPrecision` y, opcionalmente, `netNote` con el motivo.
 
-- Solo el administrador puede marcarla: en **Misiones**, el botón `NET` de cada tarjeta alterna la marca al instante, o se puede usar la casilla **Fecha NET** del formulario de edición.
-- La insignia ámbar **NET** aparece en las tarjetas y el héroe de Misiones, en el calendario (día, barra lateral y detalle) y en el contador de próxima misión de la portada.
+`netPrecision` admite tres valores:
+
+| Valor | Se publica como | Ejemplo |
+| --- | --- | --- |
+| `year` | Solo el año | `NET 2027` |
+| `month` | Año y mes | `NET MAR 2027` |
+| `day` | Año, mes y día | `27 OCT 2026` |
+
+- Solo el administrador puede marcarla: en **Misiones**, el botón `NET` de cada tarjeta alterna la marca al instante, y el formulario de edición permite elegir la **precisión** y añadir una nota.
+- La fecha guardada se usa para ordenar, pero la web solo muestra hasta la precisión elegida. Las fechas sin día confirmado no se pintan en la cuadrícula del calendario (aparecen en la lista lateral con su ventana NET) y el contador de la portada muestra la ventana en lugar de una cuenta atrás exacta.
+- La insignia ámbar **NET** aparece en las tarjetas y el héroe de Misiones, en el calendario (barra lateral y detalle) y en el contador de próxima misión de la portada.
 
 ## Autenticación y datos
 

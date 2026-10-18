@@ -1351,6 +1351,9 @@
         })();
     </script>
 
+    <!-- Fechas NET -->
+    <script src="net.js"></script>
+
     <!-- Firebase SDK & App Logic -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -1597,6 +1600,7 @@
         const tickerCountdown = document.getElementById('homepage-next-launch-countdown');
 
         let targetLaunchDate = null;
+        let targetNetLabel = null;
         let countdownTimer = null;
 
         function parseLaunchDate(m) {
@@ -1620,6 +1624,7 @@
 
         function hideTicker() {
             targetLaunchDate = null;
+            targetNetLabel = null;
             if (countdownTimer) {
                 clearInterval(countdownTimer);
                 countdownTimer = null;
@@ -1632,6 +1637,12 @@
         function updateCountdown() {
             if (!targetLaunchDate) {
                 hideTicker();
+                return;
+            }
+
+            // Fecha NET sin día confirmado: se muestra la ventana, no una cuenta atrás exacta
+            if (targetNetLabel) {
+                if (tickerCountdown) tickerCountdown.textContent = targetNetLabel;
                 return;
             }
             const now = Date.now();
@@ -1690,8 +1701,12 @@
                     tickerMission.textContent = (closestMission.title || closestMission.name || 'MISIÓN').toUpperCase();
                 }
                 const tickerNet = document.getElementById('homepage-next-launch-net');
+                const netPrec = window.JSANet.precisionOf(closestMission);
+                const netCoarse = !!closestMission.net && netPrec !== 'day';
+                targetNetLabel = netCoarse ? window.JSANet.label(closestDate, netPrec) : null;
                 if (tickerNet) {
                     tickerNet.style.display = closestMission.net ? 'inline-flex' : 'none';
+                    tickerNet.textContent = 'NET';
                     tickerNet.title = closestMission.net ? (closestMission.netNote || 'No Earlier Than: la fecha puede moverse') : '';
                 }
                 if (tickerEl) tickerEl.style.display = 'inline-flex';
