@@ -1481,11 +1481,14 @@
             .rocket-title {
                 font-family: var(--font-heading);
                 font-weight: 800;
-                font-size: clamp(40px, 6vw, 72px);
+                font-size: clamp(32px, 5vw, 64px);
                 margin: 0;
                 text-transform: uppercase;
-                letter-spacing: 0.1em;
+                letter-spacing: 0.15em;
                 color: #fff;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .rocket-tabs {
@@ -1799,7 +1802,7 @@
             <div class="rocket-hero">
                 <div class="rocket-details">
                     <span class="hero-badge">Cohete Principal</span>
-                    <h1 class="rocket-title">T O M C A T</h1>
+                    <h1 class="rocket-title">TOMCAT</h1>
 
                     <div class="rocket-tabs">
                         <button class="tab-btn active">Vehículo Completo</button>
@@ -1809,7 +1812,7 @@
                     </div>
 
                     <p class="rocket-description">
-                        Tomcat es el buque insignia y carguero superpesado de J.S. Aerospace. Diseñado para captura autónoma en torre Mechazilla, reutilización rápida al 100%, despliegue de megaconstelaciones y exploración interplanetaria.
+                        Tomcat es el buque insignia de J.S. Aerospace. Diseñado con una capacidad de 60 t a órbita baja (LEO), reutilización eficiente con aterrizaje en barcaza autónoma o Landing Zone (LZ), alta cadencia de vuelos y exploración interplanetaria.
                     </p>
 
                     <table class="specs-table">
@@ -1819,7 +1822,7 @@
                         </tr>
                         <tr>
                             <td class="spec-label">Reutilización</td>
-                            <td class="spec-value">100%<span class="unit"> (Torre Catch)</span></td>
+                            <td class="spec-value">100%<span class="unit"> (Barcaza / LZ)</span></td>
                         </tr>
                         <tr>
                             <td class="spec-label">Propelentes</td>
@@ -1827,11 +1830,11 @@
                         </tr>
                         <tr>
                             <td class="spec-label">Carga Órbita Baja</td>
-                            <td class="spec-value">150+<span class="unit">t</span></td>
+                            <td class="spec-value">60<span class="unit"> t</span></td>
                         </tr>
                         <tr>
-                            <td class="spec-label">Captura</td>
-                            <td class="spec-value">Torre Mechazilla</td>
+                            <td class="spec-label">Aterrizaje</td>
+                            <td class="spec-value">Barcaza / Landing Zone</td>
                         </tr>
                         <tr>
                             <td class="spec-label">Cadencia</td>
@@ -2422,18 +2425,18 @@ ASTRO-3_launch.png
 
         const rocketsData = {
             tomcat: {
-                title: 'T O M C A T',
+                title: 'TOMCAT',
                 badge: 'Cohete Principal',
                 image: 'Imagenes/Tomcat-Completo.png',
                 stages: {
                     'Vehículo Completo': {
-                        desc: 'Tomcat es el buque insignia y carguero superpesado de J.S. Aerospace. Diseñado para captura autónoma en torre Mechazilla, reutilización rápida al 100%, despliegue de megaconstelaciones y exploración interplanetaria.',
+                        desc: 'Tomcat es el buque insignia de J.S. Aerospace. Diseñado con una capacidad de 60 t a órbita baja (LEO), reutilización eficiente con aterrizaje en barcaza autónoma o Landing Zone (LZ), alta cadencia de vuelos y exploración interplanetaria.',
                         specs: [
                             ['Estado', 'Activo / Principal', ''],
-                            ['Reutilización', '100% (Torre Catch)', ''],
+                            ['Reutilización', '100% (Barcaza / LZ)', ''],
                             ['Propelentes', 'Metano / LOX', ''],
-                            ['Carga Órbita Baja', '150+', 't'],
-                            ['Captura', 'Torre Mechazilla', ''],
+                            ['Carga Órbita Baja', '60', 't'],
+                            ['Aterrizaje', 'Barcaza / Landing Zone', ''],
                             ['Cadencia', 'Alta Frecuencia', '']
                         ],
                         image: 'Imagenes/Tomcat-Completo.png',
@@ -2447,14 +2450,14 @@ ASTRO-3_launch.png
                         }
                     },
                     'Primera Etapa': {
-                        desc: 'El booster Tomcat proporciona el empuje colosal de despegue y realiza maniobras de retorno inmediato al sitio de lanzamiento (RTLS) para ser atrapado en pleno aire por los brazos mecánicos de la torre Mechazilla.',
+                        desc: 'El booster Tomcat proporciona el empuje colosal de despegue y realiza maniobras de retorno controlado hacia una barcaza autónoma en el océano o hacia la zona de aterrizaje terrestre (Landing Zone).',
                         image: 'Imagenes/Tomcat-Booster.png',
                         specs: [
-                            ['Etapa', 'Booster Superpesado (1ª)', ''],
-                            ['Recuperación', 'Captura en Torre (Catch)', ''],
+                            ['Etapa', 'Booster Principal (1ª)', ''],
+                            ['Recuperación', 'Barcaza / Landing Zone', ''],
                             ['Combustible', 'CH4 Líquido', ''],
                             ['Oxidante', 'LOX', ''],
-                            ['Reutilización', 'Inmediata', '']
+                            ['Reutilización', 'Alta Eficiencia', '']
                         ],
                         imgScale: 'scale(1)',
                         positions: {
