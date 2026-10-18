@@ -375,24 +375,26 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-            align-items: center;
-        }
+        @media (min-width: 901px) {
+            .nav-links {
+                display: flex;
+                list-style: none;
+                gap: 30px;
+                align-items: center;
+            }
 
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-family: var(--font-heading);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            transition: color 0.3s;
-        }
+            .nav-links a {
+                color: #fff;
+                text-decoration: none;
+                font-family: var(--font-heading);
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                transition: color 0.3s;
+            }
 
-        .nav-links a:hover {
-            color: var(--primary-color);
+            .nav-links a:hover {
+                color: var(--primary-color);
+            }
         }
 
         .logo {

@@ -858,8 +858,8 @@ p {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     z-index: 998;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -875,14 +875,26 @@ body.nav-open {
     overflow: hidden !important;
 }
 
+/* Prevenir que loaders o capas ocultas bloqueen toques */
+.page-loader.hidden,
+.page-transition-overlay:not(.active),
+.exit-overlay:not(.active) {
+    display: none !important;
+    pointer-events: none !important;
+}
+
 @media (max-width: 900px) {
     .navbar {
         padding: 12px 18px !important;
-        background: rgba(5, 5, 16, 0.92) !important;
+        background: rgba(5, 5, 16, 0.95) !important;
         backdrop-filter: blur(14px) !important;
         -webkit-backdrop-filter: blur(14px) !important;
-        border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+        border-bottom: 1px solid rgba(0, 243, 255, 0.15) !important;
         pointer-events: auto !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        z-index: 1000 !important;
     }
 
     .logo {
@@ -900,12 +912,17 @@ body.nav-open {
 
     .nav-toggle {
         display: flex !important;
+        z-index: 1002 !important;
     }
 
-    .nav-links {
+    .nav-links,
+    .navbar .nav-links,
+    ul.nav-links {
         position: fixed !important;
         top: 0 !important;
         right: -100% !important;
+        left: auto !important;
+        bottom: 0 !important;
         width: min(320px, 85vw) !important;
         height: 100vh !important;
         height: 100dvh !important;
@@ -918,44 +935,65 @@ body.nav-open {
         justify-content: flex-start !important;
         padding: 85px 22px 35px !important;
         gap: 12px !important;
+        margin: 0 !important;
+        list-style: none !important;
         transition: right 0.35s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
-        z-index: 999 !important;
+        z-index: 1001 !important;
         overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
         pointer-events: auto !important;
     }
 
-    .nav-links.open {
+    .nav-links.open,
+    .navbar .nav-links.open,
+    ul.nav-links.open {
         right: 0 !important;
     }
 
-    .nav-links li {
-        width: 100%;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        padding-bottom: 6px;
+    .nav-links li,
+    .navbar .nav-links li {
+        width: 100% !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        padding-bottom: 6px !important;
+        display: block !important;
+        margin: 0 !important;
     }
 
-    .nav-links a {
-        display: block;
+    .nav-links a,
+    .nav-links li a,
+    .navbar .nav-links a,
+    .navbar .nav-links li a {
+        display: block !important;
         font-size: 1rem !important;
-        padding: 10px 14px;
-        border-radius: 6px;
-        letter-spacing: 1px;
-        transition: all 0.25s ease;
+        padding: 10px 14px !important;
+        border-radius: 6px !important;
+        letter-spacing: 1px !important;
+        color: #fff !important;
+        text-decoration: none !important;
+        transition: all 0.25s ease !important;
+        text-transform: uppercase !important;
     }
 
     .nav-links a:hover,
-    .nav-links a.active {
-        background: rgba(0, 243, 255, 0.12);
+    .nav-links a.active,
+    .nav-links li a:hover,
+    .nav-links li a.active,
+    .navbar .nav-links a:hover,
+    .navbar .nav-links a.active,
+    .navbar .nav-links li a:hover,
+    .navbar .nav-links li a.active {
+        background: rgba(0, 243, 255, 0.12) !important;
         color: var(--primary-color) !important;
-        padding-left: 18px;
+        padding-left: 18px !important;
     }
 
-    .nav-links .auth-btn {
-        width: 100%;
-        justify-content: center;
-        padding: 12px 18px;
-        font-size: 0.95rem;
-        margin-top: 8px;
+    .nav-links .auth-btn,
+    .navbar .nav-links .auth-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 12px 18px !important;
+        font-size: 0.95rem !important;
+        margin-top: 8px !important;
     }
 
     /* Adaptación de modales en móviles */

@@ -19,7 +19,7 @@
             navbar.appendChild(navToggle);
         }
 
-        // Crear backdrop si no existe
+        // Crear backdrop si no existe en body
         let backdrop = document.querySelector('.nav-backdrop');
         if (!backdrop) {
             backdrop = document.createElement('div');
@@ -28,6 +28,9 @@
         }
 
         if (navToggle && navLinks) {
+            if (navToggle.dataset.navInitialized === 'true') return;
+            navToggle.dataset.navInitialized = 'true';
+
             const toggleMenu = function (forceState) {
                 const isOpen = typeof forceState === 'boolean' ? forceState : !navLinks.classList.contains('open');
                 navLinks.classList.toggle('open', isOpen);
@@ -47,6 +50,7 @@
 
             navToggle.addEventListener('click', function (e) {
                 e.stopPropagation();
+                e.preventDefault();
                 toggleMenu();
             });
 
@@ -75,4 +79,5 @@
     } else {
         initMobileNav();
     }
+    window.addEventListener('load', initMobileNav);
 })();
