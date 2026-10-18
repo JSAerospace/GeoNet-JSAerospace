@@ -444,10 +444,13 @@
             background: rgba(10, 10, 30, 0.95);
             border: 1px solid rgba(0, 243, 255, 0.2);
             border-radius: 20px;
-            padding: 40px;
+            padding: 32px 28px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            max-height: 88vh;
+            overflow-y: auto;
             position: relative;
+            box-sizing: border-box;
         }
 
         .close-modal {
@@ -644,6 +647,7 @@
             <li><a href="cohetes.html" class="transition-link">Cohetes</a></li>
             <li><a href="calendario.html" class="transition-link">CALENDARIO</a></li>
             <li><a href="geonet.html" class="transition-link active">GEONET</a></li>
+            <li><a href="clientes.html" class="transition-link">Clientes</a></li>
             <li><button class="auth-btn" id="contactBtn"><i class="fas fa-comment"></i> <span>Contacto</span></button>
             </li>
             <li><button class="auth-btn" id="authBtn"><i class="fas fa-user"></i> <span id="authBtnText">Iniciar
@@ -893,7 +897,14 @@
             if (user && !user.isAnonymous) {
                 isAdmin = (user.email === 'olanoagus@gmail.com');
                 document.getElementById('authBtn').innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar"> <span>${user.displayName || user.email.split('@')[0]}</span>`;
-                update(ref(database, 'users/' + user.uid), { lastLogin: new Date().toISOString(), displayName: user.displayName });
+                update(ref(database, 'users/' + user.uid), {
+                    uid: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario'),
+                    photoURL: user.photoURL || null,
+                    lastLogin: new Date().toISOString(),
+                    provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'password'
+                });
                 if (isAdmin) document.getElementById('adminFab').classList.add('active');
             } else {
                 isAdmin = false;

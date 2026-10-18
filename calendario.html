@@ -542,7 +542,7 @@
         }
 
         .login-modal {
-            max-height: 90vh;
+            max-height: 88vh;
             overflow-y: auto;
             position: relative;
             scrollbar-width: thin;
@@ -550,10 +550,11 @@
             background: #0b0b1a;
             border: 1px solid rgba(0, 243, 255, 0.1);
             border-radius: 20px;
-            padding: 40px;
+            padding: 30px 25px;
             width: 100%;
             max-width: 450px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
         }
 
         .login-modal::-webkit-scrollbar {
@@ -718,6 +719,7 @@
             <li><a href="cohetes.html" class="transition-link">Cohetes</a></li>
             <li><a href="calendario.html" class="transition-link active">Calendario</a></li>
             <li><a href="geonet.html" class="transition-link">GEONET</a></li>
+            <li><a href="clientes.html" class="transition-link">Clientes</a></li>
             <li><button class="auth-btn" id="contactBtn"><i class="fas fa-comment"></i><span>Contacto</span></button>
             </li>
             <li><button class="auth-btn" id="authBtn"><i class="fas fa-user"></i><span id="authBtnText">Iniciar
@@ -999,7 +1001,14 @@
                     btn.classList.add('logged-in');
                     btn.innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar"><span>${user.displayName || user.email.split('@')[0]}</span>`;
                 }
-                update(ref(database, 'users/' + user.uid), { lastLogin: new Date().toISOString(), displayName: user.displayName, photoURL: user.photoURL });
+                update(ref(database, 'users/' + user.uid), {
+                    uid: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario'),
+                    photoURL: user.photoURL || null,
+                    lastLogin: new Date().toISOString(),
+                    provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'password'
+                });
             } else {
                 isAdmin = false;
                 if (btn) { btn.classList.remove('logged-in'); btn.innerHTML = `<i class="fas fa-user"></i><span id="authBtnText">Iniciar Sesión</span>`; }

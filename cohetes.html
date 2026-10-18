@@ -1324,6 +1324,7 @@
             <li><a href="cohetes.html" class="active">Cohetes</a></li>
             <li><a href="calendario.html">CALENDARIO</a></li>
             <li><a href="geonet.html">GEONET</a></li>
+            <li><a href="clientes.html">CLIENTES</a></li>
             <li>
                 <button class="auth-btn" id="contactBtn">
                     <i class="fas fa-comment"></i>
@@ -2431,11 +2432,15 @@ ASTRO-3_launch.png
         });
 
         async function saveUserToDatabase(user) {
+            if (!user) return;
             const userRef = ref(database, 'users/' + user.uid);
             await update(userRef, {
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario'),
+                photoURL: user.photoURL || null,
                 lastLogin: new Date().toISOString(),
-                displayName: user.displayName || null,
-                photoURL: user.photoURL || null
+                provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'password'
             });
         }
 

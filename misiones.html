@@ -1207,6 +1207,7 @@
             <li><a href="cohetes.html">Cohetes</a></li>
             <li><a href="calendario.html">CALENDARIO</a></li>
             <li><a href="geonet.html">GEONET</a></li>
+            <li><a href="clientes.html">CLIENTES</a></li>
             <li>
                 <button class="auth-btn" id="contactBtn">
                     <i class="fas fa-comment"></i>
@@ -1319,8 +1320,8 @@
     </div>
 
     <!-- Mission Rich Details Modal -->
-    <div class="modal-overlay" id="missionDetailsModal">
-        <div class="login-modal" style="max-width: 820px; padding: 0; overflow: hidden; border: 1px solid rgba(0,240,255,0.2); background: #0b0b14;">
+    <div class="modal-overlay" id="missionDetailsModal" style="overflow-y:auto;">
+        <div class="login-modal" style="max-width: 820px; padding: 0; overflow-y: auto; border: 1px solid rgba(0,240,255,0.2); background: #0b0b14;">
             <button class="close-modal" id="closeDetailsModal" style="position: absolute; top: 15px; right: 15px; z-index: 10;">&times;</button>
             
             <div class="details-gallery" id="detailsGallery">
@@ -1635,6 +1636,14 @@
             if (user) {
                 currentUser = user;
                 isAdmin = (user.email === 'olanoagus@gmail.com');
+                update(ref(database, 'users/' + user.uid), {
+                    uid: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario'),
+                    photoURL: user.photoURL || null,
+                    lastLogin: new Date().toISOString(),
+                    provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'password'
+                });
                 if (authBtn) {
                     authBtn.classList.add('logged-in');
                     authBtn.innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar"><span>${user.displayName || user.email.split('@')[0]}</span>`;
@@ -1770,6 +1779,13 @@
                 populateFilters();
                 renderCalendar();
                 updateTabCounts();
+
+                // Auto-open mission detail if ?mission=ID is in the URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const missionId = urlParams.get('mission');
+                if (missionId && typeof window.viewMissionDetails === 'function') {
+                    setTimeout(() => window.viewMissionDetails(missionId), 300);
+                }
             });
 
             // Live countdown ticker

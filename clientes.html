@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.S. Aerospace | Área de Clientes</title>
+    <link rel="icon" type="image/png" href="LOGO_JTT.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --secondary-color: #ff0055;
+            --neon-blue: #00d4ff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff66;
+            --neon-orange: #ff6b35;
+            --neon-red: #ff3333;
+            --bg-dark: #050510;
+            --card-bg: rgba(11, 11, 26, 0.75);
+            --card-border: rgba(0, 243, 255, 0.15);
+            --font-heading: 'Orbitron', sans-serif;
+            --font-sub: 'Space Grotesk', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            min-height: 100vh !important;
+            height: auto !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            background-color: var(--bg-dark);
+            font-family: var(--font-body);
+            color: #fff;
+        }
+
+        /* Background ambient */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(0, 243, 255, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(157, 0, 255, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(5, 5, 16, 0.95) 0%, #050510 100%);
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 2;
+            padding: 100px 5vw 60px;
+            max-width: 1300px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Header de la vista */
+        .portal-header {
+            text-align: center;
+            margin-bottom: 35px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .portal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 243, 255, 0.08);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            padding: 6px 16px;
+            border-radius: 30px;
+            color: var(--primary-color);
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .portal-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
+            font-weight: 900;
+            margin: 0 0 10px 0;
+            background: linear-gradient(135deg, #fff 40%, var(--primary-color) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1.5px;
+        }
+
+        .portal-sub {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 1rem;
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ================= VISTA NO AUTENTICADO ================= */
+        .auth-cta-card {
+            background: rgba(11, 11, 26, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 24px;
+            padding: 50px 35px;
+            max-width: 520px;
+            margin: 0 auto 50px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-cta-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+
+        .auth-icon-wrap {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.15), rgba(157, 0, 255, 0.1));
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+        }
+
+        .cta-btn-main {
+            display: block;
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #00f3ff, #0077ff);
+            color: #000;
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            box-shadow: 0 6px 25px rgba(0, 243, 255, 0.3);
+            margin-top: 25px;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .cta-btn-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(0, 243, 255, 0.5);
+            color: #000;
+        }
+
+        .cta-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .cta-feature-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .cta-feature-box:hover {
+            border-color: rgba(0, 243, 255, 0.3);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .cta-feature-icon {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        /* ================= VISTA ADMIN & CLIENTE ================= */
+        .dash-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: rgba(11, 11, 26, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            border-radius: 18px;
+            padding: 18px 24px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(15px);
+        }
+
+        .dash-user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .dash-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(157, 0, 255, 0.2));
+            border: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            object-fit: cover;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .dash-user-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dash-user-sub {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 2px 0 0;
+        }
+
+        .role-badge-admin {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255, 170, 0, 0.15);
+            color: #ffaa00;
+            border: 1px solid rgba(255, 170, 0, 0.4);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .role-badge-client {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(0, 243, 255, 0.15);
+            color: var(--primary-color);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: rgba(11, 11, 26, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 243, 255, 0.3);
+            background: rgba(11, 11, 26, 0.9);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-color);
+        }
+
+        .stat-card.orange::before {
+            background: var(--neon-orange);
+        }
+
+        .stat-card.purple::before {
+            background: var(--neon-purple);
+        }
+
+        .stat-card.green::before {
+            background: var(--neon-green);
+        }
+
+        .stat-label {
+            font-family: var(--font-heading);
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .stat-val {
+            font-family: var(--font-heading);
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+        }
+
+        .stat-desc {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin-top: 6px;
+        }
+
+        /* Tabs de navegación interna */
+        .portal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .portal-tab-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .portal-tab-btn:hover {
+            color: #fff;
+            border-color: rgba(0, 243, 255, 0.3);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .portal-tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(0, 119, 255, 0.2));
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        /* Tab Content Section */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Panel Card General */
+        .content-card {
+            background: rgba(11, 11, 26, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 26px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 25px;
+        }
+
+        .content-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .content-card-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Buscador */
+        .search-box {
+            position: relative;
+            max-width: 340px;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.25);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        /* Lista de Usuarios (Admin) */
+        .user-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .user-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 243, 255, 0.3);
+            transform: translateX(4px);
+        }
+
+        .user-info-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 200px;
+        }
+
+        .user-avatar-sm {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(157, 0, 255, 0.15));
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .user-name-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-meta-sub {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+
+        .user-stats-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-chip {
+            font-size: 0.72rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-family: var(--font-sub);
+        }
+
+        .badge-chip.cyan {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: rgba(0, 243, 255, 0.3);
+            color: var(--primary-color);
+        }
+
+        .badge-chip.purple {
+            background: rgba(157, 0, 255, 0.1);
+            border-color: rgba(157, 0, 255, 0.3);
+            color: #c4b5fd;
+        }
+
+        .btn-action-sm {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            background: rgba(0, 243, 255, 0.08);
+            color: var(--primary-color);
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-action-sm:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        /* Misiones en Vista Cliente */
+        .missions-client-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 18px;
+        }
+
+        .client-mission-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            border-radius: 16px;
+            padding: 22px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .client-mission-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.15);
+        }
+
+        .client-mission-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .client-mission-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            color: #fff;
+            margin: 0 0 6px 0;
+        }
+
+        .client-mission-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .client-mission-row strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 2px;
+            font-family: var(--font-sub);
+        }
+
+        /* Modal de Asignación */
+        .assign-modal-card {
+            background: #0b0b1a;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 20px;
+            max-width: 580px;
+            width: 100%;
+            padding: 30px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            box-sizing: border-box;
+        }
+
+        .assign-modal-card h3 {
+            font-family: var(--font-heading);
+            color: #fff;
+            font-size: 1.3rem;
+            margin: 0 0 6px;
+        }
+
+        .assign-modal-card .sub {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .assign-field-group {
+            margin-bottom: 18px;
+        }
+
+        .assign-field-group label {
+            display: block;
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .assign-field-group input[type="number"],
+        .assign-field-group input[type="text"],
+        .assign-field-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .assign-field-group input:focus,
+        .assign-field-group textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        .launches-assign-list {
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .launch-assign-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .launch-assign-row:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .launch-assign-row input[type="checkbox"] {
+            accent-color: var(--primary-color);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+        }
+
+        .empty-placeholder i {
+            font-size: 2.2rem;
+            color: rgba(0, 243, 255, 0.4);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* Responsive Mobile */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 85px 15px 40px !important;
+            }
+
+            .portal-title {
+                font-size: 1.8rem !important;
+            }
+
+            .dash-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 16px;
+            }
+
+            .user-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .btn-action-sm {
+                width: 100%;
+                text-align: center;
+            }
+
+            .portal-tab-btn {
+                flex: 1;
+                font-size: 0.72rem;
+                padding: 8px 12px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ambient-bg"></div>
+
+    <!-- Navigation (Standardized) -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="LOGO_JTT.png" alt="Logo J.S. Aerospace" style="height: 32px; width: auto; object-fit: contain;">
+            <div class="logo-text">J.S.<span class="highlight">AEROSPACE</span></div>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir Menú">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="misiones.html">Misiones</a></li>
+            <li><a href="cohetes.html">Cohetes</a></li>
+            <li><a href="calendario.html">Calendario</a></li>
+            <li><a href="geonet.html">GEONET</a></li>
+            <li><a href="clientes.html" class="active">Clientes</a></li>
+            <li>
+                <button class="auth-btn" id="contactBtn">
+                    <i class="fas fa-comment"></i>
+                    <span>Contacto</span>
+                </button>
+            </li>
+            <li>
+                <button class="auth-btn" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span id="authBtnText">Iniciar Sesión</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="main-content">
+
+        <!-- Header General -->
+        <header class="portal-header">
+            <div class="portal-badge">
+                <i class="fas fa-satellite"></i> Portal Comercial & Operaciones
+            </div>
+            <h1 class="portal-title">ÁREA DE CLIENTES</h1>
+            <p class="portal-sub">
+                Seguimiento integral de contratos de lanzamiento.
+            </p>
+        </header>
+
+        <!-- ================= 1. ESTADO NO AUTENTICADO ================= -->
+        <section id="view-unauthenticated" style="display: none;">
+            <div class="auth-cta-card">
+                <div class="auth-icon-wrap">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <h2 style="font-family: var(--font-heading); font-size: 1.5rem; margin: 0 0 10px; color: #fff;">
+                    Acceso para Clientes
+                </h2>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; line-height: 1.6; margin: 0 0 20px;">
+                    Inicia sesión con tu cuenta de J.S. Aerospace para acceder a tu panel de control, ver tus misiones contratadas y monitorear tus satélites en órbita.
+                </p>
+
+                <button class="cta-btn-main" id="heroLoginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión / Registrarse
+                </button>
+
+                <div style="margin-top: 18px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">
+                    ¿Deseas contratar un lanzamiento o consultar capacidad de carga?
+                    <br>
+                    <a href="javascript:void(0)" id="ctaOpenContact" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                        Contáctanos directamente por el chat de soporte
+                    </a>
+                </div>
+            </div>
+
+            <!-- Beneficios / Características del Portal -->
+            <div class="cta-features-grid">
+                <div class="cta-feature-box">
+                    <div class="cta-feature-icon"><i class="fas fa-rocket"></i></div>
+                    <h3 style="font-family: var(--font-heading); font-size: 1rem; margin: 0 0 8px; color: #fff;">Lanzamientos Tomcat</h3>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; line-height: 1.5; margin: 0;">
+                        Seguimiento fase a fase del estado de integración de tu carga útil, ventana de despegue y telemetría de ascenso.
+                    </p>
+                </div>
+                <div class="cta-feature-box">
+                    <div class="cta-feature-icon"><i class="fas fa-globe-americas"></i></div>
+                    <h3 style="font-family: var(--font-heading); font-size: 1rem; margin: 0 0 8px; color: #fff;">Constelación GeoNet</h3>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; line-height: 1.5; margin: 0;">
+                        Monitorea tus satélites activos en los planos orbitales en tiempo real directamente sobre el globo interactivo 3D.
+                    </p>
+                </div>
+                <div class="cta-feature-box">
+                    <div class="cta-feature-icon"><i class="fas fa-headset"></i></div>
+                    <h3 style="font-family: var(--font-heading); font-size: 1rem; margin: 0 0 8px; color: #fff;">Soporte Prioritario</h3>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; line-height: 1.5; margin: 0;">
+                        Canal directo de mensajería con el equipo de operaciones e ingeniería de J.S. Aerospace.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 2. ESTADO AUTENTICADO: ADMIN (olanoagus@gmail.com) ================= -->
+        <section id="view-admin" style="display: none;">
+            <!-- Topbar Admin -->
+            <div class="dash-topbar">
+                <div class="dash-user-info">
+                    <img id="adminAvatarImg" class="dash-avatar" src="LOGO_JTT.png" alt="Avatar Admin">
+                    <div>
+                        <h2 class="dash-user-title">
+                            <span id="adminGreetingName">Agus</span>
+                            <span class="role-badge-admin"><i class="fas fa-crown"></i> Admin</span>
+                        </h2>
+                        <p class="dash-user-sub">Panel de Control General de Clientes y Misiones</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="portal-tab-btn" id="adminRefreshBtn" title="Actualizar datos">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                    <button class="portal-tab-btn" id="adminLogoutBtn" style="border-color: rgba(255,51,51,0.3); color: #ff6b6b;">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Rápidas Admin -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">👥 Personas Registradas</div>
+                    <div class="stat-val" id="adminStatUsersCount">0</div>
+                    <div class="stat-desc">Usuarios totales logueados en la web</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-label">🚀 Misiones Activas</div>
+                    <div class="stat-val" id="adminStatMissionsCount">0</div>
+                    <div class="stat-desc">Lanzamientos en base de datos</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-label">🛰️ Satélites Clientes</div>
+                    <div class="stat-val" id="adminStatSatsCount">0</div>
+                    <div class="stat-desc">Total asignados a clientes</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">💼 Asignaciones Hechas</div>
+                    <div class="stat-val" id="adminStatAssignmentsCount">0</div>
+                    <div class="stat-desc">Clientes con lanzamientos asignados</div>
+                </div>
+            </div>
+
+            <!-- Tabs Admin -->
+            <div class="portal-tabs">
+                <button class="portal-tab-btn active" data-admin-tab="users">
+                    <i class="fas fa-users"></i> Clientes Logueados
+                </button>
+                <button class="portal-tab-btn" data-admin-tab="missions">
+                    <i class="fas fa-tasks"></i> Workflow de Misiones
+                </button>
+            </div>
+
+            <!-- Tab 1: Clientes Registrados -->
+            <div class="tab-panel active" id="admin-tab-users">
+                <div class="content-card">
+                    <div class="content-card-head">
+                        <h2 class="content-card-title">
+                            <i class="fas fa-id-badge" style="color: var(--primary-color);"></i>
+                            Usuarios Registrados en J.S. Aerospace
+                        </h2>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="adminUserSearch" placeholder="Buscar por nombre o correo...">
+                        </div>
+                    </div>
+
+                    <!-- Lista de usuarios -->
+                    <div id="adminUsersListContainer">
+                        <div class="empty-placeholder">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Cargando usuarios registrados...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Workflow de Misiones -->
+            <div class="tab-panel" id="admin-tab-missions">
+                <div class="content-card">
+                    <div class="content-card-head">
+                        <h2 class="content-card-title">
+                            <i class="fas fa-rocket" style="color: var(--neon-orange);"></i>
+                            Estado Operativo de Misiones
+                        </h2>
+                        <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">
+                            Actualiza el estado de las misiones para que tus clientes lo vean en tiempo real.
+                        </div>
+                    </div>
+
+                    <div id="adminMissionsWorkflowContainer">
+                        <div class="empty-placeholder">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Cargando misiones...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 3. ESTADO AUTENTICADO: CLIENTE ================= -->
+        <section id="view-client" style="display: none;">
+            <!-- Topbar Cliente -->
+            <div class="dash-topbar">
+                <div class="dash-user-info">
+                    <img id="clientAvatarImg" class="dash-avatar" src="LOGO_JTT.png" alt="Avatar Cliente">
+                    <div>
+                        <h2 class="dash-user-title">
+                            Bienvenido, <span id="clientGreetingName">Cliente</span>
+                            <span class="role-badge-client"><i class="fas fa-user-check"></i> Cliente</span>
+                        </h2>
+                        <p class="dash-user-sub" id="clientEmailSub">cliente@correo.com</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="portal-tab-btn" id="clientLogoutBtn" style="border-color: rgba(255,51,51,0.3); color: #ff6b6b;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cliente -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">🚀 Mis Lanzamientos</div>
+                    <div class="stat-val" id="clientStatMissions">0</div>
+                    <div class="stat-desc">Misiones contratadas / asignadas</div>
+                </div>
+                <div class="stat-card orange" id="nextLaunchCard" style="display:none;">
+                    <div class="stat-label">⏱️ Próximo Lanzamiento</div>
+                    <div class="stat-val" style="font-size: 1.25rem; font-weight: 700;" id="clientStatNextLaunch">—</div>
+                    <div class="stat-desc" id="clientStatNextLaunchDesc">Sin lanzamientos pendientes</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">🛡️ Estado de Servicio</div>
+                    <div class="stat-val" style="font-size: 1.25rem; color: var(--neon-green);">ACTIVO</div>
+                    <div class="stat-desc">Soporte y telemetría en línea</div>
+                </div>
+            </div>
+
+            <!-- Tabs Cliente -->
+            <div class="portal-tabs">
+                <button class="portal-tab-btn active" data-client-tab="my-missions">
+                    <i class="fas fa-rocket"></i> Mis Misiones
+                </button>
+                <button class="portal-tab-btn" data-client-tab="fleet">
+                    <i class="fas fa-shuttle-space"></i> Cohetes Disponibles
+                </button>
+            </div>
+
+            <!-- Tab 1: Mis Misiones -->
+            <div class="tab-panel active" id="client-tab-my-missions">
+                <div class="content-card">
+                    <div class="content-card-head">
+                        <h2 class="content-card-title">
+                            <i class="fas fa-clipboard-check" style="color: var(--primary-color);"></i>
+                            Tus Misiones Asignadas
+                        </h2>
+                    </div>
+                    <div id="clientMissionsContainer">
+                        <div class="empty-placeholder">
+                            <i class="fas fa-rocket"></i>
+                            Aún no tienes lanzamientos asignados a tu cuenta.
+                            <br>
+                            <span style="font-size: 0.8rem; color: rgba(255,255,255,0.4); display: block; margin-top: 8px;">
+                                Si has contratado una misión con J.S. Aerospace, el equipo de operaciones te la asignará en breve.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Cohetes Disponibles -->
+            <div class="tab-panel" id="client-tab-fleet">
+                <div class="content-card">
+                    <div class="content-card-head">
+                        <h2 class="content-card-title">
+                            <i class="fas fa-shuttle-space" style="color: var(--primary-color);"></i>
+                            Cohetes Disponibles
+                        </h2>
+                        <a href="cohetes.html" class="btn-action-sm" style="text-decoration: none;">
+                            <i class="fas fa-external-link-alt"></i> Sección Cohetes
+                        </a>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,243,255,0.2); border-radius: 16px; overflow: hidden;">
+                            <div style="height: 180px; background-image: url('Imagenes/Tomcat%204.png'); background-size: cover; background-position: center; position: relative;">
+                                <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0b1a, transparent);"></div>
+                                <span style="position: absolute; bottom: 12px; left: 16px; font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; font-size: 1.2rem;">
+                                    TOMCAT
+                                </span>
+                            </div>
+                            <div style="padding: 20px;">
+                                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 15px;">
+                                    Carguero pesado y sistema reutilizable insignia de J.S. Aerospace. 60 toneladas a órbita baja con capacidad para constelaciones y cargas científicas.
+                                </p>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <span class="badge-chip cyan"><i class="fas fa-weight-hanging"></i> 60 t LEO</span>
+                                    <span class="badge-chip purple"><i class="fas fa-redo"></i> Reusable</span>
+                                    <span class="badge-chip"><i class="fas fa-map-marker-alt"></i> LC-39B</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL DE ASIGNACIÓN PARA ADMIN ================= -->
+    <div class="modal-overlay" id="assignModal">
+        <div class="assign-modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3><i class="fas fa-user-edit" style="color: var(--primary-color);"></i> Asignar Cliente</h3>
+                <button class="close-modal" id="closeAssignModal" style="position: static; font-size: 1.5rem; color: #fff; background: none; border: none; cursor: pointer;">&times;</button>
+            </div>
+            <div class="sub" id="assignModalSubtitle">Configurando cliente: ...</div>
+
+            <div class="assign-field-group">
+                <label>Nº de Satélites GeoNet Contratados</label>
+                <input type="number" id="assignSatsInput" min="0" value="0" placeholder="0">
+            </div>
+
+            <div class="assign-field-group">
+                <label>Notas de Carga Útil / Contrato</label>
+                <input type="text" id="assignNotesInput" placeholder="Ej: Carga secundaria 3U en Tomcat IFT">
+            </div>
+
+            <div class="assign-field-group">
+                <label>Lanzamientos Asignados a este Cliente</label>
+                <div class="launches-assign-list" id="assignLaunchesListContainer">
+                    <div style="text-align: center; color: rgba(255,255,255,0.4); padding: 15px; font-size: 0.85rem;">
+                        Cargando lista de misiones...
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button class="portal-tab-btn" id="cancelAssignBtn" style="flex: 1; justify-content: center;">
+                    Cancelar
+                </button>
+                <button class="cta-btn-main" id="saveAssignBtn" style="flex: 2; margin: 0; padding: 12px; font-size: 0.85rem;">
+                    <i class="fas fa-save"></i> Guardar Asignación
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL ESTÁNDAR: LOGIN / REGISTRO ================= -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Iniciar Sesión</h2>
+                <p id="modalSubtitle">Accede a tu cuenta de J.S.Aerospace</p>
+            </div>
+            <div class="auth-message" id="authMessage"></div>
+            <form id="authForm">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label>Nombre</label>
+                    <input type="text" id="userName" placeholder="Tu nombre">
+                </div>
+                <div class="form-group"><label>Email</label><input type="email" id="userEmail" required></div>
+                <div class="form-group"><label>Contraseña</label><input type="password" id="userPassword" required></div>
+                <button type="submit" class="login-btn" id="submitBtn">Entrar</button>
+            </form>
+            <div class="divider"><span>o continuar con</span></div>
+            <div class="social-login">
+                <button class="social-btn google" id="googleLogin">
+                    <i class="fab fa-google"></i><span>Google</span>
+                </button>
+            </div>
+            <div class="toggle-auth">
+                <span id="toggleText">¿No tienes cuenta?</span>
+                <a href="#" id="toggleLink">Regístrate</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL ESTÁNDAR: PERFIL ================= -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+            <div class="modal-header">
+                <h2>Mi Perfil</h2>
+                <p>Gestiona tu cuenta y seguridad</p>
+            </div>
+            <div class="profile-section">
+                <h3><i class="fas fa-user-edit"></i> Información Personal</h3>
+                <div class="form-group"><label>Nombre Público</label><input type="text" id="profileName" placeholder="Tu nombre"></div>
+                <button class="login-btn btn-update" id="updateNameBtn">Actualizar Nombre</button>
+            </div>
+            <div class="profile-section">
+                <h3><i class="fas fa-key"></i> Seguridad</h3>
+                <div class="form-group"><label>Nueva Contraseña</label><input type="password" id="newPassword" placeholder="Mínimo 6 caracteres"></div>
+                <button class="login-btn btn-update" id="updatePasswordBtn">Cambiar Contraseña</button>
+            </div>
+            <div class="profile-section">
+                <button class="login-btn btn-logout" id="logoutBtn">Cerrar Sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL ESTÁNDAR: CONTACTO ================= -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="login-modal" id="contactModalContent" style="max-width: 600px; height: 500px; display: flex; flex-direction: column;">
+            <button class="close-modal" id="closeContactModal">&times;</button>
+            <div class="contact-header" style="display: flex; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 15px;">
+                <button id="chat-back-btn" style="display: none; background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; margin-right: 15px;"><i class="fas fa-arrow-left"></i></button>
+                <div>
+                    <h2 style="font-family: var(--font-heading); font-size: 1.2rem; margin: 0; color: #fff;" id="chat-header-title">Contacto J.S.Aerospace</h2>
+                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin: 0;" id="chat-header-subtitle">Chat directo con soporte técnico</p>
+                </div>
+            </div>
+            <div id="contact-login-required" style="display: none; text-align: center; margin: auto;">
+                <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                <h3 style="color: #fff; margin-bottom: 10px;">Inicia sesión para chatear</h3>
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">Necesitas una cuenta para enviar mensajes.</p>
+                <button class="login-btn" id="contactLoginBtn" style="width: auto; padding: 10px 20px;">Iniciar Sesión</button>
+            </div>
+            <div id="contact-conversations" style="display: none; flex: 1; overflow-y: auto;">
+                <div id="conversations-list"></div>
+            </div>
+            <div id="contact-chat-area" style="display: none; flex: 1; flex-direction: column;">
+                <div id="chat-messages" style="flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px;"></div>
+                <form id="chat-form" style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." required style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff;">
+                    <button type="submit" class="login-btn" style="width: auto; padding: 0 20px;"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Firebase y Controladores -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set, get, update, push, onValue, onChildAdded, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6eDNK7CLl_aXEYkwFV97k-2A1axzRAKg",
+            authDomain: "j-saerospace.firebaseapp.com",
+            projectId: "j-saerospace",
+            storageBucket: "j-saerospace.firebasestorage.app",
+            messagingSenderId: "566276856004",
+            appId: "1:566276856004:web:0b2aa778d975db265691d1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        const ADMIN_EMAIL = 'olanoagus@gmail.com';
+
+        // Elementos de vista
+        const viewUnauth = document.getElementById('view-unauthenticated');
+        const viewAdmin = document.getElementById('view-admin');
+        const viewClient = document.getElementById('view-client');
+
+        // Modales
+        const loginModal = document.getElementById('loginModal');
+        const profileModal = document.getElementById('profileModal');
+        const contactModal = document.getElementById('contactModal');
+        const assignModal = document.getElementById('assignModal');
+
+        const authBtn = document.getElementById('authBtn');
+        const authBtnText = document.getElementById('authBtnText');
+        const closeModal = document.getElementById('closeModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const closeContactModal = document.getElementById('closeContactModal');
+        const closeAssignModal = document.getElementById('closeAssignModal');
+        const cancelAssignBtn = document.getElementById('cancelAssignBtn');
+        const saveAssignBtn = document.getElementById('saveAssignBtn');
+
+        const authForm = document.getElementById('authForm');
+        const authMessage = document.getElementById('authMessage');
+        const toggleLink = document.getElementById('toggleLink');
+        const toggleText = document.getElementById('toggleText');
+        const nameGroup = document.getElementById('nameGroup');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const googleLoginBtn = document.getElementById('googleLogin');
+
+        let currentUser = null;
+        let isAdmin = false;
+        let isLoginMode = true;
+
+        let allUsersData = {};
+        let allMissionsData = {};
+        let allAssignmentsData = {};
+        let selectedAssignUid = null;
+
+        // Actualizar o guardar usuario en Firebase Realtime Database
+        async function saveUserToDatabase(user) {
+            if (!user) return;
+            const userRef = ref(database, 'users/' + user.uid);
+            await update(userRef, {
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario'),
+                photoURL: user.photoURL || null,
+                lastLogin: new Date().toISOString(),
+                provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'password'
+            });
+        }
+
+        // Listener de Estado de Autenticación
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user) {
+                isAdmin = (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+                await saveUserToDatabase(user);
+
+                // Navbar auth button
+                authBtn.innerHTML = `
+                    <img src="${user.photoURL || 'LOGO_JTT.png'}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid var(--primary-color);">
+                    <span>${user.displayName || (user.email ? user.email.split('@')[0] : 'Cuenta')}</span>
+                `;
+
+                if (isAdmin) {
+                    renderAdminView();
+                } else {
+                    renderClientView();
+                }
+            } else {
+                isAdmin = false;
+                authBtn.innerHTML = `<i class="fas fa-user"></i><span id="authBtnText">Iniciar Sesión</span>`;
+                renderUnauthenticatedView();
+            }
+        });
+
+        // 1. Render Vista No Autenticado
+        function renderUnauthenticatedView() {
+            viewUnauth.style.display = 'block';
+            viewAdmin.style.display = 'none';
+            viewClient.style.display = 'none';
+        }
+
+        // 2. Render Vista Admin
+        function renderAdminView() {
+            viewUnauth.style.display = 'none';
+            viewAdmin.style.display = 'block';
+            viewClient.style.display = 'none';
+
+            if (currentUser) {
+                document.getElementById('adminGreetingName').textContent = currentUser.displayName || 'Agus';
+                if (currentUser.photoURL) {
+                    document.getElementById('adminAvatarImg').src = currentUser.photoURL;
+                }
+            }
+
+            // Escuchar Usuarios
+            onValue(ref(database, 'users'), (snap) => {
+                allUsersData = snap.val() || {};
+                updateAdminStats();
+                renderAdminUsersList();
+            });
+
+            // Escuchar Misiones
+            onValue(ref(database, 'missions'), (snap) => {
+                allMissionsData = snap.val() || {};
+                updateAdminStats();
+                renderAdminMissionsWorkflow();
+            });
+
+            // Escuchar Asignaciones
+            onValue(ref(database, 'client_assignments'), (snap) => {
+                allAssignmentsData = snap.val() || {};
+                updateAdminStats();
+                renderAdminUsersList();
+            });
+        }
+
+        // 3. Render Vista Cliente
+        function renderClientView() {
+            viewUnauth.style.display = 'none';
+            viewAdmin.style.display = 'none';
+            viewClient.style.display = 'block';
+
+            if (currentUser) {
+                document.getElementById('clientGreetingName').textContent = currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Cliente');
+                document.getElementById('clientEmailSub').textContent = currentUser.email || '';
+                if (currentUser.photoURL) {
+                    document.getElementById('clientAvatarImg').src = currentUser.photoURL;
+                }
+            }
+
+            // Escuchar datos del cliente y misiones
+            onValue(ref(database, 'client_assignments/' + currentUser.uid), (snap) => {
+                const myAssignment = snap.val() || {};
+                updateClientDashboard(myAssignment);
+            });
+
+            onValue(ref(database, 'missions'), (snap) => {
+                allMissionsData = snap.val() || {};
+                // Re-renderizar si ya tenemos la asignación
+                get(ref(database, 'client_assignments/' + currentUser.uid)).then(s => {
+                    updateClientDashboard(s.val() || {});
+                });
+            });
+        }
+
+        // Actualizar métricas del Admin
+        function updateAdminStats() {
+            const usersCount = Object.keys(allUsersData).length;
+            const missionsCount = Object.keys(allMissionsData).length;
+            const assignmentsCount = Object.keys(allAssignmentsData).length;
+
+            let totalSats = 0;
+            Object.values(allAssignmentsData).forEach(a => {
+                if (a && a.sats) totalSats += parseInt(a.sats) || 0;
+            });
+
+            document.getElementById('adminStatUsersCount').textContent = usersCount;
+            document.getElementById('adminStatMissionsCount').textContent = missionsCount;
+            document.getElementById('adminStatSatsCount').textContent = totalSats;
+            document.getElementById('adminStatAssignmentsCount').textContent = assignmentsCount;
+        }
+
+        // Renderizar lista de usuarios (Admin)
+        function renderAdminUsersList() {
+            const container = document.getElementById('adminUsersListContainer');
+            const search = (document.getElementById('adminUserSearch').value || '').toLowerCase().trim();
+            const uids = Object.keys(allUsersData);
+
+            if (!uids.length) {
+                container.innerHTML = `
+                    <div class="empty-placeholder">
+                        <i class="fas fa-users-slash"></i>
+                        No hay usuarios registrados aún en la base de datos.
+                    </div>`;
+                return;
+            }
+
+            const filteredUids = uids.filter(uid => {
+                const u = allUsersData[uid] || {};
+                const name = (u.displayName || '').toLowerCase();
+                const email = (u.email || '').toLowerCase();
+                return name.includes(search) || email.includes(search);
+            });
+
+            if (!filteredUids.length) {
+                container.innerHTML = `
+                    <div class="empty-placeholder">
+                        <i class="fas fa-search"></i>
+                        No se encontraron usuarios con ese término de búsqueda.
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filteredUids.map(uid => {
+                const u = allUsersData[uid] || {};
+                const isUserAdmin = (u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+                const assign = allAssignmentsData[uid] || {};
+                const launchCount = (assign.missions || []).length;
+                const satsCount = parseInt(assign.sats) || 0;
+
+                const name = u.displayName || (u.email ? u.email.split('@')[0] : 'Usuario');
+                const email = u.email || 'Sin correo';
+                const avatar = u.photoURL
+                    ? `<img src="${u.photoURL}" class="user-avatar-sm" alt="Avatar">`
+                    : `<div class="user-avatar-sm">${name.charAt(0).toUpperCase()}</div>`;
+
+                let lastLoginText = 'Reciente';
+                if (u.lastLogin) {
+                    try {
+                        const d = new Date(u.lastLogin);
+                        lastLoginText = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                    } catch(e) {}
+                }
+
+                const assignBadge = launchCount > 0 || satsCount > 0
+                    ? `<span class="badge-chip cyan"><i class="fas fa-rocket"></i> ${launchCount} lanz.</span> <span class="badge-chip purple"><i class="fas fa-satellite"></i> ${satsCount} sats</span>`
+                    : `<span class="badge-chip"><i class="fas fa-circle-notch"></i> Sin asignación</span>`;
+
+                return `
+                    <div class="user-row">
+                        <div class="user-info-left">
+                            ${avatar}
+                            <div>
+                                <div class="user-name-text">
+                                    ${name}
+                                    ${isUserAdmin ? '<span class="role-badge-admin"><i class="fas fa-crown"></i> Admin</span>' : ''}
+                                </div>
+                                <div class="user-meta-sub">${email} · Login: ${lastLoginText}</div>
+                            </div>
+                        </div>
+
+                        <div class="user-stats-badges">
+                            ${assignBadge}
+                            <button class="btn-action-sm" onclick="window.openAssignModal('${uid}')">
+                                <i class="fas fa-sliders-h"></i> Asignar
+                            </button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        // Búsqueda en tiempo real de usuarios
+        document.getElementById('adminUserSearch').addEventListener('input', renderAdminUsersList);
+
+        // Renderizar Workflow de Misiones (Admin)
+        function renderAdminMissionsWorkflow() {
+            const container = document.getElementById('adminMissionsWorkflowContainer');
+            const entries = Object.entries(allMissionsData);
+
+            if (!entries.length) {
+                container.innerHTML = `
+                    <div class="empty-placeholder">
+                        <i class="fas fa-rocket"></i>
+                        No hay misiones registradas.
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = entries.map(([id, m]) => {
+                const title = m.title || m.name || 'Misión sin título';
+                const status = m.status || 'upcoming';
+                const vehicle = m.vehicle || 'Tomcat';
+                const date = m.date || 'Sin fecha';
+
+                const statusOptions = [
+                    { val: 'upcoming', label: 'Próxima' },
+                    { val: 'in_flight', label: 'En Vuelo' },
+                    { val: 'success', label: 'Completada' },
+                    { val: 'failed', label: 'Fallida' }
+                ];
+
+                return `
+                    <div class="user-row" style="align-items: center;">
+                        <div>
+                            <div class="user-name-text" style="font-family: var(--font-heading); color: var(--primary-color);">
+                                <i class="fas fa-shuttle-space"></i> ${title}
+                            </div>
+                            <div class="user-meta-sub">Vehículo: ${vehicle} · Fecha: ${date}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <select onchange="window.updateMissionStatus('${id}', this.value)" style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(0,243,255,0.3); background: rgba(0,0,0,0.4); color: #fff; font-family: inherit; font-size: 0.8rem; outline: none; cursor: pointer;">
+                                ${statusOptions.map(opt => `<option value="${opt.val}" ${status === opt.val ? 'selected' : ''}>${opt.label}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        // Actualizar estado de misión desde admin
+        window.updateMissionStatus = async (missionId, newStatus) => {
+            try {
+                await update(ref(database, 'missions/' + missionId), { status: newStatus });
+                alert('Estado de misión actualizado.');
+            } catch(e) {
+                alert('Error al actualizar: ' + e.message);
+            }
+        };
+
+        // Modal de Asignación: Abrir
+        window.openAssignModal = (uid) => {
+            selectedAssignUid = uid;
+            const user = allUsersData[uid] || {};
+            const userName = user.displayName || user.email || 'Usuario';
+            const assign = allAssignmentsData[uid] || {};
+
+            document.getElementById('assignModalSubtitle').textContent = `Configurando cliente: ${userName} (${user.email || 'Sin correo'})`;
+            document.getElementById('assignSatsInput').value = assign.sats || 0;
+            document.getElementById('assignNotesInput').value = assign.notes || '';
+
+            const listCont = document.getElementById('assignLaunchesListContainer');
+            const missionEntries = Object.entries(allMissionsData);
+            const assignedMissions = assign.missions || [];
+
+            if (!missionEntries.length) {
+                listCont.innerHTML = `<div style="text-align:center; padding:15px; color:rgba(255,255,255,0.4);">No hay misiones disponibles para asignar.</div>`;
+            } else {
+                listCont.innerHTML = missionEntries.map(([id, m]) => {
+                    const isChecked = assignedMissions.includes(id) ? 'checked' : '';
+                    const title = m.title || m.name || id;
+                    const date = m.date || '';
+                    return `
+                        <label class="launch-assign-row">
+                            <input type="checkbox" value="${id}" ${isChecked}>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; font-size: 0.85rem; color: #fff;">${title}</div>
+                                <div style="font-size: 0.72rem; color: rgba(255,255,255,0.4);">${date} · ${m.vehicle || 'Tomcat'}</div>
+                            </div>
+                        </label>`;
+                }).join('');
+            }
+
+            assignModal.classList.add('active');
+        };
+
+        // Modal de Asignación: Cerrar
+        function closeAssignModalFn() {
+            assignModal.classList.remove('active');
+            selectedAssignUid = null;
+        }
+        closeAssignModal.addEventListener('click', closeAssignModalFn);
+        cancelAssignBtn.addEventListener('click', closeAssignModalFn);
+
+        // Modal de Asignación: Guardar
+        saveAssignBtn.addEventListener('click', async () => {
+            if (!selectedAssignUid) return;
+
+            const sats = parseInt(document.getElementById('assignSatsInput').value) || 0;
+            const notes = document.getElementById('assignNotesInput').value.trim();
+
+            const checkboxes = document.querySelectorAll('#assignLaunchesListContainer input[type="checkbox"]');
+            const selectedMissions = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) selectedMissions.push(cb.value);
+            });
+
+            try {
+                await set(ref(database, 'client_assignments/' + selectedAssignUid), {
+                    sats: sats,
+                    notes: notes,
+                    missions: selectedMissions,
+                    updatedAt: new Date().toISOString()
+                });
+                closeAssignModalFn();
+                alert('Asignación guardada con éxito.');
+            } catch (err) {
+                alert('Error al guardar: ' + err.message);
+            }
+        });
+
+        // 4. Actualizar Dashboard del Cliente
+        function updateClientDashboard(assignment) {
+            const assignedMissionIds = assignment.missions || [];
+
+            document.getElementById('clientStatMissions').textContent = assignedMissionIds.length;
+
+            const container = document.getElementById('clientMissionsContainer');
+
+            if (!assignedMissionIds.length) {
+                container.innerHTML = `
+                    <div class="empty-placeholder">
+                        <i class="fas fa-rocket"></i>
+                        Aún no tienes misiones asignadas a tu cuenta.
+                        <br>
+                        <span style="font-size: 0.8rem; color: rgba(255,255,255,0.4); display: block; margin-top: 8px;">
+                            Si has contratado un servicio de lanzamiento, nuestro equipo de operaciones lo vinculará aquí.
+                        </span>
+                    </div>`;
+                return;
+            }
+
+            const clientMissions = assignedMissionIds
+                .map(id => ({ id, ...(allMissionsData[id] || {}) }))
+                .filter(m => m.title || m.name);
+
+            if (!clientMissions.length) {
+                container.innerHTML = `
+                    <div class="empty-placeholder">
+                        <i class="fas fa-info-circle"></i>
+                        Tus misiones asignadas se están sincronizando...
+                    </div>`;
+                return;
+            }
+
+            // Próximo lanzamiento — solo mostrar si hay misiones upcoming o in_flight
+            const nextLaunchCard = document.getElementById('nextLaunchCard');
+            const pendingMissions = clientMissions.filter(m => m.status === 'upcoming' || m.status === 'in_flight');
+            if (pendingMissions.length) {
+                const nextOne = pendingMissions[0];
+                document.getElementById('clientStatNextLaunch').textContent = (nextOne.title || nextOne.name || 'MISIÓN').toUpperCase();
+                document.getElementById('clientStatNextLaunchDesc').textContent = nextOne.date ? `Fecha: ${nextOne.date}` : 'Fecha a definir';
+                nextLaunchCard.style.display = '';
+            } else {
+                nextLaunchCard.style.display = 'none';
+            }
+
+            const statusColors = {
+                'upcoming': 'var(--neon-orange)',
+                'in_flight': 'var(--neon-blue)',
+                'success': 'var(--neon-green)',
+                'failed': 'var(--neon-red)'
+            };
+            const statusLabels = {
+                'upcoming': 'PRÓXIMA',
+                'in_flight': 'EN VUELO',
+                'success': 'COMPLETADA',
+                'failed': 'FALLIDA'
+            };
+
+            container.innerHTML = `<div class="missions-client-grid">${clientMissions.map(m => {
+                const sColor = statusColors[m.status] || 'var(--primary-color)';
+                const sLabel = statusLabels[m.status] || (m.status || 'PROGRAMADA').toUpperCase();
+                const title = m.title || m.name || 'Misión';
+                const vehicle = m.vehicle || 'Tomcat';
+                const date = m.date || 'A determinar';
+                const time = m.time || 'TBD';
+                const payload = m.payload || assignment.notes || 'Carga Comercial';
+                const destination = m.destination || 'Órbita Baja Terrestre (LEO)';
+
+                return `
+                    <div class="client-mission-card" onclick="window.location.href='misiones.html?mission=${m.id}'" style="cursor:pointer;" title="Ver detalles en Misiones">
+                        <div class="client-mission-top">
+                            <span class="badge-chip cyan"><i class="fas fa-shuttle-space"></i> ${vehicle}</span>
+                            <span class="badge-chip" style="border-color:${sColor}; color:${sColor};">
+                                <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:${sColor}; margin-right:5px;"></span>
+                                ${sLabel}
+                            </span>
+                        </div>
+                        <h3 class="client-mission-title">${title}</h3>
+                        <p style="font-size:0.82rem; color:rgba(255,255,255,0.6); margin:0 0 10px; line-height:1.5;">
+                            ${m.description || 'Lanzamiento orbital contratado operado por J.S. Aerospace.'}
+                        </p>
+                        <div class="client-mission-row">
+                            <div>
+                                <strong>FECHA / HORA</strong>
+                                <span>${date} ${time}</span>
+                            </div>
+                            <div>
+                                <strong>DESTINO</strong>
+                                <span>${destination}</span>
+                            </div>
+                        </div>
+                        <div class="client-mission-row" style="margin-top:8px;">
+                            <div>
+                                <strong>CARGA ÚTIL</strong>
+                                <span>${payload}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top:12px; text-align:right;">
+                            <span style="font-size:0.75rem; color:var(--primary-color); opacity:0.7;"><i class="fas fa-arrow-right"></i> Ver detalles</span>
+                        </div>
+                    </div>`;
+            }).join('')}</div>`;
+        }
+
+        // Navegación Tabs Admin
+        document.querySelectorAll('[data-admin-tab]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-admin-tab]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const target = btn.dataset.adminTab;
+                document.querySelectorAll('#view-admin .tab-panel').forEach(p => p.classList.remove('active'));
+                const targetEl = document.getElementById('admin-tab-' + target);
+                if (targetEl) targetEl.classList.add('active');
+            });
+        });
+
+        // Navegación Tabs Cliente
+        document.querySelectorAll('[data-client-tab]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-client-tab]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const target = btn.dataset.clientTab;
+                document.querySelectorAll('#view-client .tab-panel').forEach(p => p.classList.remove('active'));
+                const targetEl = document.getElementById('client-tab-' + target);
+                if (targetEl) targetEl.classList.add('active');
+            });
+        });
+
+        // Botones de acción directos
+        document.getElementById('heroLoginBtn').addEventListener('click', () => {
+            loginModal.classList.add('active');
+        });
+
+        document.getElementById('ctaOpenContact').addEventListener('click', () => {
+            contactModal.classList.add('active');
+            updateChatView();
+        });
+
+
+
+        document.getElementById('adminRefreshBtn').addEventListener('click', () => {
+            get(ref(database, 'users')).then(s => {
+                allUsersData = s.val() || {};
+                renderAdminUsersList();
+                updateAdminStats();
+            });
+        });
+
+        document.getElementById('adminLogoutBtn').addEventListener('click', () => signOut(auth));
+        document.getElementById('clientLogoutBtn').addEventListener('click', () => signOut(auth));
+
+        // Auth Modal & Profile Management
+        authBtn.addEventListener('click', () => {
+            if (currentUser) profileModal.classList.add('active');
+            else loginModal.classList.add('active');
+        });
+
+        closeModal.addEventListener('click', () => loginModal.classList.remove('active'));
+        closeProfileModal.addEventListener('click', () => profileModal.classList.remove('active'));
+
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            modalTitle.textContent = isLoginMode ? 'Iniciar Sesión' : 'Registrarse';
+            modalSubtitle.textContent = isLoginMode ? 'Accede a tu cuenta de J.S.Aerospace' : 'Únete a la nueva era espacial';
+            submitBtn.textContent = isLoginMode ? 'Entrar' : 'Crear Cuenta';
+            toggleText.textContent = isLoginMode ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
+            toggleLink.textContent = isLoginMode ? 'Regístrate' : 'Inicia Sesión';
+            nameGroup.style.display = isLoginMode ? 'none' : 'block';
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            const name = document.getElementById('userName').value;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await updateProfile(userCredential.user, { displayName: name });
+                }
+                loginModal.classList.remove('active');
+            } catch (error) {
+                authMessage.textContent = error.message;
+                authMessage.className = 'auth-message error';
+            }
+        });
+
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                loginModal.classList.remove('active');
+            } catch (error) {
+                authMessage.textContent = error.message;
+                authMessage.className = 'auth-message error';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth);
+            profileModal.classList.remove('active');
+            contactModal.classList.remove('active');
+        });
+
+        // Chat de soporte
+        const contactBtn = document.getElementById('contactBtn');
+        const contactLoginRequired = document.getElementById('contact-login-required');
+        const contactChatArea = document.getElementById('contact-chat-area');
+        const contactConversations = document.getElementById('contact-conversations');
+        const contactLoginBtn = document.getElementById('contactLoginBtn');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const conversationsList = document.getElementById('conversations-list');
+        const chatBackBtn = document.getElementById('chat-back-btn');
+
+        let chatListeners = [], activeChatUid = null;
+
+        contactBtn.addEventListener('click', () => { contactModal.classList.add('active'); updateChatView(); });
+        closeContactModal.addEventListener('click', () => contactModal.classList.remove('active'));
+        contactLoginBtn.addEventListener('click', () => { contactModal.classList.remove('active'); loginModal.classList.add('active'); });
+
+        function updateChatView() {
+            chatListeners.forEach(off => off());
+            chatListeners = [];
+
+            if (!currentUser) {
+                contactLoginRequired.style.display = 'block';
+                contactConversations.style.display = 'none';
+                contactChatArea.style.display = 'none';
+                chatBackBtn.style.display = 'none';
+                return;
+            }
+            contactLoginRequired.style.display = 'none';
+
+            if (isAdmin) {
+                if (activeChatUid) {
+                    contactConversations.style.display = 'none';
+                    contactChatArea.style.display = 'flex';
+                    chatBackBtn.style.display = 'block';
+                    loadChatMessages(activeChatUid);
+                } else {
+                    contactConversations.style.display = 'block';
+                    contactChatArea.style.display = 'none';
+                    chatBackBtn.style.display = 'none';
+                    loadAdminConversations();
+                }
+            } else {
+                contactConversations.style.display = 'none';
+                contactChatArea.style.display = 'flex';
+                chatBackBtn.style.display = 'none';
+                loadChatMessages(currentUser.uid);
+            }
+        }
+
+        chatBackBtn.addEventListener('click', () => {
+            activeChatUid = null;
+            updateChatView();
+        });
+
+        function loadAdminConversations() {
+            const chatsRef = ref(database, 'chats');
+            const off = onValue(chatsRef, (snapshot) => {
+                conversationsList.innerHTML = '';
+                const data = snapshot.val();
+                if (!data) {
+                    conversationsList.innerHTML = '<p style="text-align:center; color:rgba(255,255,255,0.5);">No hay conversaciones.</p>';
+                    return;
+                }
+                Object.keys(data).forEach(uid => {
+                    const uData = allUsersData[uid] || {};
+                    const name = uData.displayName || (uData.email ? uData.email.split('@')[0] : 'Usuario');
+                    const div = document.createElement('div');
+                    div.style.cssText = 'padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.2s;';
+                    div.innerHTML = `<i class="fas fa-user-circle" style="font-size: 1.5rem; color: var(--primary-color);"></i><div><strong style="color: #fff;">${name}</strong><br><small style="color: rgba(255,255,255,0.4);">${uData.email || uid}</small></div>`;
+                    div.onmouseover = () => div.style.background = 'rgba(255,255,255,0.05)';
+                    div.onmouseout = () => div.style.background = 'transparent';
+                    div.onclick = () => {
+                        activeChatUid = uid;
+                        updateChatView();
+                    };
+                    conversationsList.appendChild(div);
+                });
+            });
+            chatListeners.push(() => off());
+        }
+
+        function loadChatMessages(targetUid) {
+            chatMessages.innerHTML = '';
+            const msgRef = ref(database, 'chats/' + targetUid);
+            const off = onChildAdded(msgRef, (snapshot) => {
+                const msg = snapshot.val();
+                const isMe = (msg.senderUid === currentUser.uid);
+                const div = document.createElement('div');
+                div.style.cssText = `max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; ${isMe ? 'align-self: flex-end; background: var(--primary-color); color: #000;' : 'align-self: flex-start; background: rgba(255,255,255,0.1); color: #fff;'}`;
+                div.textContent = msg.text;
+                chatMessages.appendChild(div);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+            chatListeners.push(() => off());
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text || !currentUser) return;
+            const targetUid = isAdmin ? activeChatUid : currentUser.uid;
+            if (!targetUid) return;
+
+            const msgRef = ref(database, 'chats/' + targetUid);
+            await push(msgRef, {
+                text: text,
+                senderUid: currentUser.uid,
+                senderEmail: currentUser.email,
+                senderName: currentUser.displayName || currentUser.email.split('@')[0],
+                timestamp: new Date().toISOString()
+            });
+            chatInput.value = '';
+        });
+    </script>
+
+    <script src="nav-mobile.js"></script>
+</body>
+
+</html>
