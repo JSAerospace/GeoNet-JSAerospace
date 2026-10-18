@@ -99,8 +99,12 @@
         /* Hero Fullscreen Sections */
         .hero-section {
             position: relative;
-            height: 100vh;
+            /* Altura mínima, no fija: si el contenido no cabe (pantalla baja),
+               la sección crece y la galería no se corta */
+            height: auto;
             min-height: 650px;
+            min-height: 100vh;
+            min-height: 100svh;
             width: 100%;
             background-size: cover;
             background-position: center;
