@@ -21,18 +21,39 @@
         return precisionOf(mission) !== 'day';
     }
 
-    function label(dateObj, precision) {
-        if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) return '';
-        var year = dateObj.getFullYear();
-        var month = MONTHS_ES[dateObj.getMonth()];
-        var day = dateObj.getDate();
+    // Partes de la fecha tal como se guardó (evita saltos de día/mes por zona horaria)
+    function partsOf(raw) {
+        if (!raw) return null;
+        var s = String(raw).trim();
+        var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return { year: +m[1], month: +m[2] - 1, day: +m[3] };
+        m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if (m) return { year: +m[3], month: +m[2] - 1, day: +m[1] };
+        return null;
+    }
+
+    function label(dateObj, precision, rawDate) {
+        var parts = partsOf(rawDate);
+        var year, monthIndex, day;
+        if (parts) {
+            year = parts.year;
+            monthIndex = parts.month;
+            day = parts.day;
+        } else if (dateObj instanceof Date && !isNaN(dateObj.getTime())) {
+            year = dateObj.getFullYear();
+            monthIndex = dateObj.getMonth();
+            day = dateObj.getDate();
+        } else {
+            return '';
+        }
+        var month = MONTHS_ES[monthIndex];
         if (precision === 'year') return String(year);
         if (precision === 'month') return month + ' ' + year;
         return day + ' ' + month + ' ' + year;
     }
 
     function labelFor(mission, dateObj) {
-        return label(dateObj, precisionOf(mission));
+        return label(dateObj, precisionOf(mission), mission && mission.date);
     }
 
     function description(mission) {

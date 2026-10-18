@@ -1703,7 +1703,9 @@
                 const tickerNet = document.getElementById('homepage-next-launch-net');
                 const netPrec = window.JSANet.precisionOf(closestMission);
                 const netCoarse = !!closestMission.net && netPrec !== 'day';
-                targetNetLabel = netCoarse ? window.JSANet.label(closestDate, netPrec) : null;
+                targetNetLabel = netCoarse
+                    ? window.JSANet.label(closestDate, netPrec, closestMission.date)
+                    : ((closestMission.net && !closestMission.time) ? 'hora por confirmar' : null);
                 if (tickerNet) {
                     tickerNet.style.display = closestMission.net ? 'inline-flex' : 'none';
                     tickerNet.textContent = 'NET';

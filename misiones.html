@@ -1423,7 +1423,7 @@
                         <input type="date" id="mDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="mTime">Hora (Local)</label>
+                        <label for="mTime" id="mTimeLabel">Hora (Local)</label>
                         <input type="time" id="mTime" required>
                     </div>
                 </div>
@@ -1947,7 +1947,7 @@
                 // NET: precisión publicada (año / año+mes / fecha completa)
                 const netPrec = window.JSANet.precisionOf(launch);
                 const netCoarse = !!launch.net && netPrec !== 'day';
-                const netTxt = launch.net ? window.JSANet.label(d, netPrec) : '';
+                const netTxt = launch.net ? window.JSANet.label(d, netPrec, launch.date) : '';
                 const dateBadgeHtml = netCoarse
                     ? `<div class="date-badge net"><span class="date-text">${netTxt}</span></div>`
                     : `<div class="date-badge"><span class="date-day">${day}</span><span class="date-month">${monthShort}</span></div>`;
@@ -2042,7 +2042,7 @@
                         ${dateBadgeHtml}
                         <div class="rocket-mission">${launch.vehicle || 'COHETE'} <span class="separator">•</span> ${launch.mission}</div>
                         ${badges}
-                        <div class="time-row"><div class="launch-time">🕒 ${time} (Local)</div></div>
+                        <div class="time-row"><div class="launch-time">🕒 ${launch.time ? time + ' (Local)' : 'Hora por confirmar'}</div></div>
                         <div class="card-footer">
                             <div class="location-row"><span>📍</span><span>${launch.location || launch.site || 'J.S. Aerospace Base'}</span></div>
                             <div class="detail-item"><span class="label">Proveedor:</span><span style="font-weight:600">${launch.provider || 'J.S. Aerospace'}</span></div>
@@ -2108,9 +2108,10 @@
             const d = m.dateObj;
             const netPrec = window.JSANet.precisionOf(m);
             const netCoarse = !!m.net && netPrec !== 'day';
+            const horaTexto = m.time ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'hora por confirmar';
             safeGet('detailsDateTime').textContent = netCoarse
-                ? `NET · ${window.JSANet.label(d, netPrec)}`
-                : `${d.toLocaleDateString()} • ${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}${m.net ? ' · NET' : ''}`;
+                ? `NET · ${window.JSANet.label(d, netPrec, m.date)}`
+                : `${d.toLocaleDateString()} • ${horaTexto}${m.net ? ' · NET' : ''}`;
             safeGet('detailsVehicle').textContent = m.vehicle || 'Tomcat';
             safeGet('detailsBooster').textContent = m.booster ? `Booster: ${m.booster}` : '';
             safeGet('detailsProvider').textContent = m.provider || 'J.S. Aerospace';
@@ -2179,13 +2180,12 @@
             safeGet('missionModalTitle').innerText = 'Editar Misión';
             safeGet('mTitle').value = m.mission || '';
             safeGet('mDate').value = m.date || m.dateObj.toISOString().split('T')[0];
-            safeGet('mTime').value = m.time || '18:00';
+            safeGet('mTime').value = m.time || '';
             safeGet('mStatus').value = m.status || 'upcoming';
             if (safeGet('mNet')) safeGet('mNet').checked = !!m.net;
-            if (safeGet('mNetNoteGroup')) safeGet('mNetNoteGroup').style.display = m.net ? 'block' : 'none';
-            if (safeGet('mNetPrecisionGroup')) safeGet('mNetPrecisionGroup').style.display = m.net ? 'block' : 'none';
             if (safeGet('mNetPrecision')) safeGet('mNetPrecision').value = m.netPrecision || 'day';
             if (safeGet('mNetNote')) safeGet('mNetNote').value = m.netNote || '';
+            syncNetFields();
             safeGet('mLocation').value = m.location || m.site || '';
             safeGet('mProvider').value = m.provider || 'J.S. Aerospace';
             safeGet('mVehicle').value = m.vehicle || '';
@@ -2225,16 +2225,27 @@
             }
         };
 
-        // NET: mostrar/ocultar la nota según la casilla
-        const netCheckbox = safeGet('mNet');
-        if (netCheckbox) {
-            netCheckbox.onchange = () => {
-                const nota = safeGet('mNetNoteGroup');
-                const precision = safeGet('mNetPrecisionGroup');
-                if (nota) nota.style.display = netCheckbox.checked ? 'block' : 'none';
-                if (precision) precision.style.display = netCheckbox.checked ? 'block' : 'none';
-            };
+        // NET: la hora deja de ser obligatoria y se muestran precisión/nota
+        function syncNetFields() {
+            const cb = safeGet('mNet');
+            const on = !!(cb && cb.checked);
+            ['mNetNoteGroup', 'mNetPrecisionGroup'].forEach((id) => {
+                const el = safeGet(id);
+                if (el) el.style.display = on ? 'block' : 'none';
+            });
+            const time = safeGet('mTime');
+            if (time) {
+                time.required = !on;
+                time.placeholder = on ? 'Opcional en fechas NET' : '';
+            }
+            const timeLabel = safeGet('mTimeLabel');
+            if (timeLabel) timeLabel.innerHTML = on ? 'Hora (Local) <span style="color:var(--net-color); font-size:0.7em; letter-spacing:1px;">· OPCIONAL EN NET</span>' : 'Hora (Local)';
+            return on;
         }
+
+        const netCheckbox = safeGet('mNet');
+        if (netCheckbox) netCheckbox.onchange = syncNetFields;
+        syncNetFields();
 
         // Save Mission (Add / Edit)
         const missionForm = safeGet('missionForm');
@@ -2273,8 +2284,7 @@
                     safeGet('missionModal').classList.remove('active');
                     missionForm.reset();
                     safeGet('editingMissionId').value = '';
-                    if (safeGet('mNetNoteGroup')) safeGet('mNetNoteGroup').style.display = 'none';
-                    if (safeGet('mNetPrecisionGroup')) safeGet('mNetPrecisionGroup').style.display = 'none';
+                    syncNetFields();
                 } catch (err) {
                     alert('Error al guardar: ' + err.message);
                 }

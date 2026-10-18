@@ -1124,10 +1124,12 @@
             
             const netPrec = window.JSANet.precisionOf(m);
             const netCoarse = !!m.net && netPrec !== 'day';
-            const netTxt = m.net ? window.JSANet.label(dateObj, netPrec) : '';
+            const netTxt = m.net ? window.JSANet.label(dateObj, netPrec, m.date) : '';
             safeGet('detailsDateTime').textContent = netCoarse
                 ? `NET · ${netTxt}`
-                : (isNaN(dateObj.getTime()) ? (m.date + ' ' + m.time) : (dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false})));
+                : (isNaN(dateObj.getTime())
+                    ? (m.date + ' ' + (m.time || 'hora por confirmar'))
+                    : (dateObj.toLocaleDateString() + ' ' + (m.time ? dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}) : '· hora por confirmar')));
             safeGet('detailsTimeType').textContent = netCoarse
                 ? '(Ventana NET · ' + (netPrec === 'year' ? 'solo año' : 'año y mes') + ')'
                 : (m.net ? '(Hora Local · Fecha NET)' : '(Hora Local)');
@@ -1382,7 +1384,7 @@
                 
                 const netPrec = window.JSANet.precisionOf(m);
                 const netCoarse = !!m.net && netPrec !== 'day';
-                const netTxt = m.net ? window.JSANet.label(dObj, netPrec) : '';
+                const netTxt = m.net ? window.JSANet.label(dObj, netPrec, m.date) : '';
                 const dateBadge = netCoarse
                     ? `<div class="card-date-badge net" title="Zona NET (no antes de)">${netTxt}</div>`
                     : `<div class="card-date-badge" style="color:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}">${dObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }).toUpperCase()}</div>`;
@@ -1400,7 +1402,9 @@
                     </div>
                     ${netCoarse
                         ? `<div class="sidebar-countdown net-countdown">Ventana NET · ${netTxt}</div>`
-                        : (m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : '')}
+                        : ((m.net && !m.time)
+                            ? `<div class="sidebar-countdown net-countdown">Hora por confirmar</div>`
+                            : (m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : ''))}
                 `;
                 card.onclick = () => window.viewMissionDetails(m.id);
                 list.appendChild(card);

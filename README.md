@@ -50,6 +50,7 @@ Los lanzamientos admiten la marca **NET** (*no antes de*): la fecha es una estim
 | `day` | Año, mes y día | `27 OCT 2026` |
 
 - Solo el administrador puede marcarla: en **Misiones**, el botón `NET` de cada tarjeta alterna la marca al instante, y el formulario de edición permite elegir la **precisión** y añadir una nota.
+- En una misión NET la **hora es opcional**: si se deja vacía, las tarjetas, el detalle, el calendario y el contador muestran «Hora por confirmar» en lugar de una hora inventada.
 - La fecha guardada se usa para ordenar, pero la web solo muestra hasta la precisión elegida. Las fechas sin día confirmado no se pintan en la cuadrícula del calendario (aparecen en la lista lateral con su ventana NET) y el contador de la portada muestra la ventana en lugar de una cuenta atrás exacta.
 - La insignia ámbar **NET** aparece en las tarjetas y el héroe de Misiones, en el calendario (barra lateral y detalle) y en el contador de próxima misión de la portada.
 
