@@ -538,6 +538,79 @@
             color: #fff;
             font-weight: bold;
         }
+
+        /* Mobile Controls & HUD Adaptation */
+        .hud-toggle-btn {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 15px;
+            z-index: 101;
+            background: rgba(5, 15, 30, 0.9);
+            border: 1px solid #00d4ff;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 900px) {
+            .hud-toggle-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .dashboard-container {
+                top: 115px !important;
+                left: 12px !important;
+                right: 12px !important;
+                width: auto !important;
+                max-width: calc(100vw - 24px) !important;
+                max-height: calc(100vh - 200px) !important;
+                max-height: calc(100dvh - 200px) !important;
+                overflow-y: auto !important;
+                transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.35s ease;
+                transform: translateY(-20px);
+                opacity: 0;
+                pointer-events: none;
+                background: rgba(3, 8, 18, 0.95);
+                padding: 14px;
+                border-radius: 12px;
+                border: 1px solid rgba(0, 212, 255, 0.3);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
+            }
+
+            .dashboard-container.mobile-open {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .focus-controls {
+                bottom: 25px !important;
+                padding: 6px 14px !important;
+                gap: 8px !important;
+                width: auto !important;
+            }
+
+            .focus-btn {
+                padding: 8px 14px !important;
+                font-size: 0.75rem !important;
+            }
+
+            .sat-header-overlay {
+                top: 65px !important;
+                padding: 0 15px !important;
+            }
+        }
     </style>
 </head>
 
@@ -560,7 +633,10 @@
             <img src="LOGO_JTT.png" alt="J.S.Aerospace Logo">
             <div class="logo-text">J.S.<span class="highlight">AEROSPACE</span></div>
         </a>
-        <ul class="nav-links">
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir Menú">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
             <li><a href="index.html" class="transition-link">Inicio</a></li>
             <li><a href="misiones.html" class="transition-link">Misiones</a></li>
             <li><a href="cohetes.html" class="transition-link">Cohetes</a></li>
@@ -575,6 +651,10 @@
 
     <div class="hud-overlay">
 
+        <!-- Botón móvil para mostrar/ocultar panel HUD -->
+        <button class="hud-toggle-btn" id="hudToggleBtn" onclick="toggleDashboard()">
+            <i class="fas fa-chart-pie"></i> PANEL
+        </button>
 
         <!-- Focus Controls Moved to Bottom -->
         <div class="focus-controls">
@@ -583,7 +663,7 @@
             <button class="focus-btn" id="focusLaythe">Laythe</button>
         </div>
 
-        <div class="dashboard-container">
+        <div class="dashboard-container" id="dashboardContainer">
             <div class="hud-panel">
                 <div class="panel-header"><i class="fas fa-chart-pie"></i> Información General</div>
                 <div class="panel-content">
@@ -1590,8 +1670,20 @@
                 console.warn("GeoNet: Safety timeout triggered. Closing loading screen.");
                 l.style.display = 'none';
             }
-        }, 12000); 
+        }, 12000);
+
+        window.toggleDashboard = function () {
+            const dc = document.getElementById('dashboardContainer') || document.querySelector('.dashboard-container');
+            const btn = document.getElementById('hudToggleBtn');
+            if (dc) {
+                const isOpen = dc.classList.toggle('mobile-open');
+                if (btn) {
+                    btn.innerHTML = isOpen ? '<i class="fas fa-times"></i> CERRAR' : '<i class="fas fa-chart-pie"></i> PANEL';
+                }
+            }
+        };
     </script>
+    <script src="nav-mobile.js"></script>
 </body>
 
 </html>

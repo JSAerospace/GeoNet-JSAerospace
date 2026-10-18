@@ -257,6 +257,55 @@
             }
         }
 
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 75px 12px 30px !important;
+            }
+
+            .calendar-wrapper {
+                padding: 16px 10px !important;
+                border-radius: 12px !important;
+            }
+
+            .calendar-grid {
+                gap: 4px !important;
+            }
+
+            .weekday {
+                font-size: 0.65rem !important;
+                padding-bottom: 6px !important;
+            }
+
+            .calendar-day {
+                padding: 4px 2px !important;
+                border-radius: 6px !important;
+                min-height: 48px !important;
+            }
+
+            .day-number {
+                font-size: 0.75rem !important;
+            }
+
+            .event-tag {
+                font-size: 0.55rem !important;
+                padding: 2px 3px !important;
+                margin-top: 2px !important;
+                border-radius: 3px !important;
+            }
+
+            .current-month {
+                font-size: 1.05rem !important;
+            }
+
+            .sidebar-upcoming {
+                padding: 16px 12px !important;
+            }
+
+            .sidebar-title {
+                font-size: 1.1rem !important;
+            }
+        }
+
         /* Calendar Navigation (Arrows) */
         .calendar-nav {
             display: flex;
@@ -477,7 +526,10 @@
             <img src="LOGO_JTT.png" alt="J.S.Aerospace Logo">
             <div class="logo-text">J.S.<span class="highlight">AEROSPACE</span></div>
         </a>
-        <ul class="nav-links">
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir Menú">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
             <li><a href="index.html" class="transition-link">Inicio</a></li>
             <li><a href="misiones.html" class="transition-link">Misiones</a></li>
             <li><a href="cohetes.html" class="transition-link">Cohetes</a></li>
@@ -1215,6 +1267,7 @@
             };
         });
     </script>
+    <script src="nav-mobile.js"></script>
 </body>
 
 </html>

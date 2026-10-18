@@ -824,3 +824,198 @@ p {
     visibility: hidden !important;
     pointer-events: none !important;
 }
+
+/* ========================================================
+   SISTEMA RESPONSIVE PARA DISPOSITIVOS MÓVILES (CELULAR)
+   ======================================================== */
+
+.nav-toggle {
+    display: none;
+    background: rgba(0, 243, 255, 0.08);
+    border: 1px solid rgba(0, 243, 255, 0.4);
+    color: var(--primary-color, #00f3ff);
+    font-size: 1.25rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 1002;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-toggle:hover,
+.nav-toggle:focus {
+    background: rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+    outline: none;
+}
+
+.nav-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+}
+
+.nav-backdrop.active {
+    display: block;
+    opacity: 1;
+}
+
+body.nav-open {
+    overflow: hidden !important;
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        padding: 12px 18px !important;
+        background: rgba(5, 5, 16, 0.92) !important;
+        backdrop-filter: blur(14px) !important;
+        -webkit-backdrop-filter: blur(14px) !important;
+        border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+        pointer-events: auto !important;
+    }
+
+    .logo {
+        gap: 10px;
+    }
+
+    .logo img {
+        height: 28px !important;
+    }
+
+    .logo-text {
+        font-size: 1rem !important;
+        letter-spacing: 1.5px !important;
+    }
+
+    .nav-toggle {
+        display: flex !important;
+    }
+
+    .nav-links {
+        position: fixed !important;
+        top: 0 !important;
+        right: -100% !important;
+        width: min(320px, 85vw) !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        background: linear-gradient(180deg, #090b18 0%, #050510 100%) !important;
+        border-left: 1px solid rgba(0, 243, 255, 0.25) !important;
+        box-shadow: -15px 0 40px rgba(0, 0, 0, 0.85) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        justify-content: flex-start !important;
+        padding: 85px 22px 35px !important;
+        gap: 12px !important;
+        transition: right 0.35s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+        z-index: 999 !important;
+        overflow-y: auto !important;
+        pointer-events: auto !important;
+    }
+
+    .nav-links.open {
+        right: 0 !important;
+    }
+
+    .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding-bottom: 6px;
+    }
+
+    .nav-links a {
+        display: block;
+        font-size: 1rem !important;
+        padding: 10px 14px;
+        border-radius: 6px;
+        letter-spacing: 1px;
+        transition: all 0.25s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+        background: rgba(0, 243, 255, 0.12);
+        color: var(--primary-color) !important;
+        padding-left: 18px;
+    }
+
+    .nav-links .auth-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 18px;
+        font-size: 0.95rem;
+        margin-top: 8px;
+    }
+
+    /* Adaptación de modales en móviles */
+    .modal-overlay {
+        padding: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .login-modal {
+        padding: 24px 18px !important;
+        margin: auto !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        max-height: 90vh !important;
+        max-height: 90dvh !important;
+        overflow-y: auto !important;
+        border-radius: 14px !important;
+    }
+
+    .modal-header h2 {
+        font-size: 1.4rem !important;
+    }
+
+    .form-group {
+        margin-bottom: 14px !important;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px !important; /* Previene zoom automático indeseado en Safari iOS */
+        padding: 12px 14px !important;
+    }
+
+    .auth-submit-btn {
+        padding: 12px !important;
+        font-size: 1rem !important;
+    }
+
+    .admin-fab {
+        bottom: 20px !important;
+        right: 20px !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 1.2rem !important;
+    }
+
+    .missions-grid,
+    .fleet-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+        padding: 10px 0 !important;
+    }
+
+    .mission-card,
+    .fleet-card {
+        margin: 0 !important;
+        width: 100% !important;
+    }
+}
+

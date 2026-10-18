@@ -343,20 +343,60 @@
             .hero-section {
                 padding-left: 20px;
                 padding-right: 20px;
+                height: auto !important;
+                min-height: 100svh;
+                padding-top: 85px;
+                padding-bottom: 40px;
             }
 
             .side-nav {
-                width: 50px;
-                padding-right: 16px;
+                display: none !important;
             }
 
-            .side-nav-label {
-                display: none;
+            .hero-title {
+                font-size: clamp(2rem, 8vw, 3.2rem) !important;
+                margin-bottom: 1rem !important;
+            }
+
+            .hero-subtitle {
+                font-size: 0.9rem !important;
+                letter-spacing: 2px !important;
             }
 
             .hero-desc {
                 max-width: 100%;
-                font-size: 1rem;
+                font-size: 0.95rem;
+                line-height: 1.55;
+                margin-bottom: 1.6rem;
+            }
+
+            .next-mission-ticker {
+                max-width: 100%;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 6px 12px;
+                margin-bottom: 18px;
+            }
+
+            .ticker-mission-name {
+                font-size: 11px;
+                padding-right: 8px;
+            }
+
+            .ticker-countdown {
+                font-size: 12px;
+            }
+
+            .hero-btn {
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+                padding: 13px 20px;
+            }
+
+            .hero-gallery-strip {
+                margin-top: 20px !important;
+                gap: 8px !important;
             }
         }
 
@@ -878,7 +918,10 @@
             <img src="LOGO_JTT.png" alt="Logo J.S. Aerospace" style="height: 32px; width: auto; object-fit: contain;">
             <div class="logo-text">J.S.<span class="highlight">AEROSPACE</span></div>
         </a>
-        <ul class="nav-links">
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir Menú">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
             <li><a href="#tomcat" class="active">Inicio</a></li>
             <li><a href="misiones.html">Misiones</a></li>
             <li><a href="cohetes.html">Cohetes</a></li>
@@ -1596,6 +1639,7 @@
         updateCountdown();
     </script>
 
+    <script src="nav-mobile.js"></script>
 </body>
 
 </html>
