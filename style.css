@@ -156,7 +156,7 @@ body {
 
 /* Angry Red Grid/Smoke for Rockets */
 .split.right .split-bg {
-    background: url('cohete.completo.png') no-repeat center center/cover;
+    background: url('imagenes/cohete.completo.png') no-repeat center center/cover;
     box-shadow: inset 50px 0 100px rgba(0, 0, 0, 0.8);
     opacity: 0.5;
 }
