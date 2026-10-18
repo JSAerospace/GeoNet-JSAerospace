@@ -574,14 +574,7 @@
     </nav>
 
     <div class="hud-overlay">
-        <div class="sat-header-overlay">
-            <div class="sat-header-content">
-                <div class="sat-title-group">
-                    <h1 class="sat-main-title">CONSTELACIÓN GEONET</h1>
-                    <p class="sat-subtitle">VISUALIZACIÓN ORBITAL EN TIEMPO REAL</p>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Focus Controls Moved to Bottom -->
         <div class="focus-controls">
@@ -790,7 +783,7 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getDatabase, ref, set, get, update, push, onValue, onChildAdded, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
@@ -813,9 +806,9 @@
 
         let currentUser = null, isLoginMode = true, activeChatUid = null, isChatAdmin = false, chatListeners = [], isAdmin = false;
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
-            if (user) {
+            if (user && !user.isAnonymous) {
                 isAdmin = (user.email === 'olanoagus@gmail.com');
                 document.getElementById('authBtn').innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar"> <span>${user.displayName || user.email.split('@')[0]}</span>`;
                 update(ref(database, 'users/' + user.uid), { lastLogin: new Date().toISOString(), displayName: user.displayName });
@@ -824,8 +817,14 @@
                 isAdmin = false;
                 document.getElementById('authBtn').innerHTML = `<i class="fas fa-user"></i> <span>Iniciar Sesión</span>`;
                 document.getElementById('adminFab').classList.remove('active');
+                if (!user) {
+                    try { await signInAnonymously(auth); } catch (e) {}
+                }
             }
             updateChatView();
+            if (window.renderPlanesData && window.currentPlanes) {
+                window.renderPlanesData(window.currentPlanes);
+            }
         });
 
         document.getElementById('authBtn').onclick = () => currentUser ? document.getElementById('profileModal').classList.add('active') : document.getElementById('loginModal').classList.add('active');
@@ -1225,12 +1224,37 @@
             planeGroups.push(group);
         }
 
-        onValue(ref(database, 'geonet/planes'), snap => {
+        const DEFAULT_PLANES = {
+            "-default_p1": {
+                name: "Plano 1",
+                body: "earth",
+                alt: 300,
+                inc: 45,
+                count: 30,
+                color: "#00d4ff"
+            }
+        };
+
+        const getStoredPlanes = () => {
+            try {
+                const s = localStorage.getItem('geonet_cached_planes');
+                if (s) {
+                    const parsed = JSON.parse(s);
+                    if (parsed && Object.keys(parsed).length > 0) return parsed;
+                }
+            } catch (e) {}
+            return DEFAULT_PLANES;
+        };
+
+        window.currentPlanes = getStoredPlanes();
+
+        window.renderPlanesData = (planes) => {
+            window.currentPlanes = planes;
             planeGroups.forEach(g => { if (g && g.parent) g.parent.remove(g); });
             planeGroups.length = 0;
-            const planes = snap.val() || {};
             const list = document.getElementById('planes-list'), target = document.getElementById('targetPlane');
-            list.innerHTML = ''; target.innerHTML = '';
+            if (list) list.innerHTML = '';
+            if (target) target.innerHTML = '';
             Object.keys(planes).forEach((id, i) => {
                 const p = planes[id];
                 createPlane(i, p.alt, p.inc, p.count, p.color, p.body || 'earth');
@@ -1238,12 +1262,34 @@
                 if (p.body === 'moon') bodyName = 'Mun';
                 if (p.body === 'laythe') bodyName = 'Laythe';
                 const badge = `<span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem; margin-left:5px;">${bodyName}</span>`;
-                list.innerHTML += `<div class="plane-item"><div class="plane-header"><span class="plane-name">${p.name} ${badge}</span> <button onclick="window.deletePlane('${id}')" style="background:none; border:none; color:#ff3333; cursor:pointer;"><i class="fas fa-trash"></i></button></div><div class="plane-grid-info"><span>${p.alt}km</span> <span>${p.count} sats</span></div></div>`;
-                target.innerHTML += `<option value="${id}">${p.name} (${bodyName[0]})</option>`;
+                const deleteBtn = isAdmin ? `<button onclick="window.deletePlane('${id}')" style="background:none; border:none; color:#ff3333; cursor:pointer;"><i class="fas fa-trash"></i></button>` : '';
+                if (list) list.innerHTML += `<div class="plane-item"><div class="plane-header"><span class="plane-name">${p.name} ${badge}</span> ${deleteBtn}</div><div class="plane-grid-info"><span>${p.alt}km</span> <span>${p.count} sats</span></div></div>`;
+                if (target) target.innerHTML += `<option value="${id}">${p.name} (${bodyName[0]})</option>`;
             });
-            document.getElementById('stats-active-planes').textContent = Object.keys(planes).length;
-            document.getElementById('stats-active-sats').textContent = Object.values(planes).reduce((s, p) => s + parseInt(p.count), 0);
-            document.getElementById('stats-network-status').textContent = 'ONLINE';
+            const pKeys = Object.keys(planes);
+            const totalSats = Object.values(planes).reduce((s, p) => s + (parseInt(p.count) || 0), 0);
+            const activePlanesEl = document.getElementById('stats-active-planes');
+            const activeSatsEl = document.getElementById('stats-active-sats');
+            const netStatusEl = document.getElementById('stats-network-status');
+            if (activePlanesEl) activePlanesEl.textContent = pKeys.length;
+            if (activeSatsEl) activeSatsEl.textContent = totalSats;
+            if (netStatusEl) netStatusEl.textContent = 'ONLINE';
+        };
+
+        // Render stored/default planes immediately so visitors are never blocked
+        window.renderPlanesData(window.currentPlanes);
+
+        onValue(ref(database, 'geonet/planes'), snap => {
+            const planes = snap.val();
+            if (planes && Object.keys(planes).length > 0) {
+                try { localStorage.setItem('geonet_cached_planes', JSON.stringify(planes)); } catch(e) {}
+                window.renderPlanesData(planes);
+            } else {
+                window.renderPlanesData(getStoredPlanes());
+            }
+        }, error => {
+            console.warn("GeoNet: Permiso de lectura Firebase restringido para visitantes. Mostrando constelación en caché:", error);
+            window.renderPlanesData(getStoredPlanes());
         });
 
         const surfaceMarkers = [];
@@ -1379,18 +1425,32 @@
             }
         });
 
-        onValue(ref(database, 'geonet/stats'), snap => document.getElementById('stats-total-launches').textContent = snap.val()?.totalLaunches || '0');
+        onValue(ref(database, 'geonet/stats'), snap => {
+            const launches = snap.val()?.totalLaunches || '0';
+            const el = document.getElementById('stats-total-launches');
+            if (el) el.textContent = launches;
+        }, err => {
+            const el = document.getElementById('stats-total-launches');
+            if (el) el.textContent = '0';
+        });
 
         document.getElementById('adminPlaneForm').onsubmit = (e) => {
             e.preventDefault();
-            push(ref(database, 'geonet/planes'), {
+            const newP = {
                 name: document.getElementById('planeName').value,
                 body: document.getElementById('planeBody').value,
                 alt: parseInt(document.getElementById('planeAlt').value),
                 inc: parseInt(document.getElementById('planeInc').value),
                 count: 0,
                 color: document.getElementById('planeColor').value
-            });
+            };
+            push(ref(database, 'geonet/planes'), newP);
+            try {
+                const stored = getStoredPlanes();
+                stored['local_' + Date.now()] = newP;
+                localStorage.setItem('geonet_cached_planes', JSON.stringify(stored));
+                window.renderPlanesData(stored);
+            } catch(err) {}
             document.getElementById('adminModal').classList.remove('active');
         };
 
@@ -1398,11 +1458,30 @@
             e.preventDefault();
             const id = document.getElementById('targetPlane').value, count = parseInt(document.getElementById('satCountToAdd').value);
             const snap = await get(ref(database, `geonet/planes/${id}`));
-            if (snap.exists()) await update(ref(database, `geonet/planes/${id}`), { count: (snap.val().count || 0) + count });
+            const currentCount = snap.exists() ? (snap.val().count || 0) : ((window.currentPlanes && window.currentPlanes[id]?.count) || 0);
+            const newCount = currentCount + count;
+            try { await update(ref(database, `geonet/planes/${id}`), { count: newCount }); } catch(err) {}
+            try {
+                const stored = getStoredPlanes();
+                if (stored[id]) {
+                    stored[id].count = newCount;
+                    localStorage.setItem('geonet_cached_planes', JSON.stringify(stored));
+                    window.renderPlanesData(stored);
+                }
+            } catch(err) {}
             document.getElementById('adminModal').classList.remove('active');
         };
 
-        window.deletePlane = (id) => confirm('¿Eliminar plano?') && remove(ref(database, `geonet/planes/${id}`));
+        window.deletePlane = (id) => {
+            if (!confirm('¿Eliminar plano?')) return;
+            try { remove(ref(database, `geonet/planes/${id}`)); } catch(e) {}
+            try {
+                const stored = getStoredPlanes();
+                delete stored[id];
+                localStorage.setItem('geonet_cached_planes', JSON.stringify(stored));
+                window.renderPlanesData(stored);
+            } catch(e) {}
+        };
 
         let satR, satS, satC, satM, satAnim;
         window.openSatViewer = () => {
@@ -1480,26 +1559,14 @@
             renderer.render(scene, camera);
         }
 
-        // --- TELEMETRY FALLBACK (Premium Mock Data) ---
+        // --- TELEMETRY FALLBACK (Safety Check) ---
         setTimeout(() => {
-            const syncStatus = document.getElementById('orbit-list');
-            if (syncStatus && syncStatus.innerText.includes('Sincronizando')) {
-                console.log("GeoNet: Offline detected. Injecting mock telemetry...");
-                const mockSatellites = [
-                    { name: "Astro-3 (Transit)", orbit: "280km x 310km", status: "Nominal" },
-                    { name: "Laythe Station Alpha", orbit: "120km x 120km", status: "Active" },
-                    { name: "GeoNet Relay-A", orbit: "Synchronous", status: "Relaying" }
-                ];
-                syncStatus.innerHTML = mockSatellites.map(s => `
-                    <div style="background:rgba(0,212,255,0.1); padding:10px; border-radius:4px; margin-bottom:8px; border-left:3px solid #00d4ff;">
-                        <strong style="color:#00d4ff;">${s.name}</strong><br>
-                        <small>${s.orbit} | <span style="color:#00ff88;">●</span> ${s.status}</small>
-                    </div>
-                `).join('');
-                document.getElementById('focusMoon').innerText = "LUNA (384,400km)";
-                document.getElementById('focusLaythe').innerText = "LAYTHE (Jool Orbit)";
+            const list = document.getElementById('planes-list');
+            if (list && list.innerText.includes('Sincronizando')) {
+                console.log("GeoNet: Sincronización demorada. Cargando constelación guardada...");
+                window.renderPlanesData(getStoredPlanes());
             }
-        }, 3000);
+        }, 1500);
 
         animate();
 
