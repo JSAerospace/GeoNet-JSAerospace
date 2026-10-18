@@ -1701,11 +1701,8 @@
                     tickerMission.textContent = (closestMission.title || closestMission.name || 'MISIÓN').toUpperCase();
                 }
                 const tickerNet = document.getElementById('homepage-next-launch-net');
-                const netPrec = window.JSANet.precisionOf(closestMission);
-                const netCoarse = !!closestMission.net && netPrec !== 'day';
-                targetNetLabel = netCoarse
-                    ? window.JSANet.label(closestDate, netPrec, closestMission.date)
-                    : ((closestMission.net && !closestMission.time) ? 'hora por confirmar' : null);
+                // En misiones NET la cuenta atrás no tiene sentido: se anuncia como A DEFINIR
+                targetNetLabel = closestMission.net ? 'A DEFINIR' : null;
                 if (tickerNet) {
                     tickerNet.style.display = closestMission.net ? 'inline-flex' : 'none';
                     tickerNet.textContent = 'NET';

@@ -1400,11 +1400,9 @@
                         <span style="font-size:0.6rem; font-family:'Orbitron'; color:${m.status === 'in_flight' ? 'var(--neon-blue)' : (m.net ? 'var(--net-color)' : 'var(--neon-orange)')}; letter-spacing:1px;">${(m.status === 'in_flight' ? 'EN VUELO' : 'PRÓXIMA')}</span>
                         ${m.net ? `<span class="net-badge" style="margin-left:auto;" title="No Earlier Than: la fecha puede moverse">NET${netCoarse ? ' ' + netTxt : ''}</span>` : ''}
                     </div>
-                    ${netCoarse
-                        ? `<div class="sidebar-countdown net-countdown">Ventana NET · ${netTxt}</div>`
-                        : ((m.net && !m.time)
-                            ? `<div class="sidebar-countdown net-countdown">Hora por confirmar</div>`
-                            : (m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : ''))}
+                    ${m.net
+                        ? `<div class="sidebar-countdown net-countdown">A DEFINIR</div>`
+                        : (m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : '')}
                 `;
                 card.onclick = () => window.viewMissionDetails(m.id);
                 list.appendChild(card);

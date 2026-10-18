@@ -1998,7 +1998,9 @@
                             <p class="hero-launch-desc">${launch.description || (netCoarse ? `Ventana NET ${netTxt}. Misión operada desde ${launch.location || launch.site || 'J.S. Aerospace Launch Pad'}.` : `Programado para el ${day} de ${monthShort} a las ${time}. Misión operada desde ${launch.location || launch.site || 'J.S. Aerospace Launch Pad'}.`)}</p>
                             <div class="hero-launch-countdown">
                                 <span class="hero-countdown-label">T-MINUS</span>
-                                <div class="hero-countdown-time" data-live-countdown="${launch.datetimeISO}">${countdownText}</div>
+                                ${launch.net
+                                    ? '<div class="hero-countdown-time" style="letter-spacing: 2px;">A DEFINIR</div>'
+                                    : `<div class="hero-countdown-time" data-live-countdown="${launch.datetimeISO}">${countdownText}</div>`}
                             </div>
                             <button class="hero-launch-btn" onclick="window.viewMissionDetails('${launch.id}')">VER DETALLES</button>
                         </div>
