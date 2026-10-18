@@ -972,6 +972,7 @@
                 <a href="calendario.html" id="homepage-next-launch-ticker" class="next-mission-ticker" style="display: none;">
                     <span class="ticker-label">PRÓXIMA MISIÓN</span>
                     <span id="homepage-next-launch-mission" class="ticker-mission-name"></span>
+                    <span id="homepage-next-launch-net" class="net-badge" style="display: none;">NET</span>
                     <span id="homepage-next-launch-countdown" class="ticker-countdown"></span>
                 </a>
 
@@ -1624,6 +1625,8 @@
                 countdownTimer = null;
             }
             if (tickerEl) tickerEl.style.display = 'none';
+            const tickerNetEl = document.getElementById('homepage-next-launch-net');
+            if (tickerNetEl) tickerNetEl.style.display = 'none';
         }
 
         function updateCountdown() {
@@ -1685,6 +1688,11 @@
                 targetLaunchDate = closestDate;
                 if (tickerMission) {
                     tickerMission.textContent = (closestMission.title || closestMission.name || 'MISIÓN').toUpperCase();
+                }
+                const tickerNet = document.getElementById('homepage-next-launch-net');
+                if (tickerNet) {
+                    tickerNet.style.display = closestMission.net ? 'inline-flex' : 'none';
+                    tickerNet.title = closestMission.net ? (closestMission.netNote || 'No Earlier Than: la fecha puede moverse') : '';
                 }
                 if (tickerEl) tickerEl.style.display = 'inline-flex';
                 updateCountdown();

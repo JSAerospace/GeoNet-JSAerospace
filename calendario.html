@@ -1087,6 +1087,7 @@
                     <span style="color:${sCol}; font-family:'Orbitron'; font-size:0.75rem; letter-spacing:2px; font-weight:700; line-height:1;">${(statusMap[m.status] || m.status).toUpperCase()}</span>
                     ${m.status === 'success' ? '<i class="fas fa-check-circle" style="color:var(--neon-green); font-size:0.9rem; margin-left:5px;"></i>' : ''}
                     ${m.status === 'failed' ? '<i class="fas fa-times-circle" style="color:var(--neon-red); font-size:0.9rem; margin-left:5px;"></i>' : ''}
+                    ${m.net ? '<span class="net-badge" style="margin-left:6px;" title="' + (m.netNote ? String(m.netNote).replace(/"/g, '&quot;') : 'No Earlier Than: la fecha puede moverse') + '">NET</span>' : ''}
                 </div>`;
             badge.style.background = 'none';
             badge.style.padding = '0';
@@ -1119,7 +1120,16 @@
             } else dateObj = new Date(`${m.date}T${m.time || '00:00'}:00Z`);
             
             safeGet('detailsDateTime').textContent = isNaN(dateObj.getTime()) ? (m.date + ' ' + m.time) : (dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}));
-            safeGet('detailsTimeType').textContent = '(Hora Local)';
+            safeGet('detailsTimeType').textContent = m.net ? '(Hora Local · Fecha NET)' : '(Hora Local)';
+
+            let netNoteEl = safeGet('detailsNetNote');
+            if (!netNoteEl) {
+                netNoteEl = document.createElement('span');
+                netNoteEl.id = 'detailsNetNote';
+                netNoteEl.className = 'net-note';
+                safeGet('detailsTimeType')?.parentElement?.appendChild(netNoteEl);
+            }
+            netNoteEl.textContent = m.net ? (m.netNote || 'No antes de esta fecha: puede deslizarse.') : '';
             
             safeGet('detailsVehicle').textContent = m.vehicle || 'Vehículo J.S.A.';
             safeGet('detailsBooster').textContent = m.booster ? `Booster: ${m.booster}` : '';
@@ -1306,7 +1316,19 @@
 
                 if (daily.length) {
                     const list = div.appendChild(Object.assign(document.createElement('div'), { className: 'event-list', style: 'margin-top:5px;' }));
-                    daily.forEach(m => list.appendChild(Object.assign(document.createElement('div'), { className: `event-tag ${m.status}`, textContent: m.title })));
+                    daily.forEach(m => {
+                        const tag = document.createElement('div');
+                        tag.className = `event-tag ${m.status}${m.net ? ' net' : ''}`;
+                        if (m.net) {
+                            const flag = document.createElement('span');
+                            flag.className = 'net-mini';
+                            flag.textContent = 'NET';
+                            flag.title = m.netNote || 'No Earlier Than: la fecha puede moverse';
+                            tag.appendChild(flag);
+                        }
+                        tag.appendChild(document.createTextNode(m.title || m.name || 'Misión'));
+                        list.appendChild(tag);
+                    });
                 }
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 div.onclick = () => {
@@ -1353,7 +1375,8 @@
                     <h3 class="card-mission-name">${m.title}</h3>
                     <div class="sidebar-status" style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
                         <span style="width:6px; height:6px; border-radius:50%; background:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; box-shadow: 0 0 8px ${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; ${m.status === 'in_flight' ? 'animation: pulse-active 2s infinite;' : ''}"></span>
-                        <span style="font-size:0.6rem; font-family:'Orbitron'; color:${m.status === 'in_flight' ? 'var(--neon-blue)' : 'var(--neon-orange)'}; letter-spacing:1px;">${(m.status === 'in_flight' ? 'EN VUELO' : 'PRÓXIMA')}</span>
+                        <span style="font-size:0.6rem; font-family:'Orbitron'; color:${m.status === 'in_flight' ? 'var(--neon-blue)' : (m.net ? 'var(--net-color)' : 'var(--neon-orange)')}; letter-spacing:1px;">${(m.status === 'in_flight' ? 'EN VUELO' : 'PRÓXIMA')}</span>
+                        ${m.net ? '<span class="net-badge" style="margin-left:auto;" title="No Earlier Than: la fecha puede moverse">NET</span>' : ''}
                     </div>
                     ${m.showCountdown !== false ? `<div class="sidebar-countdown" id="sb-timer-${idFriendly(m.title)}"></div>` : ''}
                 `;
@@ -1436,7 +1459,7 @@
                     <div style="width: 70px; height: 50px; background-size: cover; background-position: center; border-radius: 4px; background-color: #111127; background-image: url('${thumbSrc}')"></div>
                     <div style="flex: 1;">
                         <div style="color: var(--neon-orange); font-size: 0.7rem; font-family: 'Orbitron';">${localTime}</div>
-                        <h4 style="margin: 3px 0; color: #fff; font-size: 0.9rem; font-family: 'Orbitron';">${missionTitle}</h4>
+                        <h4 style="margin: 3px 0; color: #fff; font-size: 0.9rem; font-family: 'Orbitron';">${m.net ? '<span class="net-mini">NET</span>' : ''}${missionTitle}</h4>
                         <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5);">${vehicleName}</div>
                     </div>
                 ` }));
