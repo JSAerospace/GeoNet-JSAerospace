@@ -1032,11 +1032,17 @@
             const statusMap = { 'success': 'COMPLETADA', 'upcoming': 'PRÓXIMA', 'failed': 'FALLIDA', 'in_flight': 'EN VUELO' };
             const statusColors = { 'success': 'var(--neon-green)', 'upcoming': 'var(--neon-orange)', 'failed': 'var(--neon-red)', 'in_flight': 'var(--neon-blue)' };
 
-            // Gallery setup
+            // Gallery setup — resolveImg matching misiones.html
+            function resolveImg(path) {
+                if (!path) return 'Imagenes/Tomcat 4.png';
+                if (path.startsWith('http')) return path;
+                if (path.includes('/')) return path;
+                return 'Imagenes/' + path;
+            }
             let imgs = m.images || []; 
             if (typeof imgs === 'object' && !Array.isArray(imgs)) imgs = Object.values(imgs);
-            const placeholderSVG = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect fill="#0b0b1a" width="800" height="600"/><rect fill="#111127" x="50" y="50" width="700" height="500" rx="20"/><text x="400" y="270" text-anchor="middle" fill="#333355" font-family="sans-serif" font-size="80">🚀</text><text x="400" y="340" text-anchor="middle" fill="#444466" font-family="sans-serif" font-size="22">Sin imagen disponible</text></svg>`)}`;
-            galleryImages = imgs.length ? imgs : [placeholderSVG];
+            if (!imgs.length) imgs = [m.image ? m.image : 'Imagenes/Tomcat 4.png'];
+            galleryImages = imgs.map(src => resolveImg(src));
             currentGalleryIndex = 0;
             
             const tracks = safeGet('galleryTracks');
@@ -1050,7 +1056,7 @@
                 const imgEl = document.createElement('img');
                 imgEl.src = img;
                 imgEl.className = `gallery-img ${idx === 0 ? 'active' : ''}`;
-                imgEl.onerror = () => { imgEl.src = placeholderSVG; };
+                imgEl.onerror = () => { imgEl.src = 'Imagenes/Tomcat 4.png'; };
                 tracks.appendChild(imgEl);
                 
                 const dot = document.createElement('div');
@@ -1405,12 +1411,20 @@
                 
                 let imgs = m.images || []; 
                 if (typeof imgs === 'object' && !Array.isArray(imgs)) imgs = Object.values(imgs);
+                if (!imgs.length && m.image) imgs = [m.image];
+                function resolveImgThumb(path) {
+                    if (!path) return 'Imagenes/Tomcat 4.png';
+                    if (path.startsWith('http')) return path;
+                    if (path.includes('/')) return path;
+                    return 'Imagenes/' + path;
+                }
+                const thumbSrc = imgs.length ? resolveImgThumb(imgs[0]) : 'Imagenes/Tomcat 4.png';
                 
                 const div = list.appendChild(Object.assign(document.createElement('div'), {
                     className: 'event-details-card',
                     style: 'display: flex; gap: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; cursor: pointer; transition: background 0.2s; border: 1px solid rgba(255,255,255,0.05);',
                     innerHTML: `
-                    <div style="width: 70px; height: 50px; background-size: cover; background-position: center; border-radius: 4px; background-color: #111127; background-image: ${imgs[0] ? `url(${imgs[0]})` : 'linear-gradient(135deg, #111127, #1a1a3a)'}"></div>
+                    <div style="width: 70px; height: 50px; background-size: cover; background-position: center; border-radius: 4px; background-color: #111127; background-image: url('${thumbSrc}')"></div>
                     <div style="flex: 1;">
                         <div style="color: var(--neon-orange); font-size: 0.7rem; font-family: 'Orbitron';">${localTime}</div>
                         <h4 style="margin: 3px 0; color: #fff; font-size: 0.9rem; font-family: 'Orbitron';">${missionTitle}</h4>
