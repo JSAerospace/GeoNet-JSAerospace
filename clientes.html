@@ -577,6 +577,53 @@
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
         }
 
+        /* Variante secundaria (renombrar) y de peligro (ocultar) del botón pequeño */
+        .btn-action-sm.btn-ghost {
+            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .btn-action-sm.btn-ghost:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-action-sm.btn-danger {
+            border-color: rgba(255, 107, 107, 0.4);
+            background: rgba(255, 107, 107, 0.06);
+            color: #ff6b6b;
+        }
+
+        .btn-action-sm.btn-danger:hover {
+            background: #ff6b6b;
+            color: #000;
+            box-shadow: 0 0 12px rgba(255, 107, 107, 0.35);
+        }
+
+        /* Fila de usuario oculta por el admin */
+        .user-row.is-hidden-user {
+            opacity: 0.55;
+            border-style: dashed;
+        }
+
+        .hidden-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: rgba(255, 107, 107, 0.12);
+            border: 1px solid rgba(255, 107, 107, 0.45);
+            color: #ff6b6b;
+            font-family: var(--font-heading);
+        }
+
         /* Misiones en Vista Cliente */
         .missions-client-grid {
             display: grid;
@@ -940,9 +987,14 @@
                             <i class="fas fa-id-badge" style="color: var(--primary-color);"></i>
                             Usuarios Registrados en J.S. Aerospace
                         </h2>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="adminUserSearch" placeholder="Buscar por nombre o correo...">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="adminUserSearch" placeholder="Buscar por nombre o correo...">
+                            </div>
+                            <button class="btn-action-sm btn-ghost" id="toggleHiddenUsersBtn" title="Ver u ocultar los usuarios marcados como ocultos" style="display: none;">
+                                <i class="fas fa-eye"></i> Ocultos
+                            </button>
                         </div>
                     </div>
 
@@ -1274,6 +1326,8 @@
         let allMissionsData = {};
         let allAssignmentsData = {};
         let selectedAssignUid = null;
+        // Usuarios ocultos por el admin (users/{uid}/hidden) y estado del conmutador
+        let showHiddenUsers = false;
 
         // Actualizar o guardar usuario en Firebase Realtime Database
         async function saveUserToDatabase(user) {
@@ -1363,7 +1417,8 @@
             viewClient.style.display = 'block';
 
             if (currentUser) {
-                document.getElementById('clientGreetingName').textContent = currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Cliente');
+                const meData = allUsersData[currentUser.uid] || {};
+                document.getElementById('clientGreetingName').textContent = meData.customName || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Cliente');
                 document.getElementById('clientEmailSub').textContent = currentUser.email || '';
                 if (currentUser.photoURL) {
                     document.getElementById('clientAvatarImg').src = currentUser.photoURL;
@@ -1374,6 +1429,13 @@
             onValue(ref(database, 'client_assignments/' + currentUser.uid), (snap) => {
                 const myAssignment = snap.val() || {};
                 updateClientDashboard(myAssignment);
+            });
+
+            // Escuchar el propio perfil: si el admin lo renombra (customName),
+            // el saludo se actualiza al momento
+            onValue(ref(database, 'users/' + currentUser.uid), (snap) => {
+                const me = snap.val() || {};
+                document.getElementById('clientGreetingName').textContent = me.customName || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Cliente');
             });
 
             onValue(ref(database, 'missions'), (snap) => {
@@ -1417,12 +1479,28 @@
                 return;
             }
 
+            const effectiveName = (u) => (u.customName || u.displayName || (u.email ? u.email.split('@')[0] : '')).toLowerCase();
+            let hiddenCount = 0;
             const filteredUids = uids.filter(uid => {
                 const u = allUsersData[uid] || {};
-                const name = (u.displayName || '').toLowerCase();
+                // Admin nunca se oculta a sí mismo
+                if (u.hidden && !(u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase())) {
+                    hiddenCount++;
+                    if (!showHiddenUsers) return false;
+                }
+                const name = effectiveName(u);
                 const email = (u.email || '').toLowerCase();
                 return name.includes(search) || email.includes(search);
             });
+
+            const hiddenToggle = document.getElementById('toggleHiddenUsersBtn');
+            if (hiddenToggle) {
+                hiddenToggle.style.display = hiddenCount > 0 ? 'inline-flex' : 'none';
+                hiddenToggle.innerHTML = showHiddenUsers
+                    ? '<i class="fas fa-eye-slash"></i> No ocultos'
+                    : `<i class="fas fa-eye"></i> Ocultos (${hiddenCount})`;
+                hiddenToggle.classList.toggle('btn-danger', showHiddenUsers);
+            }
 
             if (!filteredUids.length) {
                 container.innerHTML = `
@@ -1440,7 +1518,7 @@
                 const launchCount = (assign.missions || []).length;
                 const satsCount = parseInt(assign.sats) || 0;
 
-                const name = u.displayName || (u.email ? u.email.split('@')[0] : 'Usuario');
+                const name = u.customName || u.displayName || (u.email ? u.email.split('@')[0] : 'Usuario');
                 const email = u.email || 'Sin correo';
                 const avatar = u.photoURL
                     ? `<img src="${u.photoURL}" class="user-avatar-sm" alt="Avatar">`
@@ -1457,15 +1535,20 @@
                 const assignBadge = launchCount > 0 || satsCount > 0
                     ? `<span class="badge-chip cyan"><i class="fas fa-rocket"></i> ${launchCount} lanz.</span> <span class="badge-chip purple"><i class="fas fa-satellite"></i> ${satsCount} sats</span>`
                     : `<span class="badge-chip"><i class="fas fa-circle-notch"></i> Sin asignación</span>`;
+                const hiddenBadge = u.hidden ? '<span class="hidden-badge"><i class="fas fa-eye-slash"></i> Oculto</span>' : '';
+                const isHidden = !!u.hidden;
+                const canHide = !isUserAdmin; // el admin no se oculta a sí mismo
+                const canRename = true;       // renombrar permitido en cualquier cuenta
 
                 return `
-                    <div class="user-row">
+                    <div class="user-row ${isHidden ? 'is-hidden-user' : ''}">
                         <div class="user-info-left">
                             ${avatar}
                             <div>
                                 <div class="user-name-text">
                                     ${name}
                                     ${isUserAdmin ? '<span class="role-badge-admin"><i class="fas fa-crown"></i> Admin</span>' : ''}
+                                    ${hiddenBadge}
                                 </div>
                                 <div class="user-meta-sub">${email} · Login: ${lastLoginText}</div>
                             </div>
@@ -1473,9 +1556,15 @@
 
                         <div class="user-stats-badges">
                             ${assignBadge}
+                            ${canRename ? `<button class="btn-action-sm btn-ghost" onclick="window.openRenameUserModal('${uid}')">
+                                <i class="fas fa-pen"></i> Renombrar
+                            </button>` : ''}
                             <button class="btn-action-sm" onclick="window.openAssignModal('${uid}')">
                                 <i class="fas fa-sliders-h"></i> Asignar
                             </button>
+                            ${canHide ? `<button class="btn-action-sm ${isHidden ? 'btn-ghost' : 'btn-danger'}" onclick="window.toggleHideUser('${uid}', ${!isHidden})" title="${isHidden ? 'Volver a mostrar este usuario en el panel' : 'Ocultar este usuario del panel y del chat'}">
+                                <i class="fas fa-${isHidden ? 'eye' : 'eye-slash'}"></i> ${isHidden ? 'Mostrar' : 'Ocultar'}
+                            </button>` : ''}
                         </div>
                     </div>`;
             }).join('');
@@ -1538,11 +1627,51 @@
             }
         };
 
+        // ============ GESTIÓN DE USUARIOS: RENOMBRAR / OCULTAR ============
+        // El nombre efectivo del usuario es customName (puesto por el admin);
+        // si no existe, se usa displayName y luego el email. Guardar customName
+        // tras saveUserToDatabase evita que el próximo login lo revierta.
+        window.openRenameUserModal = (uid) => {
+            const u = allUsersData[uid] || {};
+            const current = u.customName || u.displayName || (u.email ? u.email.split('@')[0] : '') || '';
+            let nuevo = null;
+            for (let intentos = 0; intentos < 3; intentos++) {
+                nuevo = prompt('Nombre visible para el cliente (vacío para volver al nombre original):', current);
+                if (nuevo === null) return; // cancelado
+                nuevo = nuevo.trim();
+                if (nuevo.length <= 40) break;
+                alert('Máximo 40 caracteres.');
+            }
+            if (nuevo.length > 40) return;
+            try {
+                if (nuevo) {
+                    update(ref(database, 'users/' + uid), { customName: nuevo });
+                } else {
+                    remove(ref(database, 'users/' + uid + '/customName'));
+                }
+            } catch (e) {
+                alert('Error al renombrar: ' + e.message);
+            }
+        };
+
+        window.toggleHideUser = (uid, hide) => {
+            try {
+                update(ref(database, 'users/' + uid), { hidden: !!hide });
+            } catch (e) {
+                alert('Error al actualizar visibilidad: ' + e.message);
+            }
+        };
+
+        document.getElementById('toggleHiddenUsersBtn').addEventListener('click', () => {
+            showHiddenUsers = !showHiddenUsers;
+            renderAdminUsersList();
+        });
+
         // Modal de Asignación: Abrir
         window.openAssignModal = (uid) => {
             selectedAssignUid = uid;
             const user = allUsersData[uid] || {};
-            const userName = user.displayName || user.email || 'Usuario';
+            const userName = user.customName || user.displayName || user.email || 'Usuario';
             const assign = allAssignmentsData[uid] || {};
 
             document.getElementById('assignModalSubtitle').textContent = `Configurando cliente: ${userName} (${user.email || 'Sin correo'})`;
@@ -1884,7 +2013,9 @@
                 }
                 Object.keys(data).forEach(uid => {
                     const uData = allUsersData[uid] || {};
-                    const name = uData.displayName || (uData.email ? uData.email.split('@')[0] : 'Usuario');
+                    // Respetar usuarios ocultados por el admin
+                    if (uData.hidden && uid !== currentUser.uid) return;
+                    const name = uData.customName || uData.displayName || (uData.email ? uData.email.split('@')[0] : 'Usuario');
                     const div = document.createElement('div');
                     div.style.cssText = 'padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.2s;';
                     div.innerHTML = `<i class="fas fa-user-circle" style="font-size: 1.5rem; color: var(--primary-color);"></i><div><strong style="color: #fff;">${name}</strong><br><small style="color: rgba(255,255,255,0.4);">${uData.email || uid}</small></div>`;
