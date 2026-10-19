@@ -9,12 +9,14 @@ Sitio web estático (HTML/CSS/JS, sin build) de **J.S. Aerospace**: presentació
 | `index.html` | Inicio: hero del Tomcat, GeoNet y vídeos destacados de YouTube |
 | `misiones.html` | Historial y detalle de misiones |
 | `cohetes.html` | Familia de cohetes y galería |
+| `boosters.html` | Flota de propulsores con filtros e historial de reutilización |
+| `booster.html` | Ficha de un núcleo: estado, ficha técnica e historial de vuelos |
 | `calendario.html` | Próximos lanzamientos con cuenta atrás |
 | `geonet.html` | Visor 3D de la constelación (Three.js + `geonet.glb`) |
 | `clientes.html` | Portal de clientes |
 | `tomcat-remote.html` | Telemetría remota del Tomcat (proyecto Firebase propio) |
 
-Recursos compartidos: `style.css`, `nav-mobile.js` y los medios en `Imagenes/` y `assets/`.
+Recursos compartidos: `style.css`, `nav-mobile.js`, `boosters.js` y los medios en `Imagenes/` y `assets/`.
 
 ## Cómo verlo localmente
 
@@ -54,6 +56,15 @@ Los lanzamientos admiten la marca **NET** (*no antes de*): la fecha es una estim
 - Las cuentas atrás (T-MINUS del héroe, contador de portada y lista del calendario) muestran **«A DEFINIR»** en las misiones NET, porque una fecha aproximada no permite un T- real.
 - La fecha guardada se usa para ordenar, pero la web solo muestra hasta la precisión elegida. Las fechas sin día confirmado no se pintan en la cuadrícula del calendario (aparecen en la lista lateral con su ventana NET) y el contador de la portada muestra la ventana en lugar de una cuenta atrás exacta.
 - La insignia ámbar **NET** aparece en las tarjetas y el héroe de Misiones, en el calendario (barra lateral y detalle) y en el contador de próxima misión de la portada.
+
+## Propulsores
+
+Cada booster vive en el nodo `boosters` de Realtime Database. El registro guarda nombre, vehículo, estado (`active`, `testing`, `maintenance`, `retired`, `lost`), base, primer vuelo, imágenes, descripción, especificaciones y un arreglo `flights` (`date`, `mission`, `landing`, `result`, `note`).
+
+- Los vuelos se editan como una línea por vuelo: `fecha | misión | lugar de aterrizaje | resultado`.
+- Las misiones que tengan cargado el campo `booster` se suman al historial del núcleo automáticamente, sin duplicar misión + fecha.
+- Mientras el nodo `boosters` esté vacío, el sitio muestra un **catálogo de referencia** (`boosters.js`). El administrador puede publicarlo con el botón *Publicar catálogo inicial* y después crear, editar o eliminar núcleos desde el botón flotante y las tarjetas.
+- La ficha `booster.html?b=NOMBRE` enlaza cada vuelo con su misión cuando el nombre y la fecha coinciden con el manifiesto.
 
 ## Autenticación y datos
 

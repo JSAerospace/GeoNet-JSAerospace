@@ -717,6 +717,7 @@
             <li><a href="index.html" class="transition-link">Inicio</a></li>
             <li><a href="misiones.html" class="transition-link">Misiones</a></li>
             <li><a href="cohetes.html" class="transition-link">Cohetes</a></li>
+            <li><a href="boosters.html" class="transition-link">BOOSTERS</a></li>
             <li><a href="calendario.html" class="transition-link active">Calendario</a></li>
             <li><a href="geonet.html" class="transition-link">GEONET</a></li>
             <li><a href="clientes.html" class="transition-link">Clientes</a></li>
@@ -1036,125 +1037,10 @@
         let currentGalleryIndex = 0;
         let galleryImages = [];
 
+        // Abre la ficha completa de misión (misma vista que el manifiesto)
         window.viewMissionDetails = (id) => {
-            const m = missionsData[id];
-            if (!m) return;
-
-            const modal = safeGet('missionDetailsModal');
-            const statusMap = { 'success': 'COMPLETADA', 'upcoming': 'PRÓXIMA', 'failed': 'FALLIDA', 'in_flight': 'EN VUELO' };
-            const statusColors = { 'success': 'var(--neon-green)', 'upcoming': 'var(--neon-orange)', 'failed': 'var(--neon-red)', 'in_flight': 'var(--neon-blue)' };
-
-            // Gallery setup — resolveImg matching misiones.html
-            function resolveImg(path) {
-                if (!path) return 'Imagenes/Tomcat 4.png';
-                if (path.startsWith('http')) return path;
-                if (path.includes('/')) return path;
-                return 'Imagenes/' + path;
-            }
-            let imgs = m.images || []; 
-            if (typeof imgs === 'object' && !Array.isArray(imgs)) imgs = Object.values(imgs);
-            if (!imgs.length) imgs = [m.image ? m.image : 'Imagenes/Tomcat 4.png'];
-            galleryImages = imgs.map(src => resolveImg(src));
-            currentGalleryIndex = 0;
-            
-            const tracks = safeGet('galleryTracks');
-            const dots = safeGet('galleryDots');
-            const nav = safeGet('galleryNav');
-            
-            tracks.innerHTML = '';
-            dots.innerHTML = '';
-            
-            galleryImages.forEach((img, idx) => {
-                const imgEl = document.createElement('img');
-                imgEl.src = img;
-                imgEl.className = `gallery-img ${idx === 0 ? 'active' : ''}`;
-                imgEl.onerror = () => { imgEl.src = 'Imagenes/Tomcat 4.png'; };
-                tracks.appendChild(imgEl);
-                
-                const dot = document.createElement('div');
-                dot.className = `dot ${idx === 0 ? 'active' : ''}`;
-                dot.onclick = () => showGalleryImage(idx);
-                dots.appendChild(dot);
-            });
-
-            nav.style.display = galleryImages.length > 1 ? 'flex' : 'none';
-            dots.style.display = galleryImages.length > 1 ? 'flex' : 'none';
-
-            safeGet('detailsTitle').textContent = m.title || m.name || 'Misión Programada';
-            
-            const badge = safeGet('detailsStatusBadge');
-            const sCol = statusColors[m.status] || 'var(--primary-color)';
-            badge.innerHTML = `
-                <div style="display:flex; align-items:center; gap:10px; padding:6px 15px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:20px;">
-                    <span style="width:8px; height:8px; border-radius:50%; background:${sCol}; box-shadow: 0 0 10px ${sCol}; ${m.status === 'in_flight' ? 'animation: pulse-active 2s infinite;' : ''}"></span>
-                    <span style="color:${sCol}; font-family:'Orbitron'; font-size:0.75rem; letter-spacing:2px; font-weight:700; line-height:1;">${(statusMap[m.status] || m.status).toUpperCase()}</span>
-                    ${m.status === 'success' ? '<i class="fas fa-check-circle" style="color:var(--neon-green); font-size:0.9rem; margin-left:5px;"></i>' : ''}
-                    ${m.status === 'failed' ? '<i class="fas fa-times-circle" style="color:var(--neon-red); font-size:0.9rem; margin-left:5px;"></i>' : ''}
-                    ${m.net ? '<span class="net-badge" style="margin-left:6px;" title="' + (m.netNote ? String(m.netNote).replace(/"/g, '&quot;') : 'No Earlier Than: la fecha puede moverse') + '">NET</span>' : ''}
-                </div>`;
-            badge.style.background = 'none';
-            badge.style.padding = '0';
-
-            // Main Info
-            const descCont = safeGet('detailsDescriptionContainer');
-            if (m.description) {
-                descCont.style.display = 'block';
-                safeGet('detailsDescription').textContent = m.description;
-            } else descCont.style.display = 'none';
-
-            const cargaCont = safeGet('detailsCargaContainer');
-            if (m.payload || m.destination) {
-                cargaCont.style.display = 'block';
-                safeGet('detailsPayload').textContent = m.payload || 'No especificada';
-                safeGet('detailsDestination').textContent = m.destination || 'No especificado';
-            } else cargaCont.style.display = 'none';
-
-            const crewCont = safeGet('detailsCrewContainer');
-            if (m.isManned && m.crew) {
-                crewCont.style.display = 'block';
-                safeGet('detailsCrew').textContent = m.crew;
-            } else crewCont.style.display = 'none';
-
-            // Sidebar
-            let dateObj;
-            if ((m.date || "").includes('/')) {
-                const [d, mon, y] = m.date.split('/');
-                dateObj = new Date(`${y}-${mon}-${d}T${m.time || '00:00'}:00Z`);
-            } else dateObj = new Date(`${m.date}T${m.time || '00:00'}:00Z`);
-            
-            const netPrec = window.JSANet.precisionOf(m);
-            const netCoarse = !!m.net && netPrec !== 'day';
-            const netTxt = m.net ? window.JSANet.label(dateObj, netPrec, m.date) : '';
-            safeGet('detailsDateTime').textContent = netCoarse
-                ? `NET · ${netTxt}`
-                : (isNaN(dateObj.getTime())
-                    ? (m.date + ' ' + (m.time || 'hora por confirmar'))
-                    : (dateObj.toLocaleDateString() + ' ' + (m.time ? dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}) : '· hora por confirmar')));
-            safeGet('detailsTimeType').textContent = netCoarse
-                ? '(Ventana NET · ' + (netPrec === 'year' ? 'solo año' : 'año y mes') + ')'
-                : (m.net ? '(Hora Local · Fecha NET)' : '(Hora Local)');
-
-            let netNoteEl = safeGet('detailsNetNote');
-            if (!netNoteEl) {
-                netNoteEl = document.createElement('span');
-                netNoteEl.id = 'detailsNetNote';
-                netNoteEl.className = 'net-note';
-                safeGet('detailsTimeType')?.parentElement?.appendChild(netNoteEl);
-            }
-            netNoteEl.textContent = m.net ? (m.netNote || 'No antes de esta fecha: puede deslizarse.') : '';
-            
-            safeGet('detailsVehicle').textContent = m.vehicle || 'Vehículo J.S.A.';
-            safeGet('detailsBooster').textContent = m.booster ? `Booster: ${m.booster}` : '';
-            safeGet('detailsProvider').textContent = m.provider || 'EsZunSpace';
-            safeGet('detailsLocation').textContent = m.location || 'Sin ubicación';
-
-            const landCont = safeGet('detailsLandingContainer');
-            if (m.landing) {
-                landCont.style.display = 'block';
-                safeGet('detailsLanding').textContent = m.landing;
-            } else landCont.style.display = 'none';
-
-            modal?.classList.add('active');
+            if (!id) return;
+            window.location.href = 'mision.html?id=' + encodeURIComponent(id);
         };
 
         function showGalleryImage(index) {

@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propulsores · J.S. Aerospace</title>
+    <meta name="description" content="Flota de propulsores de J.S. Aerospace: núcleos reutilizables, historial de vuelos, recuperaciones y estado operativo.">
+    <link rel="icon" type="image/png" href="LOGO_JTT.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@400;600&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --b-accent: #00f0ff;
+            --b-accent2: #ff00d4;
+            --b-ok: #00ff6a;
+            --b-bad: #ff3355;
+            --b-warn: #ffb300;
+            --b-line: rgba(255, 255, 255, 0.10);
+            --b-muted: rgba(255, 255, 255, 0.62);
+            --b-dim: rgba(255, 255, 255, 0.38);
+        }
+
+        #contactBtn, #contactModal { display: none !important; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            height: auto !important;
+            background: #05070b !important;
+            font-family: 'Poppins', 'Rajdhani', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+            overflow-y: auto !important;
+        }
+
+        .b-page { padding: 0 0 90px; }
+
+        .b-shell {
+            width: min(1200px, 92vw);
+            margin: 0 auto;
+        }
+
+        /* ===== ENCABEZADO ===== */
+        .b-head {
+            position: relative;
+            padding: 132px 0 34px;
+            overflow: hidden;
+        }
+
+        .b-head::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(60% 120% at 15% 0%, rgba(0, 240, 255, 0.10), transparent 60%),
+                radial-gradient(50% 100% at 90% 10%, rgba(255, 0, 212, 0.08), transparent 65%);
+            pointer-events: none;
+        }
+
+        .b-kicker {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--b-dim);
+            margin: 0 0 10px;
+        }
+
+        .b-kicker b { color: var(--b-accent); font-weight: 700; }
+
+        .b-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(38px, 6vw, 68px);
+            line-height: 0.98;
+            letter-spacing: -0.02em;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .b-sub {
+            max-width: 640px;
+            margin: 14px 0 0;
+            color: var(--b-muted);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .b-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--b-line);
+            border: 1px solid var(--b-line);
+            margin-top: 34px;
+        }
+
+        .b-stat {
+            background: #080b12;
+            padding: 18px 20px;
+        }
+
+        .b-stat .k {
+            display: block;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--b-dim);
+            margin-bottom: 8px;
+        }
+
+        .b-stat .v {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(22px, 2.6vw, 32px);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .b-stat .v small {
+            font-size: 12px;
+            color: var(--b-dim);
+            letter-spacing: 0.1em;
+            margin-left: 4px;
+        }
+
+        /* ===== FILTROS ===== */
+        .b-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 0;
+            border-top: 1px solid var(--b-line);
+            border-bottom: 1px solid var(--b-line);
+            margin-bottom: 26px;
+            position: sticky;
+            top: 68px;
+            z-index: 40;
+            background: rgba(5, 7, 11, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .b-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .b-pill {
+            border: 1px solid var(--b-line);
+            background: transparent;
+            color: var(--b-muted);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+        }
+
+        .b-pill:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+
+        .b-pill.active {
+            color: #031016;
+            background: var(--b-accent);
+            border-color: var(--b-accent);
+        }
+
+        .b-select, .b-search input {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--b-line);
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 8px 12px;
+            outline: none;
+        }
+
+        .b-select:focus, .b-search input:focus { border-color: var(--b-accent); }
+
+        .b-search { margin-left: auto; }
+
+        .b-search input {
+            width: 210px;
+            text-transform: none;
+            letter-spacing: 0.02em;
+            font-family: inherit;
+            font-size: 12px;
+        }
+
+        .b-sort {
+            background: transparent;
+            border: 1px solid var(--b-line);
+            color: var(--b-muted);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .b-sort:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+
+        /* ===== GRILLA ===== */
+        .b-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 18px;
+        }
+
+        .booster-card {
+            position: relative;
+            min-height: 470px;
+            background:
+                radial-gradient(80% 90% at 74% 10%, rgba(0, 240, 255, 0.11), transparent 62%),
+                linear-gradient(160deg, #0b1220 0%, #060810 58%, #05070b 100%);
+            border: 1px solid var(--b-line);
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            isolation: isolate;
+            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .booster-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 68%);
+            pointer-events: none;
+        }
+
+        .booster-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: linear-gradient(180deg, rgba(5, 7, 11, 0.02) 0%, rgba(5, 7, 11, 0.22) 44%, rgba(5, 7, 11, 0.9) 78%, #05070b 100%);
+            pointer-events: none;
+        }
+
+        .bc-figure {
+            position: absolute;
+            top: 22px;
+            right: 5%;
+            bottom: 132px;
+            width: 70%;
+            z-index: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            pointer-events: none;
+        }
+
+        .bc-figure img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            object-position: bottom right;
+            filter: drop-shadow(0 22px 44px rgba(0, 0, 0, 0.6));
+            opacity: 0.96;
+            transition: transform 0.5s ease;
+        }
+
+        .booster-card:hover .bc-figure img { transform: translateY(-6px) scale(1.02); }
+
+        .bc-top, .bc-body { position: relative; z-index: 3; }
+
+        .booster-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 240, 255, 0.42);
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
+        }
+
+        .booster-card:focus-visible {
+            outline: 2px solid var(--b-accent);
+            outline-offset: 3px;
+        }
+
+        .bc-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px 22px 0;
+            gap: 12px;
+        }
+
+        .bc-tally {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .bc-tally b {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 46px;
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.55));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bc-tally span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--b-dim);
+        }
+
+        .bc-body {
+            margin-top: auto;
+            padding: 22px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 5px 9px;
+            border: 1px solid transparent;
+        }
+
+        .pill.ok { color: var(--b-ok); border-color: rgba(0, 255, 106, 0.35); background: rgba(0, 255, 106, 0.07); }
+        .pill.live { color: var(--b-accent); border-color: rgba(0, 240, 255, 0.35); background: rgba(0, 240, 255, 0.07); }
+        .pill.next { color: var(--b-warn); border-color: rgba(255, 179, 0, 0.35); background: rgba(255, 179, 0, 0.07); }
+        .pill.plain { color: var(--b-muted); border-color: var(--b-line); background: rgba(255, 255, 255, 0.03); }
+        .pill.bad { color: var(--b-bad); border-color: rgba(255, 51, 85, 0.35); background: rgba(255, 51, 85, 0.07); }
+
+        .bc-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(30px, 3.4vw, 42px);
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            line-height: 1;
+            margin: 12px 0 4px;
+            text-transform: uppercase;
+        }
+
+        .bc-vehicle {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--b-dim);
+            margin: 0 0 16px;
+        }
+
+        .bc-vehicle b { color: var(--b-muted); font-weight: 600; }
+
+        .bc-meter {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 7px;
+        }
+
+        .bc-meter i {
+            height: 4px;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .bc-meter i.on { background: var(--b-accent); box-shadow: 0 0 8px rgba(0, 240, 255, 0.45); }
+
+        .bc-meter-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--b-dim);
+            margin-bottom: 16px;
+        }
+
+        .bc-rows {
+            border-top: 1px solid var(--b-line);
+            padding-top: 12px;
+            display: grid;
+            gap: 7px;
+        }
+
+        .bc-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 11.5px;
+            color: var(--b-muted);
+        }
+
+        .bc-row .l {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--b-dim);
+        }
+
+        .bc-row .r {
+            text-align: right;
+            color: #fff;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bc-cta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--b-line);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--b-accent);
+        }
+
+        .bc-cta i { transition: transform 0.25s ease; }
+
+        .booster-card:hover .bc-cta i { transform: translateX(4px); }
+
+        .bc-admin {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            z-index: 3;
+        }
+
+        .bc-admin button {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .bc-admin button:hover { border-color: var(--b-accent); color: var(--b-accent); }
+
+        .b-empty {
+            text-align: center;
+            padding: 70px 20px;
+            color: var(--b-muted);
+            border: 1px dashed var(--b-line);
+        }
+
+        .b-empty h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin: 0 0 8px;
+            color: #fff;
+        }
+
+        /* Aviso de catálogo inicial */
+        .b-notice {
+            display: none;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            border: 1px solid rgba(255, 179, 0, 0.32);
+            background: rgba(255, 179, 0, 0.05);
+            padding: 14px 18px;
+            margin-bottom: 22px;
+        }
+
+        .b-notice.show { display: flex; }
+
+        .b-notice p {
+            margin: 0;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.72);
+            flex: 1 1 320px;
+            line-height: 1.55;
+        }
+
+        .b-notice p b { color: #fff; }
+
+        .b-notice button {
+            border: 1px solid var(--b-warn);
+            background: transparent;
+            color: var(--b-warn);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 9px 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .b-notice button:hover { background: var(--b-warn); color: #000; }
+
+        /* ===== FAB ADMIN ===== */
+        .add-booster-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--b-accent), var(--b-accent2));
+            color: #000;
+            border: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.35);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 990;
+        }
+
+        .add-booster-btn:hover { transform: scale(1.1) rotate(90deg); }
+
+        /* ===== MODALES ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.active, .modal-overlay.show { opacity: 1; visibility: visible; }
+
+        .modal-card, .login-modal {
+            background: #0b0b14;
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            box-sizing: border-box;
+        }
+
+        .modal-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-header p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .close-modal:hover { color: #fff; }
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--b-accent); }
+
+        .form-group small { display: block; margin-top: 6px; color: rgba(255, 255, 255, 0.42); font-size: 11px; line-height: 1.45; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .login-btn, .btn.primary {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--b-accent), var(--b-accent2));
+            color: #000;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 240, 255, 0.35); }
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 51, 51, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--b-bad);
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .auth-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .auth-btn:hover { border-color: var(--b-accent); color: var(--b-accent); }
+
+        .auth-btn.logged-in { border-color: rgba(0, 240, 255, 0.45); padding: 5px 12px 5px 6px; }
+
+        .user-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+
+        .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+
+        /* ===== ANIMACIÓN DE ENTRADA ===== */
+        .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .reveal.in { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .booster-card { transition: none; }
+        }
+
+        @media (max-width: 900px) {
+            .b-head { padding-top: 108px; }
+            .b-stats { grid-template-columns: 1fr 1fr; }
+            .b-search { margin-left: 0; width: 100%; }
+            .b-search input { width: 100%; }
+            .b-grid { grid-template-columns: 1fr; }
+            .booster-card { min-height: 430px; }
+        }
+
+        @media (max-width: 520px) {
+            .b-toolbar { position: static; }
+            .b-pills { width: 100%; }
+            .b-pill { flex: 1 1 auto; }
+            .form-row { grid-template-columns: 1fr; }
+            .modal-card, .login-modal { padding: 24px; }
+            .bc-tally b { font-size: 38px; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="LOGO_JTT.png" alt="J.S.Aerospace Logo">
+            <div class="logo-text">J.S.<span class="highlight">AEROSPACE</span></div>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir Menú">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="misiones.html">Misiones</a></li>
+            <li><a href="cohetes.html">Cohetes</a></li>
+            <li><a href="boosters.html" class="active">Boosters</a></li>
+            <li><a href="calendario.html">CALENDARIO</a></li>
+            <li><a href="geonet.html">GEONET</a></li>
+            <li><a href="clientes.html">CLIENTES</a></li>
+            <li>
+                <button class="auth-btn" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span id="authBtnText">Iniciar Sesión</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="b-page">
+        <header class="b-head">
+            <div class="b-shell">
+                <p class="b-kicker">J.S. Aerospace · <b>Programa de reutilización</b></p>
+                <h1 class="b-title">Propulsores</h1>
+                <p class="b-sub">Cada núcleo tiene su historia: misiones encadenadas, recuperaciones en barcaza o en zona de aterrizaje y un registro de vuelos que se actualiza con el manifiesto. Entrá a un booster para ver su historial completo.</p>
+
+                <div class="b-stats" id="boosterStats">
+                    <div class="b-stat"><span class="k">Núcleos</span><span class="v" id="stat-cores">—</span></div>
+                    <div class="b-stat"><span class="k">Vuelos registrados</span><span class="v" id="stat-flights">—</span></div>
+                    <div class="b-stat"><span class="k">Aterrizajes</span><span class="v" id="stat-landings">—</span></div>
+                    <div class="b-stat"><span class="k">Tasa de recuperación</span><span class="v" id="stat-recovery">—<small>%</small></span></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="b-shell">
+            <div class="b-notice" id="seedNotice">
+                <p><b>Catálogo inicial sin publicar.</b> Estás viendo el roster de referencia. Al publicarlo se guarda en la base de datos y queda editable desde el panel de administración.</p>
+                <button id="publishSeedsBtn" type="button">Publicar catálogo inicial</button>
+            </div>
+
+            <div class="b-toolbar">
+                <div class="b-pills" id="status-pills">
+                    <button class="b-pill active" data-status="all">Todos</button>
+                    <button class="b-pill" data-status="active">En servicio</button>
+                    <button class="b-pill" data-status="testing">En pruebas</button>
+                    <button class="b-pill" data-status="retired">Retirados</button>
+                </div>
+                <select class="b-select" id="filter-vehicle" aria-label="Filtrar por vehículo">
+                    <option value="all">Todos los vehículos</option>
+                </select>
+                <div class="b-search">
+                    <input type="search" id="filter-search" placeholder="Buscar núcleo o misión..." aria-label="Buscar propulsor">
+                </div>
+                <button class="b-sort" id="sort-toggle" type="button">↓ Más vuelos</button>
+            </div>
+
+            <div class="b-grid" id="boosters-grid">
+                <div class="b-empty" style="grid-column:1/-1;">
+                    <h3>Sincronizando propulsores</h3>
+                    <p>Leyendo el registro de vuelos…</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Booster Modal -->
+    <div class="modal-overlay" id="boosterModal">
+        <div class="login-modal" style="max-width: 680px;">
+            <button class="close-modal" id="closeBoosterModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="boosterModalTitle">Nuevo Propulsor</h2>
+                <p>Núcleo, estado y registro de vuelos</p>
+            </div>
+
+            <form id="boosterForm" style="margin-top: 20px;">
+                <input type="hidden" id="editingBoosterId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bName">Nombre del núcleo</label>
+                        <input type="text" id="bName" placeholder="Ej: Z2004" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bVehicle">Vehículo</label>
+                        <select id="bVehicle">
+                            <option value="Tomcat">Tomcat</option>
+                            <option value="Astro-3">Astro-3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bStatus">Estado</label>
+                        <select id="bStatus">
+                            <option value="active">En servicio</option>
+                            <option value="testing">En pruebas</option>
+                            <option value="maintenance">Mantenimiento</option>
+                            <option value="retired">Retirado</option>
+                            <option value="lost">Perdido</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bBlock">Bloque / variante</label>
+                        <input type="text" id="bBlock" placeholder="Ej: Booster · Bloque 1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bBase">Base / plataforma</label>
+                        <input type="text" id="bBase" placeholder="Ej: LC-39B">
+                    </div>
+                    <div class="form-group">
+                        <label for="bFirstFlight">Primer vuelo</label>
+                        <input type="date" id="bFirstFlight">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bImage">Imagen principal (URL o ruta)</label>
+                    <input type="text" id="bImage" placeholder="Imagenes/Tomcat-Booster.png">
+                </div>
+
+                <div class="form-group">
+                    <label for="bImages">Galería (una URL o ruta por línea)</label>
+                    <textarea id="bImages" rows="2" placeholder="Imagenes/Tomcat-Booster.png&#10;Imagenes/Tomcat 4.png"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="bDescription">Descripción</label>
+                    <textarea id="bDescription" rows="3" placeholder="Historia operativa del núcleo..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bSpecHeight">Altura</label>
+                        <input type="text" id="bSpecHeight" placeholder="71 m">
+                    </div>
+                    <div class="form-group">
+                        <label for="bSpecEngines">Motores</label>
+                        <input type="text" id="bSpecEngines" placeholder="33 × TQ-15">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bSpecPropellant">Propelentes</label>
+                        <input type="text" id="bSpecPropellant" placeholder="Metano / LOX">
+                    </div>
+                    <div class="form-group">
+                        <label for="bSpecRecovery">Recuperación</label>
+                        <input type="text" id="bSpecRecovery" placeholder="Barcaza autónoma / LZ-1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bFlights">Historial de vuelos</label>
+                    <textarea id="bFlights" rows="5" placeholder="2026-10-12 | Transporter-2 | I Thought I Lost You | ok&#10;2026-09-27 | GeoNet 3 | I Thought I Lost You | ok"></textarea>
+                    <small>Una línea por vuelo: <b>fecha | misión | lugar de aterrizaje | resultado</b>. Resultado: ok, fail o parcial. También se suman las misiones que tengan este núcleo cargado.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="bNotes">Notas internas (opcional)</label>
+                    <input type="text" id="bNotes" placeholder="Ej: pendiente de inspección mayor">
+                </div>
+
+                <button type="submit" class="login-btn" id="saveBoosterBtn" style="margin-top: 10px;">Guardar Propulsor</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Iniciar Sesión</h2>
+                <p>Accede a tu cuenta de J.S. Aerospace</p>
+            </div>
+            <div id="authMessage" style="color: var(--b-bad); font-size: 0.85rem; margin-bottom: 12px; display: none;"></div>
+            <form id="authForm" style="margin-top: 15px;">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="userName">Nombre</label>
+                    <input type="text" id="userName" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Contraseña</label>
+                    <input type="password" id="userPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn" id="submitBtn">Entrar</button>
+            </form>
+            <div style="text-align: center; margin: 15px 0; color: rgba(255,255,255,0.3); font-size: 0.85rem;">o continuar con</div>
+            <button type="button" class="auth-btn" id="googleLogin" style="width: 100%; justify-content: center; padding: 12px;">
+                <i class="fab fa-google"></i> Google
+            </button>
+            <div style="text-align: center; margin-top: 18px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">
+                <span id="toggleText">¿No tienes cuenta?</span>
+                <a href="#" id="toggleLink" style="color: var(--b-accent); font-weight: 700; margin-left: 6px; text-decoration: none;">Regístrate</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="login-modal">
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+            <div class="modal-header">
+                <h2>Tu Perfil</h2>
+            </div>
+            <div style="display:flex; align-items:center; gap:14px; margin:18px 0;">
+                <div style="background:#00f0ff; color:#000; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">JS</div>
+                <div>
+                    <h3 id="profileName" style="margin:0; font-family:'Space Grotesk',sans-serif;">—</h3>
+                    <p id="profileEmail" style="margin:2px 0 0; color:rgba(255,255,255,0.6); font-size:0.85rem;">—</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="newDisplayName">Nombre visible</label>
+                <input type="text" id="newDisplayName" placeholder="Tu nombre">
+            </div>
+            <button class="login-btn" id="updateNameBtn">Actualizar Nombre</button>
+            <div class="form-group" style="margin-top:18px;">
+                <label for="newPassword">Nueva contraseña</label>
+                <input type="password" id="newPassword" placeholder="••••••••">
+            </div>
+            <button class="login-btn" id="updatePassBtn">Cambiar Contraseña</button>
+            <button class="btn-logout" id="logoutBtn">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <button class="add-booster-btn" id="addBoosterBtn" title="Añadir Propulsor">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <footer>
+        <div class="footer-socials">
+            <a href="https://www.youtube.com/@eszunspace_ksp" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            <a href="https://x.com/EsZunSpace" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://github.com/JSAerospace" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+        <div class="footer-copy">© <span id="year">2026</span> J.S. Aerospace – Todos los derechos reservados</div>
+    </footer>
+
+    <script src="boosters.js?v=3"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set, get, update, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6eDNK7CLl_aXEYkwFV97k-2A1axzRAKg",
+            authDomain: "j-saerospace.firebaseapp.com",
+            projectId: "j-saerospace",
+            storageBucket: "j-saerospace.firebasestorage.app",
+            messagingSenderId: "496032189875",
+            appId: "1:496032189875:web:69c591002b8131ed1c0fc6",
+            measurementId: "G-YXWPQWVGDZ",
+            databaseURL: "https://j-saerospace-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const googleProvider = new GoogleAuthProvider();
+        const B = window.JSBoosters;
+        const ADMIN_EMAIL = 'olanoagus@gmail.com';
+        const safeGet = (id) => document.getElementById(id);
+        const esc = (v) => String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+        let currentUser = null;
+        let isAdmin = false;
+        let isLoginMode = true;
+        let allBoosters = [];
+        let missions = [];
+        let usingSeeds = false;
+        let filterStatus = 'all';
+        let sortMode = 'flights';
+        let pendingEdit = '';
+
+        function statusPill(status, extraClass) {
+            const meta = B.statusMeta(status);
+            return '<span class="pill ' + meta.cls + (extraClass ? ' ' + extraClass : '') + '">' + meta.mark + ' ' + meta.label + '</span>';
+        }
+
+        function boosterUrl(b) {
+            return 'booster.html?b=' + encodeURIComponent(b.name);
+        }
+
+        function sortBoosters(list) {
+            return list.slice().sort((a, b) => {
+                if (sortMode === 'recent') {
+                    const da = B.parseDate(a.lastFlight);
+                    const db = B.parseDate(b.lastFlight);
+                    return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+                }
+                if (b.stats.total !== a.stats.total) return b.stats.total - a.stats.total;
+                return a.name.localeCompare(b.name);
+            });
+        }
+
+        function renderStats(list) {
+            const cores = list.length;
+            const flights = list.reduce((n, b) => n + b.stats.total, 0);
+            const landings = list.reduce((n, b) => n + b.stats.landings, 0);
+            safeGet('stat-cores').textContent = cores;
+            safeGet('stat-flights').textContent = flights;
+            safeGet('stat-landings').textContent = landings;
+            const rate = flights ? Math.round((landings / flights) * 100) : 0;
+            safeGet('stat-recovery').innerHTML = rate + '<small>%</small>';
+        }
+
+        function populateVehicles(list) {
+            const select = safeGet('filter-vehicle');
+            if (!select) return;
+            const current = select.value;
+            const vehicles = [...new Set(list.map(b => b.vehicle).filter(Boolean))].sort();
+            select.innerHTML = '<option value="all">Todos los vehículos</option>';
+            vehicles.forEach(v => {
+                const op = document.createElement('option');
+                op.value = v;
+                op.textContent = v;
+                select.appendChild(op);
+            });
+            select.value = vehicles.includes(current) ? current : 'all';
+        }
+
+        function render() {
+            const grid = safeGet('boosters-grid');
+            if (!grid) return;
+
+            const search = (safeGet('filter-search')?.value || '').toLowerCase().trim();
+            const vehicle = safeGet('filter-vehicle')?.value || 'all';
+
+            const filtered = allBoosters.filter(b => {
+                if (filterStatus !== 'all' && b.status !== filterStatus) return false;
+                if (vehicle !== 'all' && b.vehicle !== vehicle) return false;
+                if (search) {
+                    const hay = [b.name, b.vehicle, b.block, b.description, b.stats.flights.map(f => f.mission).join(' ')].join(' ').toLowerCase();
+                    if (!hay.includes(search)) return false;
+                }
+                return true;
+            });
+
+            renderStats(allBoosters);
+
+            if (!filtered.length) {
+                grid.innerHTML = '<div class="b-empty" style="grid-column:1/-1;"><h3>Sin resultados</h3><p>No hay propulsores que coincidan con los filtros.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = sortBoosters(filtered).map(b => {
+                const meta = B.statusMeta(b.status);
+                const img = encodeURI(B.resolveImg(B.imageList(b)[0] || b.image));
+                const last = b.stats.last;
+                const segments = Math.max(6, Math.min(10, b.stats.total + 2));
+                let meter = '';
+                for (let i = 0; i < segments; i++) meter += '<i class="' + (i < b.stats.total ? 'on' : '') + '"></i>';
+
+                const adminBtns = (isAdmin && !b.seed) ? `
+                    <div class="bc-admin">
+                        <button type="button" data-edit="${esc(b.id)}" title="Editar"><i class="fas fa-pen"></i></button>
+                        <button type="button" data-delete="${esc(b.id)}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                    </div>` : '';
+
+                return `
+                    <article class="booster-card" tabindex="0" role="link"
+                        aria-label="Ver el historial de ${esc(b.name)}" data-open="${esc(b.name)}">
+                        ${adminBtns}
+                        <div class="bc-figure"><img src="${img}" alt="" loading="lazy" onerror="this.remove()"></div>
+                        <div class="bc-top">
+                            <div class="bc-tally"><b>${String(b.stats.total).padStart(2, '0')}</b><span>Vuelos</span></div>
+                            ${statusPill(b.status)}
+                        </div>
+                        <div class="bc-body">
+                            <h2 class="bc-name">${esc(b.name)}</h2>
+                            <p class="bc-vehicle"><b>${esc(b.vehicle)}</b>${b.block ? ' · ' + esc(b.block) : ''}</p>
+                            <div class="bc-meter" aria-hidden="true">${meter}</div>
+                            <div class="bc-meter-label"><span>Reutilizaciones</span><span>${b.stats.reuses}</span></div>
+                            <div class="bc-rows">
+                                <div class="bc-row"><span class="l">Último vuelo</span><span class="r">${last ? esc(B.fmtShort(last.date)) : 'Sin vuelos'}</span></div>
+                                <div class="bc-row"><span class="l">Aterrizajes</span><span class="r">${b.stats.landings} / ${b.stats.total || 0}</span></div>
+                                <div class="bc-row"><span class="l">Base</span><span class="r">${esc(b.base || '—')}</span></div>
+                            </div>
+                            <div class="bc-cta"><span>Ver historial</span><i class="fas fa-arrow-right"></i></div>
+                        </div>
+                    </article>`;
+            }).join('');
+
+            grid.querySelectorAll('[data-open]').forEach(card => {
+                const go = () => { window.location.href = boosterUrl({ name: card.getAttribute('data-open') }); };
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('button')) return;
+                    go();
+                });
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+                });
+            });
+
+            grid.querySelectorAll('[data-edit]').forEach(btn => {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); openEditor(btn.getAttribute('data-edit')); });
+            });
+            grid.querySelectorAll('[data-delete]').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (!confirm('¿Eliminar este propulsor del registro?')) return;
+                    try { await remove(ref(database, 'boosters/' + btn.getAttribute('data-delete'))); }
+                    catch (err) { alert('No se pudo eliminar: ' + err.message); }
+                });
+            });
+
+            // Botones de admin dentro de las tarjetas reveladas: visibles al hover
+            document.querySelectorAll('.booster-card .bc-admin').forEach(el => {
+                el.style.opacity = isAdmin ? '1' : '0';
+            });
+        }
+
+        function applyData(snapshotData) {
+            const rows = snapshotData ? Object.entries(snapshotData).map(([id, raw]) => B.normalize(raw, id)) : [];
+            usingSeeds = rows.length === 0;
+            const base = usingSeeds ? B.seedCatalog() : rows;
+            allBoosters = base
+                .map(b => B.mergeMissionFlights(b, missions))
+                .sort((a, b) => b.stats.total - a.stats.total);
+            populateVehicles(allBoosters);
+            render();
+            updateSeedNotice();
+            resolvePendingEdit();
+        }
+
+        function updateSeedNotice() {
+            const notice = safeGet('seedNotice');
+            if (!notice) return;
+            notice.classList.toggle('show', usingSeeds && isAdmin);
+        }
+
+        function loadData() {
+            onValue(ref(database, 'missions'), (snap) => {
+                const data = snap.val() || {};
+                missions = Object.entries(data).map(([id, m]) => Object.assign({ id }, m));
+                applyData(latestBoosters);
+            });
+            onValue(ref(database, 'boosters'), (snap) => {
+                latestBoosters = snap.val() || {};
+                applyData(latestBoosters);
+            }, (err) => {
+                console.warn('No se pudo leer boosters:', err.message);
+                applyData(null);
+            });
+        }
+
+        let latestBoosters = null;
+
+        // ===== AUTH =====
+        onAuthStateChanged(auth, (user) => {
+            const authBtn = safeGet('authBtn');
+            const addBtn = safeGet('addBoosterBtn');
+            if (user) {
+                currentUser = user;
+                isAdmin = (user.email === ADMIN_EMAIL);
+                update(ref(database, 'users/' + user.uid), {
+                    uid: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario'),
+                    photoURL: user.photoURL || null,
+                    lastLogin: new Date().toISOString(),
+                    provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'password'
+                });
+                if (authBtn) {
+                    authBtn.classList.add('logged-in');
+                    authBtn.innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar"><span>${user.displayName || user.email.split('@')[0]}</span>`;
+                    authBtn.onclick = () => openProfile();
+                }
+                if (addBtn) addBtn.style.display = isAdmin ? 'flex' : 'none';
+            } else {
+                currentUser = null;
+                isAdmin = false;
+                if (authBtn) {
+                    authBtn.classList.remove('logged-in');
+                    authBtn.innerHTML = '<i class="fas fa-user"></i><span id="authBtnText">Iniciar Sesión</span>';
+                    authBtn.onclick = () => safeGet('loginModal').classList.add('active');
+                }
+                if (addBtn) addBtn.style.display = 'none';
+                if (pendingEdit) safeGet('loginModal').classList.add('active');
+            }
+            updateSeedNotice();
+            render();
+            resolvePendingEdit();
+        });
+
+        function resolvePendingEdit() {
+            if (!isAdmin || !pendingEdit) return;
+            const id = pendingEdit;
+            if (id !== '__new__' && !allBoosters.length) return;
+            pendingEdit = '';
+            const exists = id === '__new__' || allBoosters.some(b => b.id === id);
+            if (!exists) {
+                alert('Ese propulsor ya no existe en el registro.');
+                return;
+            }
+            setTimeout(() => openEditor(id === '__new__' ? null : id), 120);
+        }
+
+        function openProfile() {
+            if (!currentUser) return;
+            safeGet('profileName').textContent = currentUser.displayName || currentUser.email.split('@')[0];
+            safeGet('profileEmail').textContent = currentUser.email || '';
+            safeGet('newDisplayName').value = currentUser.displayName || '';
+            safeGet('profileModal').classList.add('active');
+        }
+
+        safeGet('closeProfileModal').onclick = () => safeGet('profileModal').classList.remove('active');
+        safeGet('closeModal').onclick = () => safeGet('loginModal').classList.remove('active');
+        safeGet('closeBoosterModal').onclick = () => safeGet('boosterModal').classList.remove('active');
+
+        const toggleLink = safeGet('toggleLink');
+        toggleLink.onclick = (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            safeGet('modalTitle').textContent = isLoginMode ? 'Iniciar Sesión' : 'Registrarse';
+            safeGet('submitBtn').textContent = isLoginMode ? 'Entrar' : 'Crear Cuenta';
+            safeGet('toggleText').textContent = isLoginMode ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
+            safeGet('toggleLink').textContent = isLoginMode ? 'Regístrate' : 'Inicia Sesión';
+            safeGet('nameGroup').style.display = isLoginMode ? 'none' : 'block';
+        };
+
+        safeGet('authForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = safeGet('userEmail').value;
+            const password = safeGet('userPassword').value;
+            const name = safeGet('userName').value;
+            const msg = safeGet('authMessage');
+            msg.style.display = 'none';
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const cred = await createUserWithEmailAndPassword(auth, email, password);
+                    await updateProfile(cred.user, { displayName: name });
+                }
+                safeGet('loginModal').classList.remove('active');
+            } catch (err) {
+                msg.textContent = err.message;
+                msg.style.display = 'block';
+            }
+        };
+
+        safeGet('googleLogin').onclick = async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                safeGet('loginModal').classList.remove('active');
+            } catch (err) {
+                alert('Error al conectar con Google: ' + err.message);
+            }
+        };
+
+        safeGet('updateNameBtn').onclick = async () => {
+            if (!currentUser) return;
+            const name = safeGet('newDisplayName').value.trim();
+            if (!name) return;
+            try {
+                await updateProfile(currentUser, { displayName: name });
+                await update(ref(database, 'users/' + currentUser.uid), { displayName: name });
+                alert('Nombre actualizado.');
+                openProfile();
+            } catch (err) { alert('No se pudo actualizar: ' + err.message); }
+        };
+
+        safeGet('updatePassBtn').onclick = async () => {
+            if (!currentUser) return;
+            const pass = safeGet('newPassword').value;
+            if (pass.length < 6) { alert('La contraseña debe tener al menos 6 caracteres.'); return; }
+            try {
+                await updatePassword(currentUser, pass);
+                alert('Contraseña actualizada.');
+                safeGet('newPassword').value = '';
+            } catch (err) { alert('No se pudo cambiar: ' + err.message); }
+        };
+
+        safeGet('logoutBtn').onclick = () => {
+            signOut(auth);
+            safeGet('profileModal').classList.remove('active');
+        };
+
+        // ===== EDITOR =====
+        function openEditor(id) {
+            const b = allBoosters.find(x => x.id === id);
+            if (!isAdmin) {
+                pendingEdit = id || '__new__';
+                safeGet('loginModal').classList.add('active');
+                return;
+            }
+            if (b && b.seed) {
+                alert('Este núcleo todavía es parte del catálogo de referencia. Publicá el catálogo inicial para poder editarlo.');
+                return;
+            }
+            safeGet('boosterForm').reset();
+            safeGet('editingBoosterId').value = b ? b.id : '';
+
+            if (b) {
+                safeGet('boosterModalTitle').textContent = 'Editar ' + b.name;
+                safeGet('bName').value = b.name;
+                safeGet('bVehicle').value = b.vehicle || 'Tomcat';
+                safeGet('bStatus').value = b.status || 'active';
+                safeGet('bBlock').value = b.block || '';
+                safeGet('bBase').value = b.base || '';
+                safeGet('bFirstFlight').value = toDateInput(b.firstFlight || (b.stats.first && b.stats.first.date) || '');
+                safeGet('bImage').value = b.image || '';
+                safeGet('bImages').value = B.imageList(b).join('\n');
+                safeGet('bDescription').value = b.description || '';
+                safeGet('bSpecHeight').value = (b.specs && b.specs.height) || '';
+                safeGet('bSpecEngines').value = (b.specs && b.specs.engines) || '';
+                safeGet('bSpecPropellant').value = (b.specs && b.specs.propellant) || '';
+                safeGet('bSpecRecovery').value = (b.specs && b.specs.recovery) || '';
+                safeGet('bFlights').value = B.flightsToText(b.flights);
+                safeGet('bNotes').value = b.notes || '';
+            } else {
+                safeGet('boosterModalTitle').textContent = 'Nuevo Propulsor';
+            }
+            safeGet('boosterModal').classList.add('active');
+        }
+
+        function toDateInput(raw) {
+            const d = B.parseDate(raw);
+            if (!d) return '';
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+
+        safeGet('addBoosterBtn').onclick = () => openEditor(null);
+
+        safeGet('boosterForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!isAdmin) return;
+            const id = safeGet('editingBoosterId').value;
+            const flights = B.parseFlightsText(safeGet('bFlights').value).map(f => ({
+                date: f.date,
+                mission: f.mission,
+                landing: f.landing,
+                result: B.resultOf(f.result),
+                note: f.note || ''
+            }));
+            const images = safeGet('bImages').value.split('\n').map(s => s.trim()).filter(Boolean);
+            const primary = safeGet('bImage').value.trim();
+            const data = {
+                name: safeGet('bName').value.trim().toUpperCase(),
+                vehicle: safeGet('bVehicle').value,
+                status: safeGet('bStatus').value,
+                block: safeGet('bBlock').value.trim(),
+                base: safeGet('bBase').value.trim(),
+                firstFlight: safeGet('bFirstFlight').value || (flights.length ? flights[flights.length - 1].date : ''),
+                image: primary || images[0] || '',
+                images: images,
+                description: safeGet('bDescription').value.trim(),
+                specs: {
+                    height: safeGet('bSpecHeight').value.trim(),
+                    engines: safeGet('bSpecEngines').value.trim(),
+                    propellant: safeGet('bSpecPropellant').value.trim(),
+                    recovery: safeGet('bSpecRecovery').value.trim()
+                },
+                flights: flights,
+                notes: safeGet('bNotes').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
+            try {
+                if (id) {
+                    await update(ref(database, 'boosters/' + id), data);
+                } else {
+                    await push(ref(database, 'boosters'), data);
+                }
+                safeGet('boosterModal').classList.remove('active');
+            } catch (err) {
+                alert('Error al guardar: ' + err.message);
+            }
+        };
+
+        // Publicar el catálogo de referencia en Firebase (solo admin)
+        safeGet('publishSeedsBtn').onclick = async () => {
+            if (!isAdmin || !usingSeeds) return;
+            if (!confirm('Se van a crear ' + allBoosters.length + ' propulsores en la base de datos. Después podrás editarlos. ¿Continuar?')) return;
+            const btn = safeGet('publishSeedsBtn');
+            btn.disabled = true;
+            btn.textContent = 'Publicando…';
+            try {
+                for (const b of B.seedCatalog()) {
+                    await push(ref(database, 'boosters'), {
+                        name: b.name,
+                        vehicle: b.vehicle,
+                        status: b.status,
+                        block: b.block,
+                        base: b.base,
+                        firstFlight: b.firstFlight || (b.stats.first && b.stats.first.date) || '',
+                        image: b.image,
+                        images: b.images,
+                        description: b.description,
+                        specs: b.specs,
+                        flights: b.flights.map(f => ({ date: f.date, mission: f.mission, landing: f.landing, result: f.result, note: f.note || '' })),
+                        updatedAt: new Date().toISOString()
+                    });
+                }
+                alert('Catálogo publicado. Ya podés editar cada núcleo.');
+            } catch (err) {
+                alert('No se pudo publicar el catálogo: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Publicar catálogo inicial';
+            }
+        };
+
+        // ===== FILTROS =====
+        document.querySelectorAll('#status-pills .b-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('#status-pills .b-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                filterStatus = pill.getAttribute('data-status');
+                render();
+            });
+        });
+        safeGet('filter-vehicle').addEventListener('change', render);
+        safeGet('filter-search').addEventListener('input', render);
+        safeGet('sort-toggle').addEventListener('click', () => {
+            sortMode = (sortMode === 'flights') ? 'recent' : 'flights';
+            safeGet('sort-toggle').textContent = sortMode === 'flights' ? '↓ Más vuelos' : '↓ Más reciente';
+            render();
+        });
+
+        // Deep links: ?edit=ID | ?new=1
+        const params = new URLSearchParams(window.location.search);
+        pendingEdit = params.get('edit') || '';
+        if (params.get('new') === '1') pendingEdit = '__new__';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            const yearEl = safeGet('year');
+            if (yearEl) yearEl.textContent = new Date().getFullYear();
+            document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+            resolvePendingEdit();
+        });
+    </script>
+    <script src="nav-mobile.js"></script>
+</body>
+
+</html>

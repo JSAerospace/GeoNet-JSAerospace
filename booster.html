@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propulsor · J.S. Aerospace</title>
+    <meta name="description" content="Ficha de propulsor de J.S. Aerospace: estado, historial de vuelos, recuperaciones y reutilización.">
+    <meta property="og:site_name" content="J.S. Aerospace">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Propulsor · J.S. Aerospace">
+    <meta property="og:description" content="Ficha de propulsor de J.S. Aerospace: estado, historial de vuelos, recuperaciones y reutilización.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#05070b">
+    <link rel="icon" type="image/png" href="LOGO_JTT.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@400;600&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --m-accent: #00f0ff;
+            --m-accent-soft: rgba(0, 240, 255, 0.14);
+            --m-ok: #00ff6a;
+            --m-bad: #ff3355;
+            --m-warn: #ffb300;
+            --m-line: rgba(255, 255, 255, 0.10);
+            --m-text: #eef3f7;
+            --m-muted: rgba(238, 243, 247, 0.66);
+            --m-dim: rgba(238, 243, 247, 0.4);
+            --m-bg: #05070b;
+            --m-heading: 'Space Grotesk', 'Orbitron', sans-serif;
+            --m-mono: 'Space Grotesk', ui-monospace, monospace;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        html, body {
+            height: auto !important;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+        }
+
+        body {
+            margin: 0;
+            width: 100%;
+            background: var(--m-bg);
+            color: var(--m-text);
+            font-family: 'Poppins', 'Rajdhani', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .m-wrap { width: min(1160px, 92vw); margin: 0 auto; }
+
+        .m-skip {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            z-index: 5000;
+            background: var(--m-accent);
+            color: #001014;
+            padding: 10px 16px;
+            font-family: var(--m-heading);
+            font-weight: 700;
+        }
+
+        .m-skip:focus { left: 16px; top: 16px; }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--m-line);
+            padding: 5px 10px;
+            font-family: var(--m-mono);
+            font-size: 0.64rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--m-muted);
+            white-space: nowrap;
+        }
+
+        .pill.ok { color: var(--m-ok); border-color: rgba(0, 255, 106, 0.35); background: rgba(0, 255, 106, 0.07); }
+        .pill.live { color: var(--m-accent); border-color: rgba(0, 240, 255, 0.38); background: var(--m-accent-soft); }
+        .pill.next { color: var(--m-warn); border-color: rgba(255, 179, 0, 0.35); background: rgba(255, 179, 0, 0.07); }
+        .pill.plain { color: var(--m-muted); }
+        .pill.bad { color: var(--m-bad); border-color: rgba(255, 51, 85, 0.35); background: rgba(255, 51, 85, 0.07); }
+
+        /* ===== HERO ===== */
+        .bh {
+            position: relative;
+            min-height: 76vh;
+            display: flex;
+            align-items: flex-end;
+            padding: 150px 0 54px;
+            overflow: hidden;
+            isolation: isolate;
+            background:
+                radial-gradient(60% 100% at 82% 16%, rgba(0, 240, 255, 0.12), transparent 62%),
+                radial-gradient(40% 70% at 96% 80%, rgba(255, 0, 212, 0.07), transparent 70%),
+                #05070b;
+        }
+
+        .bh-media {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: min(56%, 700px);
+            padding-top: 84px;
+            z-index: -2;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bh-media img {
+            width: 100%;
+            height: 92%;
+            object-fit: contain;
+            object-position: bottom center;
+            filter: drop-shadow(0 34px 70px rgba(0, 0, 0, 0.72));
+        }
+
+        .bh::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 56px 56px;
+            mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 70%);
+            pointer-events: none;
+        }
+
+        .bh::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                linear-gradient(90deg, rgba(5, 7, 11, 0.97) 0%, rgba(5, 7, 11, 0.88) 34%, rgba(5, 7, 11, 0.3) 64%, rgba(5, 7, 11, 0.12) 100%),
+                linear-gradient(180deg, rgba(5, 7, 11, 0.55) 0%, transparent 38%, rgba(5, 7, 11, 0.55) 76%, var(--m-bg) 100%);
+        }
+
+        .bh-inner { position: relative; }
+
+        .m-crumbs {
+            font-family: var(--m-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+            margin-bottom: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .m-crumbs a { color: var(--m-muted); text-decoration: none; }
+        .m-crumbs a:hover { color: var(--m-text); text-decoration: underline; }
+        .m-crumbs .sep { opacity: 0.5; }
+
+        .bh-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+
+        .bh-title {
+            font-family: var(--m-heading);
+            font-size: clamp(54px, 10vw, 116px);
+            font-weight: 800;
+            line-height: 0.88;
+            letter-spacing: -0.04em;
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+        }
+
+        .bh-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            align-items: center;
+            margin-top: 18px;
+            font-family: var(--m-mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--m-muted);
+        }
+
+        .bh-meta .sep { color: var(--m-dim); }
+        .bh-meta a { color: var(--m-text); text-decoration: none; border-bottom: 1px solid rgba(0, 240, 255, 0.45); }
+        .bh-meta a:hover { color: var(--m-accent); }
+
+        .bh-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+        .m-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 18px;
+            border: 1px solid var(--m-accent);
+            background: var(--m-accent);
+            color: #001014;
+            font-family: var(--m-heading);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.22s ease;
+        }
+
+        .m-btn:hover { background: transparent; color: var(--m-accent); }
+
+        .m-btn.ghost {
+            background: rgba(0, 0, 0, 0.35);
+            border-color: rgba(255, 255, 255, 0.22);
+            color: var(--m-text);
+        }
+
+        .m-btn.ghost:hover { border-color: var(--m-accent); color: var(--m-accent); }
+
+        .m-btn[hidden] { display: none !important; }
+
+        /* ===== STATS ===== */
+        .m-status {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--m-line);
+            border: 1px solid var(--m-line);
+            margin-top: -1px;
+        }
+
+        .m-status-card {
+            background: #080b12;
+            padding: 22px 24px;
+        }
+
+        .m-status-card .k {
+            margin: 0 0 10px;
+            font-family: var(--m-mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+        }
+
+        .m-status-card .v {
+            font-family: var(--m-heading);
+            font-size: clamp(22px, 2.8vw, 32px);
+            font-weight: 700;
+            line-height: 1.05;
+        }
+
+        .m-status-card .n {
+            margin: 8px 0 0;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: var(--m-muted);
+        }
+
+        /* ===== SECCIONES ===== */
+        .m-section { padding: 58px 0; border-top: 1px solid var(--m-line); }
+
+        .m-kicker {
+            margin: 0 0 10px;
+            font-family: var(--m-mono);
+            font-size: 0.66rem;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--m-muted);
+        }
+
+        .m-kicker .idx { color: var(--m-dim); }
+
+        .m-h2 {
+            margin: 0 0 18px;
+            font-family: var(--m-heading);
+            font-size: clamp(24px, 3.2vw, 36px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .m-lead {
+            margin: 0;
+            max-width: 74ch;
+            color: var(--m-muted);
+            font-size: 0.96rem;
+            line-height: 1.75;
+        }
+
+        .m-lead + .m-lead { margin-top: 14px; }
+
+        .m-spec-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--m-line);
+            border: 1px solid var(--m-line);
+        }
+
+        .spec-card { background: #080b12; padding: 20px 22px; }
+
+        .spec-card h3 {
+            margin: 0 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--m-mono);
+            font-size: 0.64rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+        }
+
+        .spec-card h3 i { color: var(--m-accent); font-size: 0.85rem; }
+
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .spec-row:first-of-type { border-top: 0; padding-top: 0; }
+        .spec-row:last-of-type { padding-bottom: 0; }
+
+        .spec-row dt {
+            margin: 0;
+            font-family: var(--m-mono);
+            font-size: 0.64rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+        }
+
+        .spec-row dd {
+            margin: 0;
+            text-align: right;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--m-text);
+        }
+
+        .spec-row dd a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(0, 240, 255, 0.45); }
+        .spec-row dd a:hover { color: var(--m-accent); }
+
+        /* ===== HISTORIAL ===== */
+        .tl-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 26px;
+        }
+
+        .tl-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-family: var(--m-mono);
+            font-size: 0.66rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+        }
+
+        .tl-summary b { color: var(--m-text); font-size: 0.9rem; }
+
+        .tl {
+            list-style: none;
+            margin: 0;
+            padding: 0 0 0 22px;
+            border-left: 1px solid var(--m-line);
+        }
+
+        .tl-item {
+            position: relative;
+            padding: 0 0 28px 24px;
+        }
+
+        .tl-item:last-child { padding-bottom: 0; }
+
+        .tl-item::before {
+            content: "";
+            position: absolute;
+            left: -27px;
+            top: 6px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--m-bg);
+            border: 2px solid var(--m-accent);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.55);
+        }
+
+        .tl-item.fail::before { border-color: var(--m-bad); box-shadow: 0 0 12px rgba(255, 51, 85, 0.55); }
+
+        .tl-top {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 10px 14px;
+            margin-bottom: 6px;
+        }
+
+        .tl-num {
+            font-family: var(--m-mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+        }
+
+        .tl-mission {
+            font-family: var(--m-heading);
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--m-text);
+            text-decoration: none;
+        }
+
+        a.tl-mission:hover { color: var(--m-accent); }
+
+        .tl-date {
+            font-family: var(--m-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--m-muted);
+        }
+
+        .tl-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+            font-size: 0.8rem;
+            color: var(--m-muted);
+        }
+
+        .tl-detail span { display: inline-flex; align-items: center; gap: 6px; }
+        .tl-detail i { color: var(--m-dim); font-size: 0.72rem; }
+
+        .tl-note {
+            margin: 8px 0 0;
+            font-size: 0.82rem;
+            line-height: 1.55;
+            color: var(--m-dim);
+            max-width: 68ch;
+        }
+
+        .tl-empty {
+            border-left: 1px dashed var(--m-line);
+            padding: 18px 22px;
+            color: var(--m-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ===== GALERÍA ===== */
+        .m-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
+        .m-gallery a {
+            display: block;
+            border: 1px solid var(--m-line);
+            overflow: hidden;
+            background: #080b12;
+        }
+
+        .m-gallery img {
+            display: block;
+            width: 100%;
+            height: 240px;
+            object-fit: contain;
+            padding: 12px;
+            background: radial-gradient(circle at 50% 40%, rgba(0, 240, 255, 0.06), #080b12 75%);
+            transition: transform 0.5s ease;
+        }
+
+        .m-gallery a:hover img { transform: scale(1.04); }
+
+        /* ===== NAVEGACIÓN ENTRE NÚCLEOS ===== */
+        .m-siblings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .m-sibling {
+            display: block;
+            padding: 18px 20px;
+            border: 1px solid var(--m-line);
+            background: rgba(255, 255, 255, 0.02);
+            text-decoration: none;
+            color: var(--m-text);
+            transition: all 0.22s ease;
+        }
+
+        .m-sibling:hover { border-color: rgba(0, 240, 255, 0.45); background: rgba(0, 240, 255, 0.04); }
+        .m-sibling.next { text-align: right; }
+
+        .m-sibling .dir {
+            display: block;
+            font-family: var(--m-mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+            margin-bottom: 6px;
+        }
+
+        .m-sibling .nm {
+            font-family: var(--m-heading);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .m-sibling .dt {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+            font-family: var(--m-mono);
+            font-size: 0.66rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--m-muted);
+        }
+
+        .m-sibling.next .dt { justify-content: flex-end; }
+
+        .m-siblings.single { grid-template-columns: 1fr; }
+        .m-siblings.single .m-sibling.next { text-align: left; }
+        .m-siblings.single .m-sibling.next .dt { justify-content: flex-start; }
+
+        .m-related {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .m-related a {
+            display: block;
+            padding: 18px 20px;
+            border: 1px solid var(--m-line);
+            text-decoration: none;
+            color: var(--m-text);
+            transition: all 0.22s ease;
+        }
+
+        .m-related a:hover { border-color: rgba(0, 240, 255, 0.45); background: rgba(0, 240, 255, 0.04); }
+
+        .m-related i { color: var(--m-accent); font-size: 1.2rem; margin-bottom: 8px; display: block; }
+
+        .m-related .t {
+            display: block;
+            font-family: var(--m-mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+            margin-bottom: 4px;
+        }
+
+        .m-related .b { display: block; font-family: var(--m-heading); font-size: 1rem; font-weight: 600; }
+
+        /* ===== ESTADOS ===== */
+        .m-state {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 24px;
+            text-align: center;
+        }
+
+        .m-state[hidden] { display: none !important; }
+
+        .m-state-title {
+            margin: 6px 0 12px;
+            font-family: var(--m-heading);
+            font-size: clamp(26px, 4vw, 38px);
+            font-weight: 700;
+        }
+
+        .m-state p { color: var(--m-muted); max-width: 48ch; margin: 0 auto 22px; line-height: 1.6; }
+
+        .m-state .m-kicker { color: var(--m-dim); }
+
+        .m-footer-note {
+            margin-top: 18px;
+            font-family: var(--m-mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+        }
+
+        .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .reveal.in { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            html { scroll-behavior: auto; }
+        }
+
+        @media (max-width: 980px) {
+            .m-spec-grid { grid-template-columns: 1fr 1fr; }
+            .m-status { grid-template-columns: 1fr; }
+            .m-related { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 760px) {
+            .bh { min-height: 66vh; padding: 118px 0 36px; }
+            .bh-media { width: 100%; opacity: 0.38; }
+            .bh-media img { height: 100%; }
+            .m-section { padding: 40px 0; }
+            .m-spec-grid { grid-template-columns: 1fr; }
+            .m-siblings { grid-template-columns: 1fr; }
+            .m-sibling.next { text-align: left; }
+            .m-sibling.next .dt { justify-content: flex-start; }
+            .m-gallery img { height: 200px; }
+        }
+    </style>
+</head>
+
+<body>
+    <a class="m-skip" href="#m-main">Saltar al contenido</a>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="LOGO_JTT.png" alt="J.S.Aerospace Logo">
+            <div class="logo-text">J.S.<span class="highlight">AEROSPACE</span></div>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir Menú">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="misiones.html">Misiones</a></li>
+            <li><a href="cohetes.html">Cohetes</a></li>
+            <li><a href="boosters.html" class="active">Boosters</a></li>
+            <li><a href="calendario.html">CALENDARIO</a></li>
+            <li><a href="geonet.html">GEONET</a></li>
+            <li><a href="clientes.html">CLIENTES</a></li>
+        </ul>
+    </nav>
+
+    <main id="m-main">
+        <div class="m-state" id="m-loading">
+            <div>
+                <p class="m-kicker">J.S. Aerospace · Registro de propulsores</p>
+                <p class="m-state-title">Cargando núcleo</p>
+            </div>
+        </div>
+
+        <div id="m-content" hidden></div>
+
+        <div class="m-state" id="m-error" hidden>
+            <div>
+                <p class="m-kicker">Error 404</p>
+                <p class="m-state-title">Propulsor no encontrado</p>
+                <p id="m-error-text">No pudimos cargar este núcleo. Puede que se haya eliminado del registro o que el enlace esté mal.</p>
+                <a class="m-btn" href="boosters.html">Volver a propulsores</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-socials">
+            <a href="https://www.youtube.com/@eszunspace_ksp" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            <a href="https://x.com/EsZunSpace" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://github.com/JSAerospace" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+        <div class="footer-copy">© <span id="year">2026</span> J.S. Aerospace – Todos los derechos reservados</div>
+    </footer>
+
+    <script src="boosters.js?v=3"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6eDNK7CLl_aXEYkwFV97k-2A1axzRAKg",
+            authDomain: "j-saerospace.firebaseapp.com",
+            projectId: "j-saerospace",
+            storageBucket: "j-saerospace.firebasestorage.app",
+            messagingSenderId: "496032189875",
+            appId: "1:496032189875:web:69c591002b8131ed1c0fc6",
+            measurementId: "G-YXWPQWVGDZ",
+            databaseURL: "https://j-saerospace-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const B = window.JSBoosters;
+        const ADMIN_EMAIL = 'olanoagus@gmail.com';
+        const el = (id) => document.getElementById(id);
+        const esc = (v) => String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+        const params = new URLSearchParams(window.location.search);
+        const wanted = (params.get('b') || params.get('booster') || params.get('id') || '').trim();
+        let current = null;
+        let pool = [];
+        let missions = [];
+        let isAdmin = false;
+
+        function showError(message) {
+            el('m-loading').hidden = true;
+            el('m-content').hidden = true;
+            el('m-error').hidden = false;
+            if (message) el('m-error-text').textContent = message;
+        }
+
+        function statusPill(status) {
+            const meta = B.statusMeta(status);
+            return '<span class="pill ' + meta.cls + '">' + meta.mark + ' ' + meta.label + '</span>';
+        }
+
+        function resultPill(result) {
+            const r = B.resultOf(result);
+            const cls = r === 'failed' ? 'bad' : r === 'partial' ? 'next' : r === 'scheduled' ? 'plain' : 'ok';
+            const mark = r === 'failed' ? '✕' : r === 'partial' ? '◐' : r === 'scheduled' ? '○' : '✓';
+            return '<span class="pill ' + cls + '">' + mark + ' ' + B.resultLabel(result) + '</span>';
+        }
+
+        function missionIndex() {
+            const byKey = {};
+            const byTitle = {};
+            missions.forEach(m => {
+                const title = String(m.title || m.mission || m.name || '').toLowerCase().trim();
+                if (!title) return;
+                byKey[title + '|' + (m.date || '')] = m.id;
+                if (!byTitle[title]) byTitle[title] = m.id;
+            });
+            return { byKey, byTitle };
+        }
+
+        function render(b) {
+            const s = b.stats;
+            const imgs = B.imageList(b);
+            const heroImg = encodeURI(B.resolveImg(imgs[0] || b.image));
+            const firstDate = b.firstFlight || (s.first ? s.first.date : '');
+            const idx = missionIndex();
+            const total = s.total;
+
+            document.title = b.name + ' · Propulsor · J.S. Aerospace';
+            const md = document.querySelector('meta[name="description"]');
+            if (md) md.setAttribute('content', 'Ficha del propulsor ' + b.name + ' (' + b.vehicle + '): ' + s.total + ' vuelos, ' + s.landings + ' aterrizajes y estado ' + B.statusMeta(b.status).label.toLowerCase() + '.');
+            const ogT = document.querySelector('meta[property="og:title"]');
+            if (ogT) ogT.setAttribute('content', b.name + ' · Propulsor · J.S. Aerospace');
+            const ogD = document.querySelector('meta[property="og:description"]');
+            if (ogD) ogD.setAttribute('content', b.vehicle + ' · ' + s.total + ' vuelos · ' + s.landings + ' aterrizajes');
+            const ogI = document.querySelector('meta[property="og:image"]');
+            if (ogI) ogI.setAttribute('content', new URL(heroImg, location.href).href);
+
+            const intro = b.description || (
+                b.name + ' es un núcleo de primera etapa de ' + b.vehicle + ' operado por J.S. Aerospace desde ' + (b.base || 'LC-39B') + '. ' +
+                (total
+                    ? 'Acumula ' + total + (total === 1 ? ' vuelo' : ' vuelos') + ' con ' + s.landings + ' ' + (s.landings === 1 ? 'recuperación' : 'recuperaciones') + '.'
+                    : 'Todavía no registra vuelos orbitales.')
+            );
+
+            const statusCards = [
+                { k: 'Estado', v: statusPill(b.status), n: b.status === 'active' ? 'Habilitado para la próxima ventana de lanzamiento.' : b.status === 'testing' ? 'En campaña de aceptación, sin vuelos orbitales.' : b.status === 'retired' ? 'Fuera de servicio; se conserva su historial.' : b.status === 'lost' ? 'No se recuperó tras su último vuelo.' : 'Fuera de línea por inspección o mantenimiento.' },
+                { k: 'Vuelos', v: String(total).padStart(2, '0'), n: total ? 'Último: ' + (s.last.mission || '—') + ' · ' + B.fmtShort(s.last.date) : 'Sin vuelos registrados.' },
+                { k: 'Aterrizajes', v: String(s.landings).padStart(2, '0'), n: total ? 'Tasa de recuperación del ' + s.successRate + '% · ' + s.reuses + ' reutilizaciones.' : 'Sin intentos de recuperación.' }
+            ].map(c => `
+                <article class="m-status-card">
+                    <p class="k">${c.k}</p>
+                    <div class="v">${c.v}</div>
+                    <p class="n">${esc(c.n)}</p>
+                </article>`).join('');
+
+            const flightRows = s.flights.map((f, i) => {
+                const num = total - i;
+                const key = String(f.mission || '').toLowerCase().trim();
+                const missionId = f.missionId || idx.byKey[key + '|' + (f.date || '')] || idx.byTitle[key] || '';
+                const title = esc(f.mission || 'Vuelo');
+                const nameHtml = missionId
+                    ? '<a class="tl-mission" href="mision.html?id=' + encodeURIComponent(missionId) + '">' + title + '</a>'
+                    : '<span class="tl-mission">' + title + '</span>';
+                return `
+                    <li class="tl-item${B.resultOf(f.result) === 'failed' ? ' fail' : ''}">
+                        <div class="tl-top">
+                            <span class="tl-num">Vuelo ${String(num).padStart(2, '0')}</span>
+                            ${nameHtml}
+                            <span class="tl-date">${esc(B.fmtShort(f.date))}</span>
+                            ${resultPill(f.result)}
+                        </div>
+                        <div class="tl-detail">
+                            <span><i class="fas fa-location-dot"></i>${esc(f.landing || 'Sin recuperación')}</span>
+                            ${i === 0 ? '<span><i class="fas fa-star"></i>Último vuelo</span>' : ''}
+                        </div>
+                        ${f.note ? '<p class="tl-note">' + esc(f.note) + '</p>' : ''}
+                    </li>`;
+            }).join('');
+
+            const history = total
+                ? '<ol class="tl">' + flightRows + '</ol>'
+                : '<div class="tl-empty">Este núcleo todavía no tiene vuelos registrados. Cuando se cargue una misión con su nombre en el manifiesto, va a aparecer acá automáticamente.</div>';
+
+            const gallery = imgs.length > 1 ? `
+                <section class="m-section reveal" aria-labelledby="gal-h">
+                    <div class="m-wrap">
+                        <p class="m-kicker"><span class="idx">04 ·</span> REGISTRO</p>
+                        <h2 class="m-h2" id="gal-h">Galería del núcleo</h2>
+                        <div class="m-gallery">
+                            ${imgs.map(src => '<a href="' + encodeURI(esc(B.resolveImg(src))) + '" target="_blank" rel="noopener"><img src="' + encodeURI(esc(B.resolveImg(src))) + '" alt="' + esc(b.name) + '" loading="lazy" onerror="this.style.display=\'none\'"></a>').join('')}
+                        </div>
+                    </div>
+                </section>` : '';
+
+            const pos = pool.findIndex(x => x.name.toUpperCase() === b.name.toUpperCase());
+            const prev = pos > 0 ? pool[pos - 1] : null;
+            const next = pos >= 0 && pos < pool.length - 1 ? pool[pos + 1] : null;
+            const siblings = (prev || next) ? `
+                <div class="m-siblings${(prev && next) ? '' : ' single'}">
+                    ${prev ? '<a class="m-sibling" href="booster.html?b=' + encodeURIComponent(prev.name) + '"><span class="dir">← Núcleo anterior</span><span class="nm">' + esc(prev.name) + '</span><span class="dt">' + esc(prev.vehicle) + ' · ' + prev.stats.total + ' vuelos</span></a>' : ''}
+                    ${next ? '<a class="m-sibling next" href="booster.html?b=' + encodeURIComponent(next.name) + '"><span class="dir">Núcleo siguiente →</span><span class="nm">' + esc(next.name) + '</span><span class="dt">' + esc(next.vehicle) + ' · ' + next.stats.total + ' vuelos</span></a>' : ''}
+                </div>` : '';
+
+            el('m-content').innerHTML = `
+                <header class="bh">
+                    <div class="bh-media"><img src="${heroImg}" alt="${esc(b.name)} · ${esc(b.vehicle)}"></div>
+                    <div class="m-wrap bh-inner">
+                        <nav class="m-crumbs" aria-label="Ruta de navegación">
+                            <a href="index.html">Inicio</a><span class="sep">/</span>
+                            <a href="boosters.html">Propulsores</a><span class="sep">/</span>
+                            <span>${esc(b.name)}</span>
+                        </nav>
+                        <div class="bh-badges">
+                            ${statusPill(b.status)}
+                            <span class="pill plain">${esc(b.vehicle)}</span>
+                            ${b.block ? '<span class="pill plain">' + esc(b.block) + '</span>' : ''}
+                            ${b.seed ? '<span class="pill next">Catálogo de referencia</span>' : ''}
+                        </div>
+                        <h1 class="bh-title">${esc(b.name)}</h1>
+                        <div class="bh-meta">
+                            <span>${esc(b.vehicle)}</span>
+                            ${b.base ? '<span class="sep">·</span><span>' + esc(b.base) + '</span>' : ''}
+                            ${firstDate ? '<span class="sep">·</span><span>Primer vuelo ' + esc(B.fmtShort(firstDate)) + '</span>' : ''}
+                            <span class="sep">·</span><span>${total} ${total === 1 ? 'vuelo' : 'vuelos'}</span>
+                        </div>
+                        <div class="bh-actions">
+                            <a class="m-btn" href="boosters.html">← Todos los propulsores</a>
+                            <a class="m-btn ghost" href="misiones.html">Manifiesto de misiones</a>
+                            <a class="m-btn ghost" id="editBooster" href="boosters.html?edit=${encodeURIComponent(b.id)}" hidden>Editar núcleo</a>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="m-wrap">
+                    <div class="m-status">${statusCards}</div>
+                </div>
+
+                <section class="m-section reveal" aria-labelledby="intro-h">
+                    <div class="m-wrap">
+                        <p class="m-kicker"><span class="idx">01 ·</span> INTRODUCCIÓN</p>
+                        <h2 class="m-h2" id="intro-h">Historia del núcleo</h2>
+                        <p class="m-lead">${esc(intro)}</p>
+                        ${b.notes ? '<p class="m-lead">Nota operativa: ' + esc(b.notes) + '</p>' : ''}
+                        <p class="m-footer-note">Registro actualizado desde el panel de administración de propulsores.</p>
+                    </div>
+                </section>
+
+                <section class="m-section reveal" aria-labelledby="spec-h">
+                    <div class="m-wrap">
+                        <p class="m-kicker"><span class="idx">02 ·</span> FICHA TÉCNICA</p>
+                        <h2 class="m-h2" id="spec-h">El núcleo en números</h2>
+                        <div class="m-spec-grid">
+                            <article class="spec-card">
+                                <h3><i class="fas fa-rocket"></i>Vehículo</h3>
+                                <dl>
+                                    <div class="spec-row"><dt>Familia</dt><dd><a href="cohetes.html">${esc(b.vehicle)}</a></dd></div>
+                                    <div class="spec-row"><dt>Variante</dt><dd>${esc(b.block || '—')}</dd></div>
+                                    <div class="spec-row"><dt>Altura</dt><dd>${esc(b.specs.height || '—')}</dd></div>
+                                </dl>
+                            </article>
+                            <article class="spec-card">
+                                <h3><i class="fas fa-fire"></i>Propulsión</h3>
+                                <dl>
+                                    <div class="spec-row"><dt>Motores</dt><dd>${esc(b.specs.engines || '—')}</dd></div>
+                                    <div class="spec-row"><dt>Propelentes</dt><dd>${esc(b.specs.propellant || '—')}</dd></div>
+                                    <div class="spec-row"><dt>Reutilizable</dt><dd>Sí</dd></div>
+                                </dl>
+                            </article>
+                            <article class="spec-card">
+                                <h3><i class="fas fa-parachute-box"></i>Recuperación</h3>
+                                <dl>
+                                    <div class="spec-row"><dt>Método</dt><dd>${esc(b.specs.recovery || '—')}</dd></div>
+                                    <div class="spec-row"><dt>Base</dt><dd>${esc(b.base || '—')}</dd></div>
+                                    <div class="spec-row"><dt>Aterrizajes</dt><dd>${s.landings} / ${total}</dd></div>
+                                </dl>
+                            </article>
+                            <article class="spec-card">
+                                <h3><i class="fas fa-clock"></i>Operación</h3>
+                                <dl>
+                                    <div class="spec-row"><dt>Primer vuelo</dt><dd>${firstDate ? esc(B.fmtShort(firstDate)) : '—'}</dd></div>
+                                    <div class="spec-row"><dt>Último vuelo</dt><dd>${s.last ? esc(B.fmtShort(s.last.date)) : '—'}</dd></div>
+                                    <div class="spec-row"><dt>Reutilizaciones</dt><dd>${s.reuses}</dd></div>
+                                </dl>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="m-section reveal" aria-labelledby="hist-h">
+                    <div class="m-wrap">
+                        <div class="tl-head">
+                            <div>
+                                <p class="m-kicker"><span class="idx">03 ·</span> BITÁCORA</p>
+                                <h2 class="m-h2" id="hist-h" style="margin-bottom:0;">Historial de vuelos</h2>
+                            </div>
+                            <div class="tl-summary">
+                                <span><b>${total}</b> vuelos</span>
+                                <span><b>${s.landings}</b> aterrizajes</span>
+                                <span><b>${s.reuses}</b> reutilizaciones</span>
+                                <span><b>${s.successRate}%</b> recuperación</span>
+                            </div>
+                        </div>
+                        ${history}
+                        ${siblings}
+                        <div class="m-related">
+                            <a href="boosters.html"><i class="fas fa-layer-group"></i><span class="t">Flota</span><span class="b">Todos los propulsores</span></a>
+                            <a href="cohetes.html"><i class="fas fa-rocket"></i><span class="t">Vehículo</span><span class="b">${esc(b.vehicle)}</span></a>
+                            <a href="misiones.html"><i class="fas fa-list-check"></i><span class="t">Manifiesto</span><span class="b">Misiones lanzadas</span></a>
+                        </div>
+                    </div>
+                </section>
+
+                ${gallery}
+            `;
+
+            el('m-loading').hidden = true;
+            el('m-error').hidden = true;
+            el('m-content').hidden = false;
+
+            document.querySelectorAll('.reveal').forEach(node => {
+                if (typeof IntersectionObserver === 'undefined') { node.classList.add('in'); return; }
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('in');
+                            io.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.08 });
+                io.observe(node);
+            });
+
+            const editLink = el('editBooster');
+            if (editLink) {
+                editLink.hidden = !isAdmin;
+                editLink.href = b.seed ? 'boosters.html' : 'boosters.html?edit=' + encodeURIComponent(b.id);
+                editLink.textContent = b.seed ? 'Publicar catálogo' : 'Editar núcleo';
+            }
+        }
+
+        function pickBooster(data) {
+            const rows = data ? Object.entries(data).map(([id, raw]) => B.normalize(raw, id)) : [];
+            pool = (rows.length ? rows : B.seedCatalog())
+                .map(b => B.mergeMissionFlights(b, missions))
+                .sort((a, b) => (b.stats.total - a.stats.total) || a.name.localeCompare(b.name));
+
+            if (!wanted) return null;
+            return pool.find(b => b.id === wanted)
+                || pool.find(b => b.name.toUpperCase() === wanted.toUpperCase())
+                || null;
+        }
+
+        async function load() {
+            try {
+                const [boostersSnap, missionsSnap] = await Promise.all([
+                    get(ref(database, 'boosters')),
+                    get(ref(database, 'missions'))
+                ]);
+                missions = missionsSnap.exists()
+                    ? Object.entries(missionsSnap.val() || {}).map(([id, m]) => Object.assign({ id }, m))
+                    : [];
+                current = pickBooster(boostersSnap.exists() ? boostersSnap.val() : null);
+                if (!current) {
+                    showError(wanted
+                        ? 'No existe un propulsor con el identificador «' + wanted + '» en el registro.'
+                        : 'Falta el identificador del propulsor en el enlace.');
+                    return;
+                }
+                render(current);
+                el('year').textContent = new Date().getFullYear();
+            } catch (err) {
+                console.error(err);
+                showError('No se pudo leer el registro de propulsores: ' + err.message);
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            isAdmin = !!(user && user.email === ADMIN_EMAIL);
+            const editLink = el('editBooster');
+            if (editLink && current) {
+                editLink.hidden = !isAdmin;
+                editLink.href = current.seed ? 'boosters.html' : 'boosters.html?edit=' + encodeURIComponent(current.id);
+                editLink.textContent = current.seed ? 'Publicar catálogo' : 'Editar núcleo';
+            }
+        });
+
+        load();
+    </script>
+    <script src="nav-mobile.js"></script>
+</body>
+
+</html>

@@ -90,6 +90,82 @@ body {
     color: var(--primary-color);
 }
 
+/* Navegación compacta en escritorios angostos (8 secciones + cuenta) */
+@media (min-width: 901px) and (max-width: 1400px) {
+    .navbar {
+        padding-left: 28px;
+        padding-right: 28px;
+    }
+
+    .nav-links {
+        gap: 16px;
+    }
+
+    .nav-links a {
+        font-size: 0.78rem;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .nav-links .auth-btn {
+        padding: 4px 10px;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .logo-text {
+        letter-spacing: 1.2px;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+    .navbar {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .nav-links {
+        gap: 10px;
+    }
+
+    .nav-links a {
+        font-size: 0.72rem;
+        letter-spacing: 0.2px;
+    }
+
+    .nav-links .auth-btn {
+        padding: 4px 9px;
+        font-size: 10px;
+    }
+
+    .logo-text {
+        font-size: 1.05rem;
+        letter-spacing: 0.8px;
+    }
+}
+
+/* El logo ya lleva al inicio: en el tramo más angosto se libera ese espacio */
+@media (min-width: 901px) and (max-width: 960px) {
+    .nav-links {
+        gap: 8px;
+    }
+
+    .nav-links li:first-child {
+        display: none;
+    }
+
+    .nav-links a {
+        font-size: 0.68rem;
+        letter-spacing: 0;
+    }
+
+    .nav-links .auth-btn {
+        padding: 4px 8px;
+        font-size: 9px;
+    }
+}
+
 /* Split Container */
 .split-container {
     display: flex;
@@ -346,6 +422,7 @@ p {
     letter-spacing: 1px;
     transition: all 0.3s ease;
     height: 32px;
+    white-space: nowrap;
 }
 
 .auth-btn:hover {

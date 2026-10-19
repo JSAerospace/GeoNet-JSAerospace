@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misión · J.S. Aerospace</title>
+    <meta name="description" content="Ficha de misión de J.S. Aerospace: estado, vehículo, carga útil, recuperación y perfil de vuelo.">
+    <meta property="og:site_name" content="J.S. Aerospace">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Misión · J.S. Aerospace">
+    <meta property="og:description" content="Ficha de misión de J.S. Aerospace: estado, vehículo, carga útil, recuperación y perfil de vuelo.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#05070b">
+    <link rel="icon" type="image/png" href="LOGO_JTT.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@400;600&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --m-accent: #00f0ff;
+            --m-accent-soft: rgba(0, 240, 255, 0.14);
+            --m-ok: #00ff6a;
+            --m-bad: #ff3355;
+            --m-warn: #ffb300;
+            --m-line: rgba(255, 255, 255, 0.10);
+            --m-line-soft: rgba(255, 255, 255, 0.06);
+            --m-panel: #0a0d13;
+            --m-panel-2: #0d1117;
+            --m-text: #f2f5f8;
+            --m-muted: rgba(242, 245, 248, 0.62);
+            --m-dim: rgba(242, 245, 248, 0.40);
+            --m-heading: 'Space Grotesk', 'Orbitron', sans-serif;
+            --m-body: 'Poppins', 'Rajdhani', sans-serif;
+            --m-mono: 'Rajdhani', 'Space Grotesk', monospace;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 100%;
+            background: #000;
+            color: var(--m-text);
+            font-family: var(--m-body);
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+        }
+
+        body {
+            background-image:
+                radial-gradient(circle at 18% 0%, rgba(0, 240, 255, 0.06), transparent 42%),
+                radial-gradient(circle at 82% 8%, rgba(255, 107, 53, 0.05), transparent 38%);
+            background-attachment: fixed;
+        }
+
+        .m-wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Solid header so the technical content stays legible while scrolling */
+        .navbar {
+            background: rgba(4, 6, 10, 0.82) !important;
+            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ===== SKIP LINK ===== */
+        .m-skip {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            background: var(--m-accent);
+            color: #001014;
+            padding: 10px 16px;
+            z-index: 10000;
+            font-weight: 700;
+        }
+        .m-skip:focus { left: 16px; top: 16px; }
+
+        /* ===== HERO ===== */
+        .m-hero {
+            position: relative;
+            min-height: clamp(430px, 64vh, 620px);
+            display: flex;
+            align-items: flex-end;
+            padding: 130px 0 42px;
+            overflow: hidden;
+        }
+
+        .m-hero-media {
+            position: absolute;
+            inset: 0;
+            background-color: #05070b;
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.02);
+            filter: brightness(1.12) saturate(1.05);
+        }
+
+        /* Imágenes de origen muy oscuras: se aclaran para que se lea la escena */
+        .m-hero-media.is-dark { filter: brightness(2.4) saturate(1.2) contrast(0.96); }
+
+        /* Depth for very dark source images */
+        .m-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(900px 420px at 78% 32%, rgba(0, 240, 255, 0.10), transparent 70%),
+                radial-gradient(700px 380px at 16% 10%, rgba(255, 107, 53, 0.07), transparent 70%);
+        }
+
+        .m-hero-media::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.15) 32%, rgba(0, 0, 0, 0.92) 100%),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.94) 0%, rgba(0, 0, 0, 0.55) 52%, rgba(0, 0, 0, 0.35) 100%);
+        }
+
+        .m-hero-inner {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .m-crumbs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--m-mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+            margin-bottom: 26px;
+        }
+
+        .m-crumbs a {
+            color: var(--m-accent);
+            text-decoration: none;
+        }
+        .m-crumbs a:hover { text-decoration: underline; }
+
+        .m-badges {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid currentColor;
+            border-radius: 3px;
+            padding: 5px 11px;
+            font-family: var(--m-mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            line-height: 1;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .pill.ok { color: var(--m-ok); }
+        .pill.bad { color: var(--m-bad); }
+        .pill.live { color: var(--m-accent); }
+        .pill.next { color: var(--m-warn); }
+        .pill.plain { color: var(--m-muted); }
+
+        .m-title {
+            font-family: var(--m-heading);
+            font-weight: 800;
+            font-size: clamp(42px, 8.4vw, 96px);
+            line-height: 0.95;
+            letter-spacing: -0.025em;
+            margin: 0 0 22px;
+            text-wrap: balance;
+        }
+
+        .m-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 14px;
+            font-family: var(--m-mono);
+            font-size: 0.95rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--m-text);
+        }
+
+        .m-meta .sep { color: var(--m-dim); }
+        .m-meta a { color: var(--m-text); text-decoration: none; border-bottom: 1px solid rgba(0, 240, 255, 0.45); }
+        .m-meta a:hover { color: var(--m-accent); }
+
+        .m-countdown {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 26px;
+            border: 1px solid rgba(255, 179, 0, 0.35);
+            background: rgba(255, 179, 0, 0.06);
+            padding: 10px 16px;
+            border-radius: 6px;
+        }
+
+        .m-countdown .lbl {
+            font-family: var(--m-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--m-warn);
+        }
+
+        .m-countdown b {
+            font-family: var(--m-mono);
+            font-size: 1.25rem;
+            letter-spacing: 0.1em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ===== STATUS CARDS ===== */
+        .m-status {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: -28px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .m-status-card {
+            background: linear-gradient(180deg, rgba(13, 17, 23, 0.96), rgba(8, 11, 16, 0.96));
+            border: 1px solid var(--m-line);
+            border-radius: 10px;
+            padding: 22px 22px 20px;
+            backdrop-filter: blur(6px);
+        }
+
+        .m-status-card .k {
+            font-family: var(--m-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+            margin: 0 0 12px;
+        }
+
+        .m-status-card .v {
+            font-family: var(--m-heading);
+            font-size: 1.55rem;
+            font-weight: 700;
+            margin: 12px 0 6px;
+            line-height: 1.1;
+            word-break: break-word;
+        }
+
+        .m-status-card .n {
+            font-family: var(--m-mono);
+            font-size: 0.82rem;
+            color: var(--m-muted);
+            margin: 0;
+            letter-spacing: 0.03em;
+        }
+
+        .m-status-card a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(0, 240, 255, 0.4); }
+
+        /* ===== SECTIONS ===== */
+        .m-section {
+            padding: 78px 0 0;
+        }
+
+        .m-kicker {
+            font-family: var(--m-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--m-accent);
+            margin: 0 0 12px;
+        }
+
+        .m-kicker .idx { color: var(--m-dim); }
+
+        .m-h2 {
+            font-family: var(--m-heading);
+            font-size: clamp(30px, 4.4vw, 46px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin: 0 0 26px;
+            line-height: 1.02;
+        }
+
+        .m-lead {
+            font-size: clamp(1rem, 1.5vw, 1.18rem);
+            line-height: 1.7;
+            color: rgba(242, 245, 248, 0.86);
+            max-width: 78ch;
+            margin: 0;
+        }
+
+        .m-lead + .m-lead { margin-top: 14px; }
+
+        /* ===== SPEC GRID ===== */
+        .m-spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .spec-card {
+            border: 1px solid var(--m-line);
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(12, 16, 22, 0.9), rgba(7, 10, 14, 0.9));
+            padding: 22px 22px 8px;
+        }
+
+        .spec-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--m-heading);
+            font-size: 1.02rem;
+            font-weight: 600;
+            margin: 0 0 16px;
+        }
+
+        .spec-card h3 i { color: var(--m-accent); font-size: 0.95rem; }
+
+        .spec-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 11px 0;
+            border-top: 1px dashed var(--m-line-soft);
+        }
+
+        .spec-row:first-of-type { border-top: 0; }
+
+        .spec-row dt {
+            font-family: var(--m-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+            margin: 0;
+            flex: 0 0 auto;
+        }
+
+        .spec-row dd {
+            margin: 0;
+            font-family: var(--m-heading);
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .spec-row dd a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(0, 240, 255, 0.45); }
+        .spec-row dd a:hover { color: var(--m-accent); }
+
+        /* ===== FLIGHT PROFILE ===== */
+        .flight-figure {
+            margin: 0;
+            border: 1px solid var(--m-line);
+            border-radius: 12px;
+            background:
+                linear-gradient(180deg, rgba(9, 13, 19, 0.98), rgba(5, 8, 12, 0.98));
+            padding: 22px;
+        }
+
+        .flight-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+            gap: 32px;
+            align-items: center;
+        }
+
+        .flight-svg { width: 100%; height: auto; display: block; }
+
+        .flight-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--m-line-soft);
+            font-family: var(--m-mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--m-muted);
+        }
+
+        .flight-legend span { display: inline-flex; align-items: center; gap: 8px; }
+        .flight-legend i { width: 26px; height: 2px; display: inline-block; border-radius: 2px; }
+        .lg-ascent { background: #f2f5f8; }
+        .lg-stage2 { background: var(--m-accent); }
+        .lg-recovery { background: repeating-linear-gradient(90deg, #ff5a52 0 5px, transparent 5px 9px); }
+
+        .hitos {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 6px;
+            counter-reset: hito;
+        }
+
+        .hito {
+            display: flex;
+            gap: 13px;
+            align-items: flex-start;
+            padding: 10px 10px 10px 6px;
+            border-radius: 8px;
+            transition: background 0.18s ease;
+        }
+
+        .hito:hover { background: rgba(255, 255, 255, 0.035); }
+
+        .hito .num {
+            flex: 0 0 auto;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            border: 1px solid var(--m-line);
+            display: grid;
+            place-items: center;
+            font-family: var(--m-mono);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .hito[data-kind="ascent"] .num { color: #f2f5f8; border-color: rgba(242, 245, 248, 0.45); }
+        .hito[data-kind="recovery"] .num { color: #ff5a52; border-color: rgba(255, 90, 82, 0.55); }
+        .hito[data-kind="stage2"] .num { color: var(--m-accent); border-color: rgba(0, 240, 255, 0.5); }
+
+        .hito h4 {
+            margin: 2px 0 3px;
+            font-family: var(--m-heading);
+            font-size: 0.98rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .hito p {
+            margin: 0;
+            font-family: var(--m-mono);
+            font-size: 0.8rem;
+            color: var(--m-muted);
+            letter-spacing: 0.02em;
+            line-height: 1.45;
+        }
+
+        @media (max-width: 640px) {
+            .flight-svg .mk circle { r: 32; }
+            .flight-svg .mk text { font-size: 26px; }
+        }
+
+        .mk { transition: transform 0.18s ease; transform-origin: center; }
+        .mk.hot { transform: scale(1.18); }
+        .mk circle { transition: fill 0.18s ease; }
+        .mk.hot circle { fill: rgba(255, 255, 255, 0.12); }
+
+        /* ===== GALLERY ===== */
+        .m-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .m-gallery a {
+            display: block;
+            aspect-ratio: 16 / 10;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--m-line);
+            background: #05070b;
+        }
+
+        .m-gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .m-gallery a:hover img { transform: scale(1.04); }
+
+        /* ===== PREV / NEXT ===== */
+        .m-siblings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .m-sibling {
+            display: block;
+            border: 1px solid var(--m-line);
+            border-radius: 10px;
+            padding: 20px 22px;
+            text-decoration: none;
+            color: var(--m-text);
+            background: rgba(255, 255, 255, 0.015);
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .m-sibling:hover { border-color: rgba(0, 240, 255, 0.45); background: rgba(0, 240, 255, 0.04); }
+        .m-sibling.next { text-align: right; }
+
+        .m-siblings.single { grid-template-columns: 1fr; }
+        .m-siblings.single .m-sibling.next { text-align: left; }
+        .m-siblings.single .m-sibling.next .dt { justify-content: flex-start; }
+
+        .m-sibling .dir {
+            display: block;
+            font-family: var(--m-mono);
+            font-size: 0.66rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--m-dim);
+            margin-bottom: 8px;
+        }
+
+        .m-sibling .nm {
+            display: block;
+            font-family: var(--m-heading);
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .m-sibling .dt {
+            font-family: var(--m-mono);
+            font-size: 0.8rem;
+            color: var(--m-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .m-sibling.next .dt { justify-content: flex-end; }
+
+        /* ===== RELATED ===== */
+        .m-related {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 90px;
+        }
+
+        .m-related a {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            border: 1px solid var(--m-line);
+            border-radius: 10px;
+            padding: 20px 22px;
+            text-decoration: none;
+            color: var(--m-text);
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .m-related a:hover { border-color: rgba(0, 240, 255, 0.45); background: rgba(0, 240, 255, 0.04); }
+        .m-related i { color: var(--m-accent); font-size: 1.4rem; }
+        .m-related .t { display: block; font-family: var(--m-mono); font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--m-dim); margin-bottom: 5px; }
+        .m-related .b { font-family: var(--m-heading); font-size: 1.12rem; font-weight: 600; }
+        .m-related .s { display: block; font-family: var(--m-mono); font-size: 0.8rem; color: var(--m-muted); margin-top: 3px; }
+
+        /* ===== ERROR / LOADING ===== */
+        .m-state[hidden] { display: none !important; }
+
+        .m-state {
+            min-height: 70vh;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 140px 24px 80px;
+        }
+
+        .m-state-title {
+            font-family: var(--m-heading);
+            font-size: clamp(28px, 5vw, 46px);
+            font-weight: 700;
+            margin: 0 0 12px;
+            line-height: 1.05;
+        }
+        .m-state p { color: var(--m-muted); max-width: 46ch; margin: 0 auto 24px; line-height: 1.6; }
+
+        .m-btn {
+            display: inline-block;
+            border: 1px solid var(--m-accent);
+            color: #001014;
+            background: var(--m-accent);
+            font-family: var(--m-heading);
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 12px 22px;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .m-btn.ghost {
+            background: transparent;
+            color: var(--m-text);
+            border-color: var(--m-line);
+        }
+
+        .m-btn.ghost:hover { border-color: var(--m-accent); color: var(--m-accent); }
+
+        /* ===== FOOTER ===== */
+        footer {
+            position: relative;
+            background: #000;
+            padding: 45px 20px;
+            z-index: 10;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .footer-socials {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .footer-socials a {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.15rem;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .footer-socials a:hover {
+            color: var(--m-accent);
+            transform: translateY(-2px);
+        }
+
+        .footer-copy {
+            opacity: 0.55;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== REVEAL ===== */
+        .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .reveal.in { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .m-hero-media { transform: none; }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 980px) {
+            .flight-grid { grid-template-columns: 1fr; gap: 20px; }
+            .m-status { grid-template-columns: 1fr; margin-top: 18px; }
+            .m-spec-grid { grid-template-columns: 1fr; }
+            .m-related { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 760px) {
+            .m-wrap { padding: 0 18px; }
+            .m-hero { min-height: 470px; padding: 104px 0 30px; }
+            .m-status { margin-top: 20px; gap: 12px; }
+            .m-status-card { padding: 18px; }
+            .m-section { padding-top: 54px; }
+            .m-siblings { grid-template-columns: 1fr; gap: 12px; }
+            .m-sibling.next { text-align: left; }
+            .m-sibling.next .dt { justify-content: flex-start; }
+            .m-meta { font-size: 0.82rem; }
+            .flight-figure { padding: 14px; }
+            .m-gallery { grid-template-columns: 1fr; }
+            .m-related { margin-bottom: 64px; }
+        }
+    </style>
+</head>
+
+<body>
+    <a class="m-skip" href="#m-main">Saltar al contenido</a>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="LOGO_JTT.png" alt="J.S.Aerospace Logo">
+            <div class="logo-text">J.S.<span class="highlight">AEROSPACE</span></div>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir Menú">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="misiones.html" class="active">Misiones</a></li>
+            <li><a href="cohetes.html">Cohetes</a></li>
+            <li><a href="boosters.html">BOOSTERS</a></li>
+            <li><a href="calendario.html">CALENDARIO</a></li>
+            <li><a href="geonet.html">GEONET</a></li>
+            <li><a href="clientes.html">CLIENTES</a></li>
+        </ul>
+    </nav>
+
+    <main id="m-main">
+        <div class="m-state" id="m-loading">
+            <div>
+                <p class="m-kicker">J.S. Aerospace · Manifiesto</p>
+                <p class="m-state-title">Cargando misión</p>
+            </div>
+        </div>
+
+        <div id="m-content" hidden></div>
+
+        <div class="m-state" id="m-error" hidden>
+            <div>
+                <p class="m-kicker">Error 404</p>
+                <p class="m-state-title">Misión no encontrada</p>
+                <p id="m-error-text">No pudimos cargar esta misión. Puede que se haya eliminado del manifiesto o que el enlace esté mal.</p>
+                <a class="m-btn" href="misiones.html">Volver al manifiesto</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-socials">
+            <a href="https://www.youtube.com/@eszunspace_ksp" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://x.com/EsZunSpace" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                <i class="fab fa-x-twitter"></i>
+            </a>
+            <a href="https://github.com/JSAerospace" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+        <div class="footer-copy">
+            © <span id="year">2026</span> J.S. Aerospace – Todos los derechos reservados
+        </div>
+    </footer>
+
+    <script src="net.js"></script>
+    <script src="nav-mobile.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            var DB = 'https://j-saerospace-default-rtdb.firebaseio.com';
+            var MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            var STATUS = {
+                success: { label: 'ÉXITO', cls: 'ok', mark: '✓' },
+                failed: { label: 'FALLO', cls: 'bad', mark: '✕' },
+                failure: { label: 'FALLO', cls: 'bad', mark: '✕' },
+                in_flight: { label: 'EN VUELO', cls: 'live', mark: '●' },
+                upcoming: { label: 'PROGRAMADO', cls: 'next', mark: '●' }
+            };
+
+            var el = function (id) { return document.getElementById(id); };
+            var esc = function (v) {
+                return String(v == null ? '' : v)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            };
+            var param = function (name) {
+                return new URLSearchParams(window.location.search).get(name);
+            };
+
+            function resolveImg(path) {
+                if (!path) return 'Imagenes/Tomcat 4.png';
+                if (String(path).indexOf('http') === 0) return path;
+                if (String(path).indexOf('/') !== -1) return path;
+                return 'Imagenes/' + path;
+            }
+
+            function parseDate(m) {
+                var raw = String(m.date || '').trim();
+                var t = String(m.time || '00:00').trim() || '00:00';
+                var bits = t.split(':').map(function (n) { return parseInt(n, 10) || 0; });
+                var d;
+                var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                var dmy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                if (iso) d = new Date(+iso[1], +iso[2] - 1, +iso[3], bits[0] || 0, bits[1] || 0);
+                else if (dmy) d = new Date(+dmy[3], +dmy[2] - 1, +dmy[1], bits[0] || 0, bits[1] || 0);
+                else d = new Date(raw);
+                if (isNaN(d.getTime())) d = new Date();
+                return d;
+            }
+
+            function fmtDate(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
+            function fmtTime(d) {
+                return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+            }
+            function fmtUtc(d) {
+                var iso = d.toISOString();
+                return iso.slice(11, 16) + ' UTC';
+            }
+
+            function statusOf(m) {
+                if (m.status && STATUS[m.status]) return m.status;
+                return parseDate(m) > new Date() ? 'upcoming' : 'success';
+            }
+
+            function landingInfo(m) {
+                var raw = String(m.landing || '').trim();
+                var low = raw.toLowerCase();
+                if (!raw || /gasto|desechable|sin recuper|no recuper|n\/a|ninguno|expend/.test(low)) {
+                    return { mode: 'expendable', kind: 'Etapa desechable', zone: 'Sin recuperación', result: 'No recuperada' };
+                }
+                if (/lz|rtls|landing zone|en tierra|tierra|pad\b/.test(low)) {
+                    return { mode: 'rtls', kind: 'RTLS · en tierra', zone: raw, result: 'Etapa recuperada' };
+                }
+                return { mode: 'ship', kind: 'Plataforma en mar', zone: raw, result: 'Etapa recuperada' };
+            }
+
+            function missionTitle(m) {
+                return m.title || m.mission || m.name || 'Misión sin título';
+            }
+
+            /* ---------- Perfil de vuelo ---------- */
+            function buildProfile(m) {
+                var info = landingInfo(m);
+                var expendable = info.mode === 'expendable';
+                var P = {
+                    liftoff: [70, 372],
+                    maxq: [272, 262],
+                    meco: [448, 96],
+                    boost: [366, 200],
+                    landing: [214, 372],
+                    seco: [900, 74]
+                };
+
+                var steps = [
+                    { title: 'Despegue', sub: 'Desde ' + (m.location || m.site || 'la plataforma'), p: P.liftoff, kind: 'ascent' },
+                    { title: 'Max-Q', sub: 'Máxima presión aerodinámica', p: P.maxq, kind: 'ascent' },
+                    { title: 'MECO y separación', sub: 'Apagado de la primera etapa', p: P.meco, kind: 'ascent' }
+                ];
+
+                if (!expendable) {
+                    steps.push({
+                        title: 'Encendido de retorno',
+                        sub: info.mode === 'rtls' ? 'La etapa invierte el rumbo' : 'Quema de entrada y descenso',
+                        p: P.boost,
+                        kind: 'recovery'
+                    });
+                    steps.push({
+                        title: 'Aterrizaje',
+                        sub: (info.zone || 'Zona de aterrizaje') + (info.mode === 'rtls' ? ' · en tierra' : ' · plataforma en mar'),
+                        p: P.landing,
+                        kind: 'recovery'
+                    });
+                }
+
+                steps.push({
+                    title: 'SECO',
+                    sub: 'Inyección a ' + (m.destination || m.orbit || 'la órbita de destino'),
+                    p: P.seco,
+                    kind: 'stage2'
+                });
+
+                steps.forEach(function (s, i) { s.num = i + 1; });
+
+                var strokeFor = function (kind) {
+                    if (kind === 'recovery') return '#ff5a52';
+                    if (kind === 'stage2') return '#00f0ff';
+                    return '#f2f5f8';
+                };
+
+                var markers = steps.map(function (s) {
+                    var x = s.p[0], y = s.p[1], c = strokeFor(s.kind);
+                    return '<g class="mk" data-marker="' + s.num + '">' +
+                        '<circle cx="' + x + '" cy="' + y + '" r="15" fill="#05070b" stroke="' + c + '" stroke-width="1.2"/>' +
+                        '<text x="' + x + '" y="' + (y + 4.5) + '" text-anchor="middle" font-family="Rajdhani, monospace" font-size="13" font-weight="600" fill="' + c + '">' + s.num + '</text>' +
+                        '</g>';
+                }).join('');
+
+                var returnPath = expendable ? '' :
+                    '<path d="M448 96 C410 150 358 214 326 272 S252 352 214 372" fill="none" stroke="#ff5a52" stroke-width="1.8" stroke-dasharray="7 6" stroke-linecap="round" opacity="0.9"/>';
+
+                var pad = expendable ? '' :
+                    '<path d="M190 381 h48" stroke="#ff5a52" stroke-width="2" stroke-linecap="round" opacity="0.9"/>' +
+                    '<path d="M198 386 h32" stroke="#ff5a52" stroke-width="1" stroke-linecap="round" opacity="0.45"/>';
+
+                var svg = '' +
+                    '<svg class="flight-svg" viewBox="0 0 1000 420" role="img" aria-labelledby="flightTitle flightDesc">' +
+                    '<title id="flightTitle">Perfil de vuelo de ' + esc(missionTitle(m)) + '</title>' +
+                    '<desc id="flightDesc">' + esc('Trayectoria de ascenso, segunda etapa' + (expendable ? '' : ' y recuperación de la primera etapa') + ', con ' + steps.length + ' hitos numerados.') + '</desc>' +
+                    '<defs>' +
+                    '<pattern id="mCross" width="100" height="100" patternUnits="userSpaceOnUse">' +
+                    '<path d="M50 45.5v9M45.5 50h9" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>' +
+                    '</pattern>' +
+                    '</defs>' +
+                    '<rect x="0.5" y="0.5" width="999" height="419" rx="10" fill="url(#mCross)" stroke="rgba(255,255,255,0.10)"/>' +
+                    '<path d="M0 372 H1000" stroke="rgba(255,255,255,0.13)" stroke-width="1" stroke-dasharray="2 6"/>' +
+                    '<path d="M60 388 H940" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>' +
+                    '<path d="M70 372 C170 366 235 330 272 262 S350 118 448 96" fill="none" stroke="#f2f5f8" stroke-width="2.2" stroke-linecap="round"/>' +
+                    '<path d="M448 96 Q660 70 900 74" fill="none" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>' +
+                    returnPath + pad + markers +
+                    '</svg>';
+
+                var legend = '<span><i class="lg-ascent"></i>Ascenso</span>' +
+                    '<span><i class="lg-stage2"></i>Segunda etapa</span>' +
+                    (expendable ? '' : '<span><i class="lg-recovery"></i>Recuperación</span>');
+
+                var list = steps.map(function (s) {
+                    return '<li class="hito" data-kind="' + s.kind + '" data-hito="' + s.num + '">' +
+                        '<span class="num">' + s.num + '</span>' +
+                        '<div><h4>' + esc(s.title) + '</h4><p>' + esc(s.sub) + '</p></div>' +
+                        '</li>';
+                }).join('');
+
+                return { svg: svg, legend: legend, list: list, steps: steps, info: info };
+            }
+
+            /* ---------- Render ---------- */
+            function render(m, all) {
+                var title = missionTitle(m);
+                var st = statusOf(m);
+                var stMeta = STATUS[st];
+                var info = landingInfo(m);
+                var d = parseDate(m);
+                var net = !!m.net;
+                var precision = window.JSANet ? window.JSANet.precisionOf(m) : 'day';
+                var coarse = net && precision !== 'day';
+                var netLabel = (net && window.JSANet) ? window.JSANet.label(d, precision, m.date) : '';
+                var vehicle = m.vehicle || 'Tomcat';
+                var site = m.location || m.site || 'J.S. Aerospace Pad';
+                var destination = m.destination || m.orbit || 'No especificada';
+                var payload = m.payload || 'No especificada';
+                var provider = m.provider || 'J.S. Aerospace';
+                var crew = String(m.crew || '').trim();
+                var manned = !!m.isManned || !!crew;
+
+                var imgs = m.images || [];
+                if (imgs && typeof imgs === 'object' && !Array.isArray(imgs)) imgs = Object.values(imgs);
+                imgs = (imgs || []).filter(Boolean);
+                if (!imgs.length && m.image) imgs = [m.image];
+                var heroImg = encodeURI(resolveImg(imgs[0] || null));
+
+                document.title = title + ' · J.S. Aerospace';
+                var md = document.querySelector('meta[name="description"]');
+                if (md) md.setAttribute('content', 'Ficha de la misión ' + title + ': estado, vehículo, carga útil, recuperación y perfil de vuelo.');
+                var ogT = document.querySelector('meta[property="og:title"]');
+                if (ogT) ogT.setAttribute('content', title + ' · J.S. Aerospace');
+                var ogI = document.querySelector('meta[property="og:image"]');
+                if (ogI) ogI.setAttribute('content', new URL(heroImg, location.href).href);
+
+                var statusCard = function (k, v, note, isHtml) {
+                    return '<article class="m-status-card">' +
+                        '<p class="k">' + k + '</p>' +
+                        '<div class="v">' + v + '</div>' +
+                        '<p class="n">' + (isHtml ? note : esc(note)) + '</p>' +
+                        '</article>';
+                };
+
+                var landingResult = st === 'upcoming' ? 'Pendiente'
+                    : (st === 'failed' || st === 'failure') ? 'Fallido'
+                    : info.mode === 'expendable' ? 'Sin recuperación'
+                    : 'Recuperado';
+
+                var landingPill = st === 'upcoming'
+                    ? '<span class="pill plain">PENDIENTE</span>'
+                    : (st === 'failed' || st === 'failure')
+                        ? '<span class="pill bad">✕ FALLIDO</span>'
+                        : info.mode === 'expendable'
+                            ? '<span class="pill plain">SIN RECUPERACIÓN</span>'
+                            : '<span class="pill ok">' + (info.mode === 'rtls' ? '✓' : '⚓') + ' RECUPERADO</span>';
+
+                var launchPill = '<span class="pill ' + stMeta.cls + '">' + stMeta.mark + ' ' + stMeta.label + '</span>';
+
+                var booster = String(m.booster || '').trim();
+                var boosterVal = booster
+                    ? '<a href="booster.html?b=' + encodeURIComponent(booster) + '">' + esc(booster) + '</a>'
+                    : '<a href="cohetes.html">' + esc(vehicle) + '</a>';
+                var boosterNote = booster ? 'Núcleo de ' + vehicle : 'Vehículo ' + vehicle;
+
+                var countdown = '';
+                if (st === 'upcoming') {
+                    if (coarse) {
+                        countdown = '<div class="m-countdown"><span class="lbl">NET</span><b>A DEFINIR</b></div>';
+                    } else {
+                        countdown = '<div class="m-countdown"><span class="lbl">T-MINUS</span><b data-cd="' + d.toISOString() + '">—</b></div>';
+                    }
+                }
+
+                var intro = String(m.description || '').trim();
+                var autoIntro = title + ' es una misión de J.S. Aerospace lanzada a bordo del ' + vehicle + ' desde ' + site +
+                    ', con ' + payload + ' como carga útil y destino ' + destination + '.';
+                var intro2 = '';
+                if (!intro) {
+                    intro = autoIntro;
+                } else if (manned && crew) {
+                    intro2 = 'Tripulación a bordo: ' + crew + '.';
+                }
+
+                var dateValue = coarse ? ('NET · ' + netLabel) : fmtDate(d);
+                var timeValue = coarse ? 'Por confirmar' : (fmtTime(d) + ' (local)');
+                var utcValue = coarse ? '—' : fmtUtc(d);
+
+                var specs = '' +
+                    '<article class="spec-card">' +
+                    '<h3><i class="fas fa-rocket"></i>Vehículo</h3>' +
+                    '<dl>' +
+                    '<div class="spec-row"><dt>Vehículo</dt><dd><a href="cohetes.html">' + esc(vehicle) + '</a></dd></div>' +
+                    '<div class="spec-row"><dt>Proveedor</dt><dd>' + esc(provider) + '</dd></div>' +
+                    '<div class="spec-row"><dt>Plataforma</dt><dd>' + esc(site) + '</dd></div>' +
+                    '<div class="spec-row"><dt>Núcleo</dt><dd>' + (booster ? '<a href="booster.html?b=' + encodeURIComponent(booster) + '">' + esc(booster) + '</a>' : '—') + '</dd></div>' +
+                    '</dl></article>' +
+
+                    '<article class="spec-card">' +
+                    '<h3><i class="fas fa-satellite"></i>Carga útil</h3>' +
+                    '<dl>' +
+                    '<div class="spec-row"><dt>Carga</dt><dd>' + esc(payload) + '</dd></div>' +
+                    '<div class="spec-row"><dt>Destino</dt><dd>' + esc(destination) + '</dd></div>' +
+                    '<div class="spec-row"><dt>Tipo</dt><dd>' + (manned ? 'Tripulada' : 'Carga') + '</dd></div>' +
+                    (crew ? '<div class="spec-row"><dt>Tripulación</dt><dd>' + esc(crew) + '</dd></div>' : '') +
+                    '</dl></article>' +
+
+                    '<article class="spec-card">' +
+                    '<h3><i class="fas fa-parachute-box"></i>Recuperación</h3>' +
+                    '<dl>' +
+                    '<div class="spec-row"><dt>Tipo</dt><dd>' + esc(info.kind) + '</dd></div>' +
+                    '<div class="spec-row"><dt>Zona</dt><dd>' + esc(info.zone) + '</dd></div>' +
+                    '<div class="spec-row"><dt>Resultado</dt><dd>' + esc(landingResult) + '</dd></div>' +
+                    '</dl></article>' +
+
+                    '<article class="spec-card">' +
+                    '<h3><i class="fas fa-clock"></i>Fecha y hora</h3>' +
+                    '<dl>' +
+                    '<div class="spec-row"><dt>Fecha</dt><dd>' + esc(dateValue) + '</dd></div>' +
+                    '<div class="spec-row"><dt>Hora local</dt><dd>' + esc(timeValue) + '</dd></div>' +
+                    '<div class="spec-row"><dt>UTC</dt><dd>' + esc(utcValue) + '</dd></div>' +
+                    '<div class="spec-row"><dt>Precisión</dt><dd>' + (coarse ? 'NET · ' + esc(precision === 'year' ? 'año' : 'mes') : 'Exacta') + '</dd></div>' +
+                    '</dl></article>';
+
+                var profile = buildProfile(m);
+
+                var gallery = '';
+                if (imgs.length > 1) {
+                    gallery = '<section class="m-section reveal" aria-labelledby="gal-h">' +
+                        '<div class="m-wrap">' +
+                        '<p class="m-kicker"><span class="idx">04 ·</span> REGISTRO</p>' +
+                        '<h2 class="m-h2" id="gal-h">Galería de la misión</h2>' +
+                        '<div class="m-gallery">' +
+                        imgs.map(function (src) {
+                            var u = resolveImg(src);
+                            return '<a href="' + esc(u) + '" target="_blank" rel="noopener" aria-label="Abrir imagen de ' + esc(title) + '">' +
+                                '<img src="' + esc(u) + '" alt="' + esc(title) + '" loading="lazy" onerror="this.src=\'Imagenes/Tomcat 4.png\'">' +
+                                '</a>';
+                        }).join('') +
+                        '</div></div></section>';
+                }
+
+                var sorted = all.slice().sort(function (a, b) { return parseDate(a) - parseDate(b); });
+                var idx = sorted.findIndex(function (x) { return x.__key === m.__key; });
+                var prev = idx > 0 ? sorted[idx - 1] : null;
+                var next = (idx > -1 && idx < sorted.length - 1) ? sorted[idx + 1] : null;
+
+                var siblingHtml = function (s, dir) {
+                    if (!s) return '';
+                    var sSt = statusOf(s);
+                    var sMeta = STATUS[sSt];
+                    return '<a class="m-sibling ' + (dir === 'next' ? 'next' : '') + '" href="mision.html?id=' + encodeURIComponent(s.__key) + '">' +
+                        '<span class="dir">' + (dir === 'next' ? 'Misión siguiente →' : '← Misión anterior') + '</span>' +
+                        '<span class="nm">' + esc(missionTitle(s)) + '</span>' +
+                        '<span class="dt">' + esc(fmtDate(parseDate(s))) + ' <span class="pill ' + sMeta.cls + '" style="font-size:0.62rem;padding:3px 7px;">' + sMeta.label + '</span></span>' +
+                        '</a>';
+                };
+
+                var siblings = siblingHtml(prev, 'prev') + siblingHtml(next, 'next');
+                var siblingsBlock = siblings
+                    ? '<section class="m-section reveal" aria-label="Misiones relacionadas">' +
+                      '<div class="m-siblings' + (prev && next ? '' : ' single') + '">' + siblings + '</div>' +
+                      '</section>'
+                    : '';
+
+                var html = '' +
+                    '<section class="m-hero">' +
+                    '<div class="m-hero-media" style="background-image:url(&quot;' + esc(heroImg) + '&quot;)"></div>' +
+                    '<div class="m-hero-inner"><div class="m-wrap">' +
+                    '<nav class="m-crumbs" aria-label="Migas de pan"><a href="misiones.html">Lanzamientos</a><span>/</span><span>' + esc(title) + '</span></nav>' +
+                    '<div class="m-badges">' + launchPill + (net ? '<span class="pill plain">NET</span>' : '') + (manned ? '<span class="pill plain">TRIPULADA</span>' : '') + '</div>' +
+                    '<h1 class="m-title">' + esc(title) + '</h1>' +
+                    '<div class="m-meta">' +
+                    '<a href="cohetes.html">' + esc(vehicle) + '</a><span class="sep">·</span>' +
+                    '<span>' + esc(site) + '</span><span class="sep">·</span>' +
+                    '<span>' + esc(coarse ? ('NET · ' + netLabel) : (fmtDate(d) + ' · ' + fmtTime(d))) + '</span>' +
+                    '</div>' +
+                    countdown +
+                    '</div></div>' +
+                    '</section>' +
+
+                    '<div class="m-wrap">' +
+                    '<section class="m-status" aria-label="Estado de la misión">' +
+                    statusCard('Lanzamiento', launchPill, coarse ? ('NET · ' + netLabel + ' · ' + site) : (fmtDate(d) + ' · ' + fmtTime(d) + ' · ' + site), true) +
+                    statusCard('Aterrizaje', landingPill, info.mode === 'expendable' ? info.zone : (info.zone + ' · ' + info.kind)) +
+                    statusCard('Propulsor', boosterVal, boosterNote, true) +
+                    '</section>' +
+
+                    '<section class="m-section reveal" aria-labelledby="intro-h">' +
+                    '<p class="m-kicker"><span class="idx">01 ·</span> INTRODUCCIÓN</p>' +
+                    '<h2 class="m-h2" id="intro-h">Introducción</h2>' +
+                    '<p class="m-lead">' + esc(intro) + '</p>' +
+                    (intro2 ? '<p class="m-lead">' + esc(intro2) + '</p>' : '') +
+                    '</section>' +
+
+                    '<section class="m-section reveal" aria-labelledby="spec-h">' +
+                    '<p class="m-kicker"><span class="idx">02 ·</span> FICHA TÉCNICA</p>' +
+                    '<h2 class="m-h2" id="spec-h">Detalles técnicos</h2>' +
+                    '<div class="m-spec-grid">' + specs + '</div>' +
+                    '</section>' +
+
+                    '<section class="m-section reveal" aria-labelledby="flight-h">' +
+                    '<p class="m-kicker"><span class="idx">03 ·</span> VUELO</p>' +
+                    '<h2 class="m-h2" id="flight-h">Perfil de vuelo</h2>' +
+                    '<figure class="flight-figure">' +
+                    '<div class="flight-grid">' +
+                    '<div>' + profile.svg + '<div class="flight-legend">' + profile.legend + '</div></div>' +
+                    '<ol class="hitos">' + profile.list + '</ol>' +
+                    '</div>' +
+                    '</figure>' +
+                    '</section>' +
+
+                    gallery +
+
+                    siblingsBlock +
+
+                    '<section class="m-section reveal" aria-label="Enlaces relacionados" style="padding-bottom:0;">' +
+                    '<div class="m-related">' +
+                    '<a href="cohetes.html"><i class="fas fa-rocket"></i><span><span class="t">Vehículo</span><span class="b">' + esc(vehicle) + '</span><span class="s">Ficha del lanzador</span></span></a>' +
+                    '<a href="misiones.html"><i class="fas fa-list-ul"></i><span><span class="t">Manifiesto</span><span class="b">Todos los lanzamientos</span><span class="s">Historial completo de J.S. Aerospace</span></span></a>' +
+                    '</div>' +
+                    '</section>' +
+                    '</div>';
+
+                var content = el('m-content');
+                content.innerHTML = html;
+                content.hidden = false;
+                el('m-loading').hidden = true;
+
+                // Si la imagen de portada no existe, usar la de respaldo
+                var heroEl = content.querySelector('.m-hero-media');
+                if (heroEl) {
+                    var probe = new Image();
+                    probe.onerror = function () {
+                        heroEl.style.backgroundImage = 'url("Imagenes/Tomcat 4.png")';
+                    };
+                    probe.onload = function () {
+                        try {
+                            var c = document.createElement('canvas');
+                            c.width = 24; c.height = 24;
+                            var ctx = c.getContext('2d');
+                            ctx.drawImage(probe, 0, 0, 24, 24);
+                            var px = ctx.getImageData(0, 0, 24, 24).data;
+                            var sum = 0;
+                            for (var i = 0; i < px.length; i += 4) {
+                                sum += px[i] * 0.2126 + px[i + 1] * 0.7152 + px[i + 2] * 0.0722;
+                            }
+                            if ((sum / (px.length / 4)) < 22) heroEl.classList.add('is-dark');
+                        } catch (e) { /* canvas bloqueado: se deja la imagen tal cual */ }
+                    };
+                    probe.src = heroImg;
+                }
+
+                // Countdown
+                var cd = content.querySelector('[data-cd]');
+                if (cd) {
+                    var target = new Date(cd.getAttribute('data-cd'));
+                    var tick = function () {
+                        var diff = target - new Date();
+                        if (diff <= 0) { cd.textContent = 'MISIÓN EN CURSO / FINALIZADA'; return; }
+                        var days = Math.floor(diff / 86400000);
+                        var h = Math.floor((diff % 86400000) / 3600000);
+                        var mi = Math.floor((diff % 3600000) / 60000);
+                        var s = Math.floor((diff % 60000) / 1000);
+                        cd.textContent = (days > 0 ? days + 'D ' : '') +
+                            String(h).padStart(2, '0') + ':' + String(mi).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+                    };
+                    tick();
+                    setInterval(tick, 1000);
+                }
+
+                // Hover hitos ↔ marcadores
+                content.querySelectorAll('.hito').forEach(function (li) {
+                    var n = li.getAttribute('data-hito');
+                    var mk = content.querySelector('[data-marker="' + n + '"]');
+                    if (!mk) return;
+                    li.addEventListener('mouseenter', function () { mk.classList.add('hot'); });
+                    li.addEventListener('mouseleave', function () { mk.classList.remove('hot'); });
+                    li.addEventListener('focusin', function () { mk.classList.add('hot'); });
+                    li.addEventListener('focusout', function () { mk.classList.remove('hot'); });
+                });
+
+                // Reveal
+                var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                var reveals = content.querySelectorAll('.reveal');
+                if (reduced || !('IntersectionObserver' in window)) {
+                    reveals.forEach(function (n) { n.classList.add('in'); });
+                } else {
+                    var io = new IntersectionObserver(function (entries) {
+                        entries.forEach(function (e) {
+                            if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+                        });
+                    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+                    reveals.forEach(function (n) { io.observe(n); });
+                }
+
+                el('year').textContent = new Date().getFullYear();
+            }
+
+            function fail(msg) {
+                el('m-loading').hidden = true;
+                if (msg) el('m-error-text').textContent = msg;
+                el('m-error').hidden = false;
+            }
+
+            async function init() {
+                el('year').textContent = new Date().getFullYear();
+                var id = param('id');
+                if (!id) { fail('Falta el identificador de la misión en el enlace.'); return; }
+
+                try {
+                    var res = await fetch(DB + '/missions.json', { cache: 'no-store' });
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    var data = await res.json() || {};
+                    var all = Object.keys(data).map(function (k) {
+                        return Object.assign({ __key: k, id: k }, data[k]);
+                    });
+                    var mission = all.find(function (x) { return x.__key === id; });
+                    if (!mission) { fail('No encontramos la misión "' + id + '" en el manifiesto.'); return; }
+                    render(mission, all);
+                } catch (err) {
+                    fail('No pudimos conectar con la base de datos de misiones. ' + err.message);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+
+</html>
