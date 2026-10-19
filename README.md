@@ -16,7 +16,7 @@ Sitio web estático (HTML/CSS/JS, sin build) de **J.S. Aerospace**: presentació
 | `clientes.html` | Portal de clientes |
 | `tomcat-remote.html` | Telemetría remota del Tomcat (proyecto Firebase propio) |
 
-Recursos compartidos: `style.css`, `nav-mobile.js`, `boosters.js` y los medios en `Imagenes/` y `assets/`.
+Recursos compartidos: `style.css`, `nav-mobile.js`, `boosters.js` (datos), `boosters-app.js` (panel) y los medios en `Imagenes/` y `assets/`.
 
 ## Cómo verlo localmente
 
@@ -59,12 +59,14 @@ Los lanzamientos admiten la marca **NET** (*no antes de*): la fecha es una estim
 
 ## Propulsores
 
-Cada booster vive en el nodo `boosters` de Realtime Database. El registro guarda nombre, vehículo, estado (`active`, `testing`, `maintenance`, `retired`, `lost`), base, primer vuelo, imágenes, descripción, especificaciones y un arreglo `flights` (`date`, `mission`, `landing`, `result`, `note`).
+Cada booster vive en el nodo `boosters` de Realtime Database. El registro guarda nombre, estado (`active`, `testing`, `maintenance`, `retired`, `lost`), bloque, base, imágenes, descripción y notas. La flota es **solo del Tomcat** y sus especificaciones son fijas: 45 m de altura, 7 motores JS-4 y metano/LOX.
 
-- Los vuelos se editan como una línea por vuelo: `fecha | misión | lugar de aterrizaje | resultado`.
-- Las misiones que tengan cargado el campo `booster` se suman al historial del núcleo automáticamente, sin duplicar misión + fecha.
-- Mientras el nodo `boosters` esté vacío, el sitio muestra un **catálogo de referencia** (`boosters.js`). El administrador puede publicarlo con el botón *Publicar catálogo inicial* y después crear, editar o eliminar núcleos desde el botón flotante y las tarjetas.
-- La ficha `booster.html?b=NOMBRE` enlaza cada vuelo con su misión cuando el nombre y la fecha coinciden con el manifiesto.
+- El historial **no se carga a mano**: se calcula con las misiones cuyo campo `booster` coincide con el nombre del núcleo. Una misión cuenta como vuelo cuando ya se lanzó (éxito o fallo).
+- Los lanzamientos se asignan de dos formas equivalentes: desde el formulario de **Misiones** (selector *Propulsor*) o desde el editor de **Propulsores** (checklist *Lanzamientos asignados*). Ambas escriben el mismo campo `booster` en la misión.
+- El selector de propulsor solo aparece habilitado para misiones del Tomcat; en misiones Astro-3 queda deshabilitado y sin asignación.
+- Mientras no haya boosters Tomcat en la base, el sitio muestra un **catálogo de referencia** (`boosters.js`). El administrador puede publicarlo y después crear, editar o eliminar núcleos.
+- Si quedaron registros viejos del Astro-3, el panel muestra **Quitar boosters Astro-3**: elimina esos núcleos y libera sus lanzamientos.
+- La ficha `booster.html?b=NOMBRE` enlaza cada vuelo con su misión en el manifiesto.
 
 ## Autenticación y datos
 

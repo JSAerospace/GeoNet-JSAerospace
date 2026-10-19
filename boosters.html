@@ -451,7 +451,7 @@
             right: 12px;
             display: flex;
             gap: 6px;
-            z-index: 3;
+            z-index: 6;
         }
 
         .bc-admin button {
@@ -466,6 +466,132 @@
         }
 
         .bc-admin button:hover { border-color: var(--b-accent); color: var(--b-accent); }
+
+        .bc-admin-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .bc-admin-actions button {
+            flex: 1;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--b-line);
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bc-admin-actions button:hover { border-color: var(--b-accent); color: var(--b-accent); }
+
+        .bc-admin-actions button.danger:hover { border-color: var(--b-bad); color: var(--b-bad); }
+
+        .b-adminbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 18px 0 0;
+        }
+
+        .b-adminbar[hidden] { display: none !important; }
+
+        .b-adminbar button {
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            background: rgba(0, 240, 255, 0.06);
+            color: var(--b-accent);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 9px 14px;
+            cursor: pointer;
+        }
+
+        .b-adminbar button:hover { background: var(--b-accent); color: #001014; }
+
+        .b-adminbar button.danger {
+            border-color: rgba(255, 51, 85, 0.45);
+            color: var(--b-bad);
+            background: rgba(255, 51, 85, 0.06);
+        }
+
+        .b-adminbar button.danger:hover { background: var(--b-bad); color: #fff; }
+
+        .b-fixed {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--b-line);
+            border: 1px solid var(--b-line);
+            margin-bottom: 16px;
+        }
+
+        .b-fixed div { background: rgba(255, 255, 255, 0.025); padding: 10px 12px; }
+
+        .b-fixed span {
+            display: block;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--b-dim);
+            margin-bottom: 4px;
+        }
+
+        .b-fixed b { font-size: 13px; font-weight: 600; }
+
+        .mp-list {
+            max-height: 230px;
+            overflow-y: auto;
+            border: 1px solid var(--b-line);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 6px;
+            display: grid;
+            gap: 2px;
+        }
+
+        .mp-list .mp-item {
+            display: grid;
+            grid-template-columns: 18px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin: 0;
+        }
+
+        .mp-list .mp-item:hover { background: rgba(255, 255, 255, 0.04); }
+
+        .mp-list .mp-item input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--b-accent);
+            margin: 0;
+            order: 0;
+        }
+
+        .mp-name { font-size: 12.5px; font-weight: 600; }
+
+        .mp-meta {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--b-dim);
+            text-align: right;
+        }
+
+        .mp-list .mp-item.is-other .mp-meta { color: var(--b-warn); }
+
+        .mp-empty { padding: 14px; font-size: 12px; color: var(--b-muted); }
 
         .b-empty {
             text-align: center;
@@ -769,6 +895,11 @@
         </header>
 
         <div class="b-shell">
+            <div class="b-adminbar" id="adminBar" hidden>
+                <button id="newBoosterBtn" type="button">+ Nuevo propulsor</button>
+                <button id="cleanupAstroBtn" type="button" class="danger" hidden>Quitar boosters Astro-3</button>
+            </div>
+
             <div class="b-notice" id="seedNotice">
                 <p><b>Catálogo inicial sin publicar.</b> Estás viendo el roster de referencia. Al publicarlo se guarda en la base de datos y queda editable desde el panel de administración.</p>
                 <button id="publishSeedsBtn" type="button">Publicar catálogo inicial</button>
@@ -781,9 +912,6 @@
                     <button class="b-pill" data-status="testing">En pruebas</button>
                     <button class="b-pill" data-status="retired">Retirados</button>
                 </div>
-                <select class="b-select" id="filter-vehicle" aria-label="Filtrar por vehículo">
-                    <option value="all">Todos los vehículos</option>
-                </select>
                 <div class="b-search">
                     <input type="search" id="filter-search" placeholder="Buscar núcleo o misión..." aria-label="Buscar propulsor">
                 </div>
@@ -818,10 +946,7 @@
                     </div>
                     <div class="form-group">
                         <label for="bVehicle">Vehículo</label>
-                        <select id="bVehicle">
-                            <option value="Tomcat">Tomcat</option>
-                            <option value="Astro-3">Astro-3</option>
-                        </select>
+                        <input type="text" id="bVehicle" value="Tomcat" readonly>
                     </div>
                 </div>
 
@@ -842,15 +967,9 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="bBase">Base / plataforma</label>
-                        <input type="text" id="bBase" placeholder="Ej: LC-39B">
-                    </div>
-                    <div class="form-group">
-                        <label for="bFirstFlight">Primer vuelo</label>
-                        <input type="date" id="bFirstFlight">
-                    </div>
+                <div class="form-group">
+                    <label for="bBase">Base / plataforma</label>
+                    <input type="text" id="bBase" placeholder="Ej: LC-39B">
                 </div>
 
                 <div class="form-group">
@@ -868,32 +987,28 @@
                     <textarea id="bDescription" rows="3" placeholder="Historia operativa del núcleo..."></textarea>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="bSpecHeight">Altura</label>
-                        <input type="text" id="bSpecHeight" placeholder="71 m">
-                    </div>
-                    <div class="form-group">
-                        <label for="bSpecEngines">Motores</label>
-                        <input type="text" id="bSpecEngines" placeholder="33 × TQ-15">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="bSpecPropellant">Propelentes</label>
-                        <input type="text" id="bSpecPropellant" placeholder="Metano / LOX">
-                    </div>
-                    <div class="form-group">
-                        <label for="bSpecRecovery">Recuperación</label>
-                        <input type="text" id="bSpecRecovery" placeholder="Barcaza autónoma / LZ-1">
-                    </div>
+                <div class="b-fixed">
+                    <div><span>Altura</span><b>45 m</b></div>
+                    <div><span>Motores</span><b>7 × JS-4</b></div>
+                    <div><span>Propelentes</span><b>Metano / LOX</b></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="bFlights">Historial de vuelos</label>
-                    <textarea id="bFlights" rows="5" placeholder="2026-10-12 | Transporter-2 | I Thought I Lost You | ok&#10;2026-09-27 | GeoNet 3 | I Thought I Lost You | ok"></textarea>
-                    <small>Una línea por vuelo: <b>fecha | misión | lugar de aterrizaje | resultado</b>. Resultado: ok, fail o parcial. También se suman las misiones que tengan este núcleo cargado.</small>
+                    <label for="bSpecRecovery">Recuperación</label>
+                    <select id="bSpecRecovery">
+                        <option value="Barcaza autónoma">Barcaza autónoma</option>
+                        <option value="LZ-1">LZ-1</option>
+                        <option value="Barcaza autónoma / LZ-1">Barcaza autónoma / LZ-1</option>
+                        <option value="LZ-1 / Barcaza">LZ-1 / Barcaza</option>
+                        <option value="Barcaza / LZ-1">Barcaza / LZ-1</option>
+                    </select>
+                    <small>Altura, motores y propelentes son fijos para todos los boosters Tomcat.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Lanzamientos asignados</label>
+                    <div class="mp-list" id="missionPicker"><p class="mp-empty">Cargando misiones…</p></div>
+                    <small>Marcá los lanzamientos de este núcleo. El historial y las estadísticas se calculan desde el manifiesto; no se cargan vuelos a mano.</small>
                 </div>
 
                 <div class="form-group">
@@ -982,503 +1097,8 @@
         <div class="footer-copy">© <span id="year">2026</span> J.S. Aerospace – Todos los derechos reservados</div>
     </footer>
 
-    <script src="boosters.js?v=3"></script>
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, set, get, update, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyC6eDNK7CLl_aXEYkwFV97k-2A1axzRAKg",
-            authDomain: "j-saerospace.firebaseapp.com",
-            projectId: "j-saerospace",
-            storageBucket: "j-saerospace.firebasestorage.app",
-            messagingSenderId: "496032189875",
-            appId: "1:496032189875:web:69c591002b8131ed1c0fc6",
-            measurementId: "G-YXWPQWVGDZ",
-            databaseURL: "https://j-saerospace-default-rtdb.firebaseio.com"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const database = getDatabase(app);
-        const googleProvider = new GoogleAuthProvider();
-        const B = window.JSBoosters;
-        const ADMIN_EMAIL = 'olanoagus@gmail.com';
-        const safeGet = (id) => document.getElementById(id);
-        const esc = (v) => String(v == null ? '' : v)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-
-        let currentUser = null;
-        let isAdmin = false;
-        let isLoginMode = true;
-        let allBoosters = [];
-        let missions = [];
-        let usingSeeds = false;
-        let filterStatus = 'all';
-        let sortMode = 'flights';
-        let pendingEdit = '';
-
-        function statusPill(status, extraClass) {
-            const meta = B.statusMeta(status);
-            return '<span class="pill ' + meta.cls + (extraClass ? ' ' + extraClass : '') + '">' + meta.mark + ' ' + meta.label + '</span>';
-        }
-
-        function boosterUrl(b) {
-            return 'booster.html?b=' + encodeURIComponent(b.name);
-        }
-
-        function sortBoosters(list) {
-            return list.slice().sort((a, b) => {
-                if (sortMode === 'recent') {
-                    const da = B.parseDate(a.lastFlight);
-                    const db = B.parseDate(b.lastFlight);
-                    return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
-                }
-                if (b.stats.total !== a.stats.total) return b.stats.total - a.stats.total;
-                return a.name.localeCompare(b.name);
-            });
-        }
-
-        function renderStats(list) {
-            const cores = list.length;
-            const flights = list.reduce((n, b) => n + b.stats.total, 0);
-            const landings = list.reduce((n, b) => n + b.stats.landings, 0);
-            safeGet('stat-cores').textContent = cores;
-            safeGet('stat-flights').textContent = flights;
-            safeGet('stat-landings').textContent = landings;
-            const rate = flights ? Math.round((landings / flights) * 100) : 0;
-            safeGet('stat-recovery').innerHTML = rate + '<small>%</small>';
-        }
-
-        function populateVehicles(list) {
-            const select = safeGet('filter-vehicle');
-            if (!select) return;
-            const current = select.value;
-            const vehicles = [...new Set(list.map(b => b.vehicle).filter(Boolean))].sort();
-            select.innerHTML = '<option value="all">Todos los vehículos</option>';
-            vehicles.forEach(v => {
-                const op = document.createElement('option');
-                op.value = v;
-                op.textContent = v;
-                select.appendChild(op);
-            });
-            select.value = vehicles.includes(current) ? current : 'all';
-        }
-
-        function render() {
-            const grid = safeGet('boosters-grid');
-            if (!grid) return;
-
-            const search = (safeGet('filter-search')?.value || '').toLowerCase().trim();
-            const vehicle = safeGet('filter-vehicle')?.value || 'all';
-
-            const filtered = allBoosters.filter(b => {
-                if (filterStatus !== 'all' && b.status !== filterStatus) return false;
-                if (vehicle !== 'all' && b.vehicle !== vehicle) return false;
-                if (search) {
-                    const hay = [b.name, b.vehicle, b.block, b.description, b.stats.flights.map(f => f.mission).join(' ')].join(' ').toLowerCase();
-                    if (!hay.includes(search)) return false;
-                }
-                return true;
-            });
-
-            renderStats(allBoosters);
-
-            if (!filtered.length) {
-                grid.innerHTML = '<div class="b-empty" style="grid-column:1/-1;"><h3>Sin resultados</h3><p>No hay propulsores que coincidan con los filtros.</p></div>';
-                return;
-            }
-
-            grid.innerHTML = sortBoosters(filtered).map(b => {
-                const meta = B.statusMeta(b.status);
-                const img = encodeURI(B.resolveImg(B.imageList(b)[0] || b.image));
-                const last = b.stats.last;
-                const segments = Math.max(6, Math.min(10, b.stats.total + 2));
-                let meter = '';
-                for (let i = 0; i < segments; i++) meter += '<i class="' + (i < b.stats.total ? 'on' : '') + '"></i>';
-
-                const adminBtns = (isAdmin && !b.seed) ? `
-                    <div class="bc-admin">
-                        <button type="button" data-edit="${esc(b.id)}" title="Editar"><i class="fas fa-pen"></i></button>
-                        <button type="button" data-delete="${esc(b.id)}" title="Eliminar"><i class="fas fa-trash"></i></button>
-                    </div>` : '';
-
-                return `
-                    <article class="booster-card" tabindex="0" role="link"
-                        aria-label="Ver el historial de ${esc(b.name)}" data-open="${esc(b.name)}">
-                        ${adminBtns}
-                        <div class="bc-figure"><img src="${img}" alt="" loading="lazy" onerror="this.remove()"></div>
-                        <div class="bc-top">
-                            <div class="bc-tally"><b>${String(b.stats.total).padStart(2, '0')}</b><span>Vuelos</span></div>
-                            ${statusPill(b.status)}
-                        </div>
-                        <div class="bc-body">
-                            <h2 class="bc-name">${esc(b.name)}</h2>
-                            <p class="bc-vehicle"><b>${esc(b.vehicle)}</b>${b.block ? ' · ' + esc(b.block) : ''}</p>
-                            <div class="bc-meter" aria-hidden="true">${meter}</div>
-                            <div class="bc-meter-label"><span>Reutilizaciones</span><span>${b.stats.reuses}</span></div>
-                            <div class="bc-rows">
-                                <div class="bc-row"><span class="l">Último vuelo</span><span class="r">${last ? esc(B.fmtShort(last.date)) : 'Sin vuelos'}</span></div>
-                                <div class="bc-row"><span class="l">Aterrizajes</span><span class="r">${b.stats.landings} / ${b.stats.total || 0}</span></div>
-                                <div class="bc-row"><span class="l">Base</span><span class="r">${esc(b.base || '—')}</span></div>
-                            </div>
-                            <div class="bc-cta"><span>Ver historial</span><i class="fas fa-arrow-right"></i></div>
-                        </div>
-                    </article>`;
-            }).join('');
-
-            grid.querySelectorAll('[data-open]').forEach(card => {
-                const go = () => { window.location.href = boosterUrl({ name: card.getAttribute('data-open') }); };
-                card.addEventListener('click', (e) => {
-                    if (e.target.closest('button')) return;
-                    go();
-                });
-                card.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
-                });
-            });
-
-            grid.querySelectorAll('[data-edit]').forEach(btn => {
-                btn.addEventListener('click', (e) => { e.stopPropagation(); openEditor(btn.getAttribute('data-edit')); });
-            });
-            grid.querySelectorAll('[data-delete]').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    if (!confirm('¿Eliminar este propulsor del registro?')) return;
-                    try { await remove(ref(database, 'boosters/' + btn.getAttribute('data-delete'))); }
-                    catch (err) { alert('No se pudo eliminar: ' + err.message); }
-                });
-            });
-
-            // Botones de admin dentro de las tarjetas reveladas: visibles al hover
-            document.querySelectorAll('.booster-card .bc-admin').forEach(el => {
-                el.style.opacity = isAdmin ? '1' : '0';
-            });
-        }
-
-        function applyData(snapshotData) {
-            const rows = snapshotData ? Object.entries(snapshotData).map(([id, raw]) => B.normalize(raw, id)) : [];
-            usingSeeds = rows.length === 0;
-            const base = usingSeeds ? B.seedCatalog() : rows;
-            allBoosters = base
-                .map(b => B.mergeMissionFlights(b, missions))
-                .sort((a, b) => b.stats.total - a.stats.total);
-            populateVehicles(allBoosters);
-            render();
-            updateSeedNotice();
-            resolvePendingEdit();
-        }
-
-        function updateSeedNotice() {
-            const notice = safeGet('seedNotice');
-            if (!notice) return;
-            notice.classList.toggle('show', usingSeeds && isAdmin);
-        }
-
-        function loadData() {
-            onValue(ref(database, 'missions'), (snap) => {
-                const data = snap.val() || {};
-                missions = Object.entries(data).map(([id, m]) => Object.assign({ id }, m));
-                applyData(latestBoosters);
-            });
-            onValue(ref(database, 'boosters'), (snap) => {
-                latestBoosters = snap.val() || {};
-                applyData(latestBoosters);
-            }, (err) => {
-                console.warn('No se pudo leer boosters:', err.message);
-                applyData(null);
-            });
-        }
-
-        let latestBoosters = null;
-
-        // ===== AUTH =====
-        onAuthStateChanged(auth, (user) => {
-            const authBtn = safeGet('authBtn');
-            const addBtn = safeGet('addBoosterBtn');
-            if (user) {
-                currentUser = user;
-                isAdmin = (user.email === ADMIN_EMAIL);
-                update(ref(database, 'users/' + user.uid), {
-                    uid: user.uid,
-                    email: user.email || '',
-                    displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario'),
-                    photoURL: user.photoURL || null,
-                    lastLogin: new Date().toISOString(),
-                    provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'password'
-                });
-                if (authBtn) {
-                    authBtn.classList.add('logged-in');
-                    authBtn.innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar"><span>${user.displayName || user.email.split('@')[0]}</span>`;
-                    authBtn.onclick = () => openProfile();
-                }
-                if (addBtn) addBtn.style.display = isAdmin ? 'flex' : 'none';
-            } else {
-                currentUser = null;
-                isAdmin = false;
-                if (authBtn) {
-                    authBtn.classList.remove('logged-in');
-                    authBtn.innerHTML = '<i class="fas fa-user"></i><span id="authBtnText">Iniciar Sesión</span>';
-                    authBtn.onclick = () => safeGet('loginModal').classList.add('active');
-                }
-                if (addBtn) addBtn.style.display = 'none';
-                if (pendingEdit) safeGet('loginModal').classList.add('active');
-            }
-            updateSeedNotice();
-            render();
-            resolvePendingEdit();
-        });
-
-        function resolvePendingEdit() {
-            if (!isAdmin || !pendingEdit) return;
-            const id = pendingEdit;
-            if (id !== '__new__' && !allBoosters.length) return;
-            pendingEdit = '';
-            const exists = id === '__new__' || allBoosters.some(b => b.id === id);
-            if (!exists) {
-                alert('Ese propulsor ya no existe en el registro.');
-                return;
-            }
-            setTimeout(() => openEditor(id === '__new__' ? null : id), 120);
-        }
-
-        function openProfile() {
-            if (!currentUser) return;
-            safeGet('profileName').textContent = currentUser.displayName || currentUser.email.split('@')[0];
-            safeGet('profileEmail').textContent = currentUser.email || '';
-            safeGet('newDisplayName').value = currentUser.displayName || '';
-            safeGet('profileModal').classList.add('active');
-        }
-
-        safeGet('closeProfileModal').onclick = () => safeGet('profileModal').classList.remove('active');
-        safeGet('closeModal').onclick = () => safeGet('loginModal').classList.remove('active');
-        safeGet('closeBoosterModal').onclick = () => safeGet('boosterModal').classList.remove('active');
-
-        const toggleLink = safeGet('toggleLink');
-        toggleLink.onclick = (e) => {
-            e.preventDefault();
-            isLoginMode = !isLoginMode;
-            safeGet('modalTitle').textContent = isLoginMode ? 'Iniciar Sesión' : 'Registrarse';
-            safeGet('submitBtn').textContent = isLoginMode ? 'Entrar' : 'Crear Cuenta';
-            safeGet('toggleText').textContent = isLoginMode ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
-            safeGet('toggleLink').textContent = isLoginMode ? 'Regístrate' : 'Inicia Sesión';
-            safeGet('nameGroup').style.display = isLoginMode ? 'none' : 'block';
-        };
-
-        safeGet('authForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const email = safeGet('userEmail').value;
-            const password = safeGet('userPassword').value;
-            const name = safeGet('userName').value;
-            const msg = safeGet('authMessage');
-            msg.style.display = 'none';
-            try {
-                if (isLoginMode) {
-                    await signInWithEmailAndPassword(auth, email, password);
-                } else {
-                    const cred = await createUserWithEmailAndPassword(auth, email, password);
-                    await updateProfile(cred.user, { displayName: name });
-                }
-                safeGet('loginModal').classList.remove('active');
-            } catch (err) {
-                msg.textContent = err.message;
-                msg.style.display = 'block';
-            }
-        };
-
-        safeGet('googleLogin').onclick = async () => {
-            try {
-                await signInWithPopup(auth, googleProvider);
-                safeGet('loginModal').classList.remove('active');
-            } catch (err) {
-                alert('Error al conectar con Google: ' + err.message);
-            }
-        };
-
-        safeGet('updateNameBtn').onclick = async () => {
-            if (!currentUser) return;
-            const name = safeGet('newDisplayName').value.trim();
-            if (!name) return;
-            try {
-                await updateProfile(currentUser, { displayName: name });
-                await update(ref(database, 'users/' + currentUser.uid), { displayName: name });
-                alert('Nombre actualizado.');
-                openProfile();
-            } catch (err) { alert('No se pudo actualizar: ' + err.message); }
-        };
-
-        safeGet('updatePassBtn').onclick = async () => {
-            if (!currentUser) return;
-            const pass = safeGet('newPassword').value;
-            if (pass.length < 6) { alert('La contraseña debe tener al menos 6 caracteres.'); return; }
-            try {
-                await updatePassword(currentUser, pass);
-                alert('Contraseña actualizada.');
-                safeGet('newPassword').value = '';
-            } catch (err) { alert('No se pudo cambiar: ' + err.message); }
-        };
-
-        safeGet('logoutBtn').onclick = () => {
-            signOut(auth);
-            safeGet('profileModal').classList.remove('active');
-        };
-
-        // ===== EDITOR =====
-        function openEditor(id) {
-            const b = allBoosters.find(x => x.id === id);
-            if (!isAdmin) {
-                pendingEdit = id || '__new__';
-                safeGet('loginModal').classList.add('active');
-                return;
-            }
-            if (b && b.seed) {
-                alert('Este núcleo todavía es parte del catálogo de referencia. Publicá el catálogo inicial para poder editarlo.');
-                return;
-            }
-            safeGet('boosterForm').reset();
-            safeGet('editingBoosterId').value = b ? b.id : '';
-
-            if (b) {
-                safeGet('boosterModalTitle').textContent = 'Editar ' + b.name;
-                safeGet('bName').value = b.name;
-                safeGet('bVehicle').value = b.vehicle || 'Tomcat';
-                safeGet('bStatus').value = b.status || 'active';
-                safeGet('bBlock').value = b.block || '';
-                safeGet('bBase').value = b.base || '';
-                safeGet('bFirstFlight').value = toDateInput(b.firstFlight || (b.stats.first && b.stats.first.date) || '');
-                safeGet('bImage').value = b.image || '';
-                safeGet('bImages').value = B.imageList(b).join('\n');
-                safeGet('bDescription').value = b.description || '';
-                safeGet('bSpecHeight').value = (b.specs && b.specs.height) || '';
-                safeGet('bSpecEngines').value = (b.specs && b.specs.engines) || '';
-                safeGet('bSpecPropellant').value = (b.specs && b.specs.propellant) || '';
-                safeGet('bSpecRecovery').value = (b.specs && b.specs.recovery) || '';
-                safeGet('bFlights').value = B.flightsToText(b.flights);
-                safeGet('bNotes').value = b.notes || '';
-            } else {
-                safeGet('boosterModalTitle').textContent = 'Nuevo Propulsor';
-            }
-            safeGet('boosterModal').classList.add('active');
-        }
-
-        function toDateInput(raw) {
-            const d = B.parseDate(raw);
-            if (!d) return '';
-            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        }
-
-        safeGet('addBoosterBtn').onclick = () => openEditor(null);
-
-        safeGet('boosterForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if (!isAdmin) return;
-            const id = safeGet('editingBoosterId').value;
-            const flights = B.parseFlightsText(safeGet('bFlights').value).map(f => ({
-                date: f.date,
-                mission: f.mission,
-                landing: f.landing,
-                result: B.resultOf(f.result),
-                note: f.note || ''
-            }));
-            const images = safeGet('bImages').value.split('\n').map(s => s.trim()).filter(Boolean);
-            const primary = safeGet('bImage').value.trim();
-            const data = {
-                name: safeGet('bName').value.trim().toUpperCase(),
-                vehicle: safeGet('bVehicle').value,
-                status: safeGet('bStatus').value,
-                block: safeGet('bBlock').value.trim(),
-                base: safeGet('bBase').value.trim(),
-                firstFlight: safeGet('bFirstFlight').value || (flights.length ? flights[flights.length - 1].date : ''),
-                image: primary || images[0] || '',
-                images: images,
-                description: safeGet('bDescription').value.trim(),
-                specs: {
-                    height: safeGet('bSpecHeight').value.trim(),
-                    engines: safeGet('bSpecEngines').value.trim(),
-                    propellant: safeGet('bSpecPropellant').value.trim(),
-                    recovery: safeGet('bSpecRecovery').value.trim()
-                },
-                flights: flights,
-                notes: safeGet('bNotes').value.trim(),
-                updatedAt: new Date().toISOString()
-            };
-            try {
-                if (id) {
-                    await update(ref(database, 'boosters/' + id), data);
-                } else {
-                    await push(ref(database, 'boosters'), data);
-                }
-                safeGet('boosterModal').classList.remove('active');
-            } catch (err) {
-                alert('Error al guardar: ' + err.message);
-            }
-        };
-
-        // Publicar el catálogo de referencia en Firebase (solo admin)
-        safeGet('publishSeedsBtn').onclick = async () => {
-            if (!isAdmin || !usingSeeds) return;
-            if (!confirm('Se van a crear ' + allBoosters.length + ' propulsores en la base de datos. Después podrás editarlos. ¿Continuar?')) return;
-            const btn = safeGet('publishSeedsBtn');
-            btn.disabled = true;
-            btn.textContent = 'Publicando…';
-            try {
-                for (const b of B.seedCatalog()) {
-                    await push(ref(database, 'boosters'), {
-                        name: b.name,
-                        vehicle: b.vehicle,
-                        status: b.status,
-                        block: b.block,
-                        base: b.base,
-                        firstFlight: b.firstFlight || (b.stats.first && b.stats.first.date) || '',
-                        image: b.image,
-                        images: b.images,
-                        description: b.description,
-                        specs: b.specs,
-                        flights: b.flights.map(f => ({ date: f.date, mission: f.mission, landing: f.landing, result: f.result, note: f.note || '' })),
-                        updatedAt: new Date().toISOString()
-                    });
-                }
-                alert('Catálogo publicado. Ya podés editar cada núcleo.');
-            } catch (err) {
-                alert('No se pudo publicar el catálogo: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Publicar catálogo inicial';
-            }
-        };
-
-        // ===== FILTROS =====
-        document.querySelectorAll('#status-pills .b-pill').forEach(pill => {
-            pill.addEventListener('click', () => {
-                document.querySelectorAll('#status-pills .b-pill').forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-                filterStatus = pill.getAttribute('data-status');
-                render();
-            });
-        });
-        safeGet('filter-vehicle').addEventListener('change', render);
-        safeGet('filter-search').addEventListener('input', render);
-        safeGet('sort-toggle').addEventListener('click', () => {
-            sortMode = (sortMode === 'flights') ? 'recent' : 'flights';
-            safeGet('sort-toggle').textContent = sortMode === 'flights' ? '↓ Más vuelos' : '↓ Más reciente';
-            render();
-        });
-
-        // Deep links: ?edit=ID | ?new=1
-        const params = new URLSearchParams(window.location.search);
-        pendingEdit = params.get('edit') || '';
-        if (params.get('new') === '1') pendingEdit = '__new__';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            const yearEl = safeGet('year');
-            if (yearEl) yearEl.textContent = new Date().getFullYear();
-            document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
-            resolvePendingEdit();
-        });
-    </script>
+    <script src="boosters.js?v=4"></script>
+    <script type="module" src="boosters-app.js?v=4"></script>
     <script src="nav-mobile.js"></script>
 </body>
 

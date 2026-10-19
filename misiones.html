@@ -1344,6 +1344,16 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label for="mBooster">Propulsor (primera etapa)</label>
+                    <select id="mBooster">
+                        <option value="">Sin asignar</option>
+                    </select>
+                    <small style="display:block; margin-top:6px; color:rgba(255,255,255,0.42); font-size:11px; line-height:1.45;">
+                        Solo para misiones del Tomcat. El historial del núcleo se arma con estas asignaciones; también podés hacerlo desde la sección Propulsores.
+                    </small>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="mPayload">Carga Útil</label>
@@ -1517,6 +1527,7 @@
         let isAdmin = false;
         let isLoginMode = true;
         let allLaunches = [];
+        let allBoosters = [];
         let filterStatus = 'all';
         let filterSort = 'desc';
 
@@ -1649,6 +1660,44 @@
             }
             if (isNaN(dateObj.getTime())) dateObj = new Date();
             return dateObj;
+        }
+
+        function syncBoosterAvailability() {
+            const vehicle = (safeGet('mVehicle')?.value || '').trim().toLowerCase();
+            const select = safeGet('mBooster');
+            if (!select) return;
+            const isTomcat = vehicle === 'tomcat';
+            select.disabled = !isTomcat;
+            if (!isTomcat) select.value = '';
+        }
+
+        function populateBoosterSelect() {
+            const select = safeGet('mBooster');
+            if (!select) return;
+            const current = select.dataset.pending || select.value;
+            const names = allBoosters
+                .filter(b => String(b.vehicle || '').trim().toLowerCase() === 'tomcat')
+                .map(b => b.name)
+                .filter(Boolean)
+                .sort();
+            select.innerHTML = '<option value="">Sin asignar</option>';
+            names.forEach(name => {
+                const op = document.createElement('option');
+                op.value = name;
+                op.textContent = name;
+                select.appendChild(op);
+            });
+            if (current && names.includes(current)) select.value = current;
+            delete select.dataset.pending;
+            syncBoosterAvailability();
+        }
+
+        function loadBoosters() {
+            onValue(ref(database, 'boosters'), (snap) => {
+                const data = snap.val() || {};
+                allBoosters = Object.entries(data).map(([id, b]) => Object.assign({ id }, b));
+                populateBoosterSelect();
+            }, (err) => console.warn('No se pudieron leer los propulsores:', err.message));
         }
 
         function loadMissions() {
@@ -1994,6 +2043,11 @@
             safeGet('mLocation').value = m.location || m.site || '';
             safeGet('mProvider').value = m.provider || 'J.S. Aerospace';
             safeGet('mVehicle').value = m.vehicle || '';
+            const boosterValue = (String(m.vehicle || '').trim().toLowerCase() === 'tomcat' && m.booster) ? m.booster : '';
+            safeGet('mBooster').dataset.pending = boosterValue;
+            syncBoosterAvailability();
+            safeGet('mBooster').value = boosterValue;
+            if (boosterValue) populateBoosterSelect();
             safeGet('mPayload').value = m.payload || '';
             safeGet('mDestination').value = m.destination || m.orbit || '';
             safeGet('mLanding').value = m.landing || '';
@@ -2072,6 +2126,7 @@
                     location: safeGet('mLocation').value.trim(),
                     provider: safeGet('mProvider').value.trim(),
                     vehicle: safeGet('mVehicle').value.trim(),
+                    booster: (safeGet('mVehicle').value.trim().toLowerCase() === 'tomcat') ? safeGet('mBooster').value : '',
                     payload: safeGet('mPayload').value.trim(),
                     destination: safeGet('mDestination').value.trim(),
                     landing: safeGet('mLanding').value.trim(),
@@ -2090,6 +2145,7 @@
                     missionForm.reset();
                     safeGet('editingMissionId').value = '';
                     syncNetFields();
+                    populateBoosterSelect();
                 } catch (err) {
                     alert('Error al guardar: ' + err.message);
                 }
@@ -2099,6 +2155,8 @@
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadMissions();
+            loadBoosters();
+            safeGet('mVehicle')?.addEventListener('input', syncBoosterAvailability);
             setTimeout(() => safeGet('pageLoader')?.classList.add('hidden'), 500);
             const yearEl = safeGet('year');
             if (yearEl) yearEl.textContent = new Date().getFullYear();

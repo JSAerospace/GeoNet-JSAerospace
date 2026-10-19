@@ -693,7 +693,7 @@
         <div class="footer-copy">© <span id="year">2026</span> J.S. Aerospace – Todos los derechos reservados</div>
     </footer>
 
-    <script src="boosters.js?v=3"></script>
+    <script src="boosters.js?v=4"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -762,7 +762,7 @@
             const s = b.stats;
             const imgs = B.imageList(b);
             const heroImg = encodeURI(B.resolveImg(imgs[0] || b.image));
-            const firstDate = b.firstFlight || (s.first ? s.first.date : '');
+            const firstDate = s.first ? s.first.date : '';
             const idx = missionIndex();
             const total = s.total;
 
@@ -981,8 +981,9 @@
 
         function pickBooster(data) {
             const rows = data ? Object.entries(data).map(([id, raw]) => B.normalize(raw, id)) : [];
-            pool = (rows.length ? rows : B.seedCatalog())
-                .map(b => B.mergeMissionFlights(b, missions))
+            const tomcat = rows.filter(B.isTomcat);
+            pool = (tomcat.length ? tomcat : B.seedCatalog(missions))
+                .map(b => B.withMissions(b, missions))
                 .sort((a, b) => (b.stats.total - a.stats.total) || a.name.localeCompare(b.name));
 
             if (!wanted) return null;

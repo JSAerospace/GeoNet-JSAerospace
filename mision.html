@@ -763,12 +763,14 @@
     </footer>
 
     <script src="net.js"></script>
+    <script src="boosters.js?v=4"></script>
     <script src="nav-mobile.js"></script>
     <script>
         (function () {
             'use strict';
 
             var DB = 'https://j-saerospace-default-rtdb.firebaseio.com';
+            var validBoosters = {};
             var MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
             var STATUS = {
                 success: { label: 'ÉXITO', cls: 'ok', mark: '✓' },
@@ -991,8 +993,13 @@
                 var launchPill = '<span class="pill ' + stMeta.cls + '">' + stMeta.mark + ' ' + stMeta.label + '</span>';
 
                 var booster = String(m.booster || '').trim();
+                // La flota es solo Tomcat: no mostramos asignaciones viejas del Astro-3
+                if (String(vehicle).trim().toLowerCase() !== 'tomcat') booster = '';
+                var boosterLinkable = !!booster && !!validBoosters[booster.toUpperCase()];
                 var boosterVal = booster
-                    ? '<a href="booster.html?b=' + encodeURIComponent(booster) + '">' + esc(booster) + '</a>'
+                    ? (boosterLinkable
+                        ? '<a href="booster.html?b=' + encodeURIComponent(booster) + '">' + esc(booster) + '</a>'
+                        : esc(booster))
                     : '<a href="cohetes.html">' + esc(vehicle) + '</a>';
                 var boosterNote = booster ? 'Núcleo de ' + vehicle : 'Vehículo ' + vehicle;
 
@@ -1026,7 +1033,7 @@
                     '<div class="spec-row"><dt>Vehículo</dt><dd><a href="cohetes.html">' + esc(vehicle) + '</a></dd></div>' +
                     '<div class="spec-row"><dt>Proveedor</dt><dd>' + esc(provider) + '</dd></div>' +
                     '<div class="spec-row"><dt>Plataforma</dt><dd>' + esc(site) + '</dd></div>' +
-                    '<div class="spec-row"><dt>Núcleo</dt><dd>' + (booster ? '<a href="booster.html?b=' + encodeURIComponent(booster) + '">' + esc(booster) + '</a>' : '—') + '</dd></div>' +
+                    '<div class="spec-row"><dt>Núcleo</dt><dd>' + (booster ? (boosterLinkable ? '<a href="booster.html?b=' + encodeURIComponent(booster) + '">' + esc(booster) + '</a>' : esc(booster)) : '—') + '</dd></div>' +
                     '</dl></article>' +
 
                     '<article class="spec-card">' +
@@ -1250,6 +1257,21 @@
                     });
                     var mission = all.find(function (x) { return x.__key === id; });
                     if (!mission) { fail('No encontramos la misión "' + id + '" en el manifiesto.'); return; }
+
+                    // Solo enlazamos núcleos que existan y sean del Tomcat
+                    try {
+                        var bres = await fetch(DB + '/boosters.json', { cache: 'no-store' });
+                        var bdata = bres.ok ? (await bres.json()) || {} : {};
+                        var tomcat = Object.values(bdata).filter(function (b) {
+                            return String((b && b.vehicle) || '').toLowerCase() === 'tomcat';
+                        });
+                        if (tomcat.length && window.JSBoosters) {
+                            tomcat.forEach(function (b) { validBoosters[String(b.name).toUpperCase()] = true; });
+                        } else if (window.JSBoosters) {
+                            window.JSBoosters.seedCatalog(all).forEach(function (b) { validBoosters[b.name.toUpperCase()] = true; });
+                        }
+                    } catch (e) { /* sin boosters: se muestra el nombre sin enlace */ }
+
                     render(mission, all);
                 } catch (err) {
                     fail('No pudimos conectar con la base de datos de misiones. ' + err.message);
