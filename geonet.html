@@ -154,7 +154,32 @@
             left: 20px;
             top: 120px;
             width: 350px;
+            max-height: calc(100vh - 150px);
+            max-height: calc(100dvh - 150px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-right: 6px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 212, 255, 0.45) transparent;
             pointer-events: auto;
+        }
+
+        .dashboard-container > * {
+            /* Sin esto los paneles se encogen y recortan su contenido en vez de scrollear */
+            flex-shrink: 0;
+        }
+
+        .dashboard-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .dashboard-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .dashboard-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.35);
+            border-radius: 4px;
         }
 
         .hud-panel {
@@ -251,52 +276,6 @@
             object-fit: cover;
         }
 
-        /* Satellite Viewer Modal */
-        .sat-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .sat-modal {
-            width: 80vw;
-            max-width: 900px;
-            height: 70vh;
-            background: #050f1e;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sat-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .sat-modal-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .sat-modal-body {
-            flex: 1;
-            position: relative;
-        }
-
         .loading {
             position: fixed;
             top: 0;
@@ -328,22 +307,6 @@
         .page-transition-overlay.active {
             opacity: 1;
             pointer-events: auto;
-        }
-
-        .view-sat-btn {
-            padding: 12px;
-            background: transparent;
-            border: 1px solid #00d4ff;
-            color: #00d4ff;
-            font-family: Orbitron;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
-
-        .view-sat-btn:hover {
-            background: #00d4ff;
-            color: #000;
         }
 
         .auth-btn {
@@ -681,9 +644,9 @@
         <div class="focus-controls">
             <button class="focus-btn active" id="focusEarth">Kerbin</button>
             <button class="focus-btn" id="focusMoon">Mun</button>
-            <button class="focus-btn" id="focusLaythe">Laythe</button>
-            <button class="focus-btn" id="focusDuna">Duna</button>
             <button class="focus-btn" id="focusMinmus">Minmus</button>
+            <button class="focus-btn" id="focusDuna">Duna</button>
+            <button class="focus-btn" id="focusLaythe">Laythe</button>
         </div>
 
         <div class="dashboard-container" id="dashboardContainer">
@@ -708,9 +671,6 @@
                 </div>
             </div>
 
-            <button class="view-sat-btn" onclick="openSatViewer()">
-                <i class="fas fa-satellite"></i> VER SATÉLITE
-            </button>
         </div>
     </div>
 
@@ -873,20 +833,9 @@
         </div>
     </div>
 
-    <div class="sat-modal-overlay" id="sat-modal">
-        <div class="sat-modal">
-            <div class="sat-modal-header">
-                <h2 class="sat-modal-title">Modelo Satélite</h2><button class="sat-modal-close"
-                    onclick="closeSatViewer()">×</button>
-            </div>
-            <div class="sat-modal-body" id="sat-viewer-container"></div>
-        </div>
-    </div>
-
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -1726,25 +1675,6 @@
                 window.renderPlanesData(stored);
             } catch(e) {}
         };
-
-        let satR, satS, satC, satM, satAnim;
-        window.openSatViewer = () => {
-            const m = document.getElementById('sat-modal'); m.style.display = 'flex'; m.classList.add('active');
-            if (!satR) {
-                const c = document.getElementById('sat-viewer-container');
-                satS = new THREE.Scene(); satS.background = new THREE.Color(0x050f1e);
-                satC = new THREE.PerspectiveCamera(50, c.clientWidth / c.clientHeight, 0.1, 100); satC.position.set(3, 2, 3);
-                satR = new THREE.WebGLRenderer({ antialias: true }); satR.setSize(c.clientWidth, c.clientHeight); c.appendChild(satR.domElement);
-                satS.add(new THREE.AmbientLight(0xffffff, 0.8)); const l = new THREE.DirectionalLight(0xffffff, 1); l.position.set(5, 5, 5); satS.add(l);
-                new THREE.GLTFLoader().load('geonet.glb', g => { satM = g.scene; satS.add(satM); }, null, () => {
-                    const g = new THREE.BoxGeometry(1, 0.4, 0.4); const m = new THREE.MeshPhongMaterial({ color: 0x00d4ff });
-                    satM = new THREE.Mesh(g, m); satS.add(satM);
-                });
-                const loop = () => { satAnim = requestAnimationFrame(loop); if (satM) satM.rotation.y += 0.01; satR.render(satS, satC); };
-                loop();
-            }
-        };
-        window.closeSatViewer = () => { document.getElementById('sat-modal').classList.remove('active'); setTimeout(() => document.getElementById('sat-modal').style.display = 'none', 300); };
 
         function animate() {
             requestAnimationFrame(animate);
