@@ -1283,86 +1283,92 @@
         moon.position.set(moonOrbitRadius, 0, 0); moonGroup.add(moon);
         const mun = moon;
 
-        // --- DUNA (Procedural Red Desert Shader) ---
+        // --- DUNA (SCANsat-Style Textured Surface) ---
+        const dunaMap = loader.load('duna_texture.webp', (t) => { t.needsUpdate = true; });
         const dunaMat = new THREE.ShaderMaterial({
-            uniforms: { sun: { value: new THREE.Vector3(5, 3, 5) } },
-            vertexShader: `varying vec3 vN; varying vec3 vV; varying vec3 vP; void main() { vP = position; vec4 wP = modelMatrix * vec4(position, 1.0); vN = normalize((modelMatrix * vec4(normal, 0.0)).xyz); vV = normalize(cameraPosition - wP.xyz); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-            fragmentShader: `
-                varying vec3 vN; varying vec3 vV; varying vec3 vP;
-                uniform vec3 sun;
-                float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-                float noise(vec2 p) {
-                    vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f);
-                    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-                               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-                }
-                float fbm(vec2 p) { float s = 0.0; float a = 0.5; for (int i = 0; i < 5; i++) { s += a * noise(p); p *= 2.0; a *= 0.5; } return s; }
+            uniforms: {
+                uMap: { value: dunaMap },
+                uSunDir: { value: sun.position.clone().normalize() }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vViewDir;
                 void main() {
-                    vec3 n = normalize(vN);
-                    vec3 pn = normalize(vP);
-                    vec2 uvB = vP.xy * 3.0; vec2 uvA = vP.yz * 3.0; vec2 uvC = vP.xz * 3.0;
-                    float rough = fbm(uvB * 22.0);
-                    float crat = fbm(uvB * 60.0);
-                    float detail = fbm(uvC * 10.0);
-                    vec3 dark = vec3(0.52, 0.22, 0.12);
-                    vec3 baseC = vec3(0.82, 0.38, 0.18);
-                    vec3 lightC = vec3(0.94, 0.53, 0.29);
-                    vec3 col = mix(dark, baseC, rough);
-                    col = mix(col, lightC, detail * 0.35);
-                    // Canyons / dust streaks
-                    float cracks = smoothstep(0.46, 0.52, abs(crat - 0.5));
-                    col = mix(col, vec3(0.30, 0.12, 0.07), cracks * 0.45);
-                    // Polar ice caps (small, noisy edge)
-                    float capEdge = fbm(uvB * 30.0);
-                    float caps = smoothstep(0.86, 0.94, abs(pn.y) + (capEdge - 0.5) * 0.06);
-                    col = mix(col, vec3(0.94, 0.89, 0.85), caps * 0.90);
-                    float diff = max(dot(n, normalize(sun)), 0.0);
-                    float term = 0.26 + 0.80 * diff;
-                    vec3 lit = col * term * vec3(1.0, 0.97, 0.92);
-                    float rim = 1.0 - max(dot(normalize(vV), n), 0.0);
-                    lit += vec3(0.40, 0.45, 0.75) * pow(rim, 3.0) * 0.20 * diff;
-                    gl_FragColor = vec4(lit, 1.0);
-                }`
+                    vUv = uv;
+                    vNormal = normalize(normalMatrix * normal);
+                    vec3 wPos = (modelMatrix * vec4(position, 1.0)).xyz;
+                    vViewDir = normalize(cameraPosition - wPos);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D uMap;
+                uniform vec3 uSunDir;
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vViewDir;
+                void main() {
+                    vec3 tex = texture2D(uMap, vUv).rgb;
+                    // Realce de medios tonos: el mapa base es oscuro
+                    tex = pow(tex, vec3(0.90)) * 1.14;
+                    float diff = max(dot(vNormal, uSunDir), 0.0);
+                    float term = smoothstep(-0.1, 0.15, dot(vNormal, uSunDir));
+                    vec3 lit = tex * diff * vec3(1.0, 0.96, 0.90);
+                    float rim = 1.0 - max(dot(vViewDir, vNormal), 0.0);
+                    // Atmósfera tenue de Duna
+                    vec3 thinAtmo = vec3(0.55, 0.38, 0.32) * pow(rim, 3.0) * 0.22 * diff;
+                    gl_FragColor = vec4(lit * term + tex * 0.014 + thinAtmo, 1.0);
+                }
+            `
         });
         const dunaSystem = new THREE.Group(); scene.add(dunaSystem); dunaSystem.visible = false;
-        const duna = new THREE.Mesh(new THREE.SphereGeometry(0.45, 48, 48), dunaMat);
+        const duna = new THREE.Mesh(new THREE.SphereGeometry(0.45, 64, 64), dunaMat);
         dunaSystem.add(duna);
 
-        // --- MINMUS (Procedural Mint-Green Ice Shader) ---
+        // --- MINMUS (SCANsat-Style Textured Surface) ---
+        const minmusMap = loader.load('minmus_texture.webp', (t) => { t.needsUpdate = true; });
         const minmusMat = new THREE.ShaderMaterial({
-            uniforms: { sun: { value: new THREE.Vector3(5, 3, 5) } },
-            vertexShader: `varying vec3 vN; varying vec3 vV; varying vec3 vP; void main() { vP = position; vec4 wP = modelMatrix * vec4(position, 1.0); vN = normalize((modelMatrix * vec4(normal, 0.0)).xyz); vV = normalize(cameraPosition - wP.xyz); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-            fragmentShader: `
-                varying vec3 vN; varying vec3 vV; varying vec3 vP;
-                uniform vec3 sun;
-                float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-                float noise(vec2 p) {
-                    vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f);
-                    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-                               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-                }
-                float fbm(vec2 p) { float s = 0.0; float a = 0.5; for (int i = 0; i < 5; i++) { s += a * noise(p); p *= 2.0; a *= 0.5; } return s; }
+            uniforms: {
+                uMap: { value: minmusMap },
+                uSunDir: { value: sun.position.clone().normalize() }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vViewDir;
                 void main() {
-                    vec3 n = normalize(vN);
-                    vec2 uvB = vP.xy * 5.0; vec2 uvC = vP.yz * 5.0;
-                    float rough = fbm(uvB * 18.0);
-                    float valleys = fbm(uvC * 34.0);
-                    vec3 dark = vec3(0.28, 0.47, 0.40);
-                    vec3 baseC = vec3(0.52, 0.76, 0.64);
-                    vec3 lightC = vec3(0.75, 0.94, 0.84);
-                    vec3 col = mix(dark, baseC, rough);
-                    col = mix(col, lightC, valleys * 0.30);
-                    float diff = max(dot(n, normalize(sun)), 0.0);
-                    float term = 0.20 + 0.90 * diff;
-                    vec3 lit = col * term * vec3(0.95, 1.0, 0.95);
-                    float rim = 1.0 - max(dot(normalize(vV), n), 0.0);
-                    lit += vec3(0.55, 0.85, 0.75) * pow(rim, 3.0) * 0.25 * diff;
-                    gl_FragColor = vec4(lit, 1.0);
-                }`
+                    vUv = uv;
+                    vNormal = normalize(normalMatrix * normal);
+                    vec3 wPos = (modelMatrix * vec4(position, 1.0)).xyz;
+                    vViewDir = normalize(cameraPosition - wPos);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D uMap;
+                uniform vec3 uSunDir;
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vViewDir;
+                void main() {
+                    vec3 tex = texture2D(uMap, vUv).rgb;
+                    // Saturación extra: el mapa base es un verde pálido uniforme
+                    float lum = dot(tex, vec3(0.299, 0.587, 0.114));
+                    tex = clamp(mix(vec3(lum), tex, 1.35), 0.0, 1.0);
+                    float diff = max(dot(vNormal, uSunDir), 0.0);
+                    float term = smoothstep(-0.1, 0.15, dot(vNormal, uSunDir));
+                    vec3 lit = tex * diff * vec3(1.0, 1.0, 0.98);
+                    float rim = 1.0 - max(dot(vViewDir, vNormal), 0.0);
+                    // Polvo helado muy sutil (sin atmósfera)
+                    vec3 dustRim = vec3(0.55, 0.80, 0.70) * pow(rim, 4.0) * 0.18 * diff;
+                    gl_FragColor = vec4(lit * term + tex * 0.008 + dustRim, 1.0);
+                }
+            `
         });
         const minmusGroup = new THREE.Group(); earthSystem.add(minmusGroup); minmusGroup.rotation.z = 0.12;
         const minmusOrbitRadius = 6.4;
-        const minmus = new THREE.Mesh(new THREE.SphereGeometry(0.18, 32, 32), minmusMat);
+        const minmus = new THREE.Mesh(new THREE.SphereGeometry(0.18, 48, 48), minmusMat);
         minmus.position.set(minmusOrbitRadius, 0, 0); minmusGroup.add(minmus);
         const minmusOrbitGeom = new THREE.RingGeometry(minmusOrbitRadius - 0.01, minmusOrbitRadius + 0.01, 128);
         const minmusOrbitMat = new THREE.MeshBasicMaterial({ color: 0x00ffaa, transparent: true, opacity: 0.12, side: THREE.DoubleSide });
@@ -1798,6 +1804,12 @@
             }
             if (moon.material && moon.material.uniforms && moon.material.uniforms.uSunDir) {
                 moon.material.uniforms.uSunDir.value.copy(sun.position).normalize();
+            }
+            if (duna.material.uniforms && duna.material.uniforms.uSunDir) {
+                duna.material.uniforms.uSunDir.value.copy(sun.position).normalize();
+            }
+            if (minmus.material.uniforms && minmus.material.uniforms.uSunDir) {
+                minmus.material.uniforms.uSunDir.value.copy(sun.position).normalize();
             }
             if (laythe.material.uniforms && laythe.material.uniforms.sun) {
                 laythe.material.uniforms.sun.value.copy(sun.position);
