@@ -6,7 +6,7 @@ on:
   schedule:
     # Refresca las vistas previas de enlaces aunque no haya cambios de código:
     # así los lanzamientos nuevos también se comparten con foto y descripción.
-    - cron: '23 */6 * * *'
+    - cron: '23 * * * *'
   workflow_dispatch:
 
 permissions:

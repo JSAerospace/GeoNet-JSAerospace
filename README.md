@@ -79,9 +79,9 @@ Por eso cada ficha tiene una **copia estática con los metadatos ya escritos**:
 | `m-<clave>.html` | `mision.html?id=<clave>` | Foto y descripción del lanzamiento |
 | `p-<nombre>.html` | `booster.html?b=<nombre>` | Foto y descripción del núcleo |
 
-- Las genera [`tools/build-share.py`](tools/build-share.py) leyendo los nodos `missions` y `boosters` de Realtime Database. Se ejecuta en el despliegue y además por **cron cada 6 h**, así un lanzamiento nuevo se comparte bien sin tocar código.
-- No se versionan (`.gitignore`); el workflow las escribe antes de publicar.
-- El precio a pagar: un lanzamiento recién creado tarda hasta 6 h en tener su página de vista previa. Hasta entonces el botón **Compartir** copia el enlace directo.
+- Las genera [`tools/build-share.py`](tools/build-share.py) leyendo los nodos `missions` y `boosters` de Realtime Database. Se ejecuta en el despliegue y además por **cron cada hora**, así un lanzamiento nuevo se comparte bien sin tocar código.
+- No se versionan (`.gitignore`); el workflow las escribe antes de publicar. Por eso **Pages debe estar en *Source: GitHub Actions ***: con *Deploy from a branch* el build automático de la rama pisa el artefacto y las páginas desaparecen.
+- El precio a pagar: un lanzamiento recién creado tarda hasta una hora en tener su página de vista previa. Hasta entonces el botón **Compartir** copia el enlace directo.
 - En `mision.html` y `booster.html`, el botón **Compartir** (y la barra de direcciones, que se reescribe a la URL canónica) usa la copia estática; en móvil abre la hoja nativa de compartir.
 - La tarjeta genérica del sitio es `assets/social/site-card.png` (1200×630), generada desde [`tools/social-card.html`](tools/social-card.html). Para regenerarla:
 
