@@ -77,7 +77,9 @@ Por eso cada ficha tiene una **copia estática con los metadatos ya escritos**:
 | Archivo generado | Abre la ficha | Contenido de la vista previa |
 | --- | --- | --- |
 | `m-<clave>.html` | `mision.html?id=<clave>` | Foto y descripción del lanzamiento |
-| `p-<nombre>.html` | `booster.html?b=<nombre>` | Foto y descripción del núcleo |
+| `p-<nombre>.html` | `booster.html?b=<nombre>` | Solo descripción y datos del núcleo (sin foto) |
+
+Los lanzamientos se comparten con imagen; los propulsores, sin imagen: la tarjeta de Discord/WhatsApp queda compacta con el nombre, el vehículo y la descripción.
 
 - Las genera [`tools/build-share.py`](tools/build-share.py) leyendo los nodos `missions` y `boosters` de Realtime Database. Se ejecuta en el despliegue y además por **cron cada hora**, así un lanzamiento nuevo se comparte bien sin tocar código.
 - No se versionan (`.gitignore`); el workflow las escribe antes de publicar. Por eso **Pages debe estar en *Source: GitHub Actions ***: con *Deploy from a branch* el build automático de la rama pisa el artefacto y las páginas desaparecen.

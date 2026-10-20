@@ -38,7 +38,6 @@ MARKER = '<!-- jsa:share-preview -->'
 MISSION_TEMPLATE = 'mision.html'
 BOOSTER_TEMPLATE = 'booster.html'
 MISSION_FALLBACK_IMG = 'Imagenes/Tomcat 4.png'
-BOOSTER_FALLBACK_IMG = 'Imagenes/Tomcat-Booster.png'
 
 MONTHS_ES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 STATUS_LABEL = {
@@ -144,7 +143,8 @@ def date_label(mission):
 
 # ----------------------------------------------------------------------------- HTML
 
-def build_head(*, title, description, url, image, image_alt, canonical_extra=''):
+def build_head(*, title, description, url, image=None, image_alt='', canonical_extra=''):
+    """Bloque social de la copia. Sin imagen la tarjeta sale solo con texto."""
     tags = [
         '<title>%s</title>' % esc(title),
         '<meta name="description" content="%s">' % esc(description),
@@ -154,14 +154,20 @@ def build_head(*, title, description, url, image, image_alt, canonical_extra='')
         '<meta property="og:url" content="%s">' % esc(url),
         '<meta property="og:title" content="%s">' % esc(title),
         '<meta property="og:description" content="%s">' % esc(description),
-        '<meta property="og:image" content="%s">' % esc(image),
-        '<meta property="og:image:alt" content="%s">' % esc(image_alt),
+    ]
+    if image:
+        tags += [
+            '<meta property="og:image" content="%s">' % esc(image),
+            '<meta property="og:image:alt" content="%s">' % esc(image_alt),
+        ]
+    tags += [
         '<meta property="og:locale" content="es_AR">',
-        '<meta name="twitter:card" content="summary_large_image">',
+        '<meta name="twitter:card" content="%s">' % ('summary_large_image' if image else 'summary'),
         '<meta name="twitter:title" content="%s">' % esc(title),
         '<meta name="twitter:description" content="%s">' % esc(description),
-        '<meta name="twitter:image" content="%s">' % esc(image),
     ]
+    if image:
+        tags.append('<meta name="twitter:image" content="%s">' % esc(image))
     if canonical_extra:
         tags.append(canonical_extra)
     tags.append(MARKER)
@@ -237,9 +243,6 @@ def booster_page(key, booster, template):
     status = str(booster.get('status') or 'active').strip()
     specs = booster.get('specs') if isinstance(booster.get('specs'), dict) else {}
 
-    images = as_list(booster.get('images')) or as_list(booster.get('image'))
-    image_path = resolve_img(images[0]) if images else BOOSTER_FALLBACK_IMG
-
     description = one_line(booster.get('description'), 280)
     if not description:
         bits = [vehicle]
@@ -260,12 +263,11 @@ def booster_page(key, booster, template):
     filename = 'p-%s.html' % slug(name)
     url = SITE_BASE + filename
 
+    # Los propulsores se comparten sin foto: la tarjeta queda solo con el texto
     head = build_head(
         title=headline + ' · J.S. Aerospace',
         description=description,
         url=url,
-        image=abs_url(image_path),
-        image_alt='%s · núcleo %s' % (name, vehicle),
     )
     return filename, render_page(template, head, marker('booster', name, url))
 
@@ -326,9 +328,16 @@ def main():
     if check_only:
         problems = []
         for name, body in pages.items():
-            for prop in ('og:title', 'og:description', 'og:image', 'og:url'):
+            for prop in ('og:title', 'og:description', 'og:url'):
                 if 'property="%s"' % prop not in body:
                     problems.append('%s sin %s' % (name, prop))
+            # Los lanzamientos comparten la foto; los propulsores, solo texto
+            wants_image = name.startswith('m-')
+            has_image = '<meta property="og:image"' in body
+            if wants_image and not has_image:
+                problems.append('%s sin og:image' % name)
+            if not wants_image and has_image:
+                problems.append('%s no debería llevar og:image' % name)
             if body.count('<title>') != 1:
                 problems.append('%s con %d etiquetas <title>' % (name, body.count('<title>')))
             if '__MISSION_ID__' not in body and '__BOOSTER_NAME__' not in body:
