@@ -1,0 +1,9 @@
+# Páginas de vista previa de enlaces generadas por tools/build-share.py
+# (las escribe el despliegue; no se versionan para no duplicar las fichas)
+m-*.html
+p-*.html
+
+# Artefactos locales
+_site/
+screenshots/
+.freebuff/

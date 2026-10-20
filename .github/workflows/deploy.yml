@@ -3,6 +3,10 @@ name: Deploy a GitHub Pages
 on:
   push:
     branches: [main]
+  schedule:
+    # Refresca las vistas previas de enlaces aunque no haya cambios de código:
+    # así los lanzamientos nuevos también se comparten con foto y descripción.
+    - cron: '23 */6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,6 +28,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Generar vistas previas de enlaces
+        # Escribe m-<clave>.html y p-<nombre>.html con los metadatos Open Graph
+        # de cada lanzamiento y de cada propulsor.
+        continue-on-error: true
+        env:
+          JSA_SITE_BASE: https://jsaerospace.github.io/GeoNet-JSAerospace/
+        run: python3 tools/build-share.py
+
       - name: Preparar sitio estático
         run: |
           set -euo pipefail
@@ -33,8 +45,11 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.freebuff' \
+            --exclude='tools' \
+            --exclude='screenshots' \
             --exclude='_site' \
             ./ _site/
+          echo "Páginas de vista previa: $(find _site -maxdepth 1 -name 'm-*.html' -o -maxdepth 1 -name 'p-*.html' | wc -l)"
           echo "Archivos publicados: $(find _site -type f | wc -l)"
 
       - name: Configurar Pages

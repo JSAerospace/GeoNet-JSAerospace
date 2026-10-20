@@ -8,9 +8,16 @@
     <meta name="description" content="Ficha de misión de J.S. Aerospace: estado, vehículo, carga útil, recuperación y perfil de vuelo.">
     <meta property="og:site_name" content="J.S. Aerospace">
     <meta property="og:type" content="article">
+    <meta property="og:url" content="https://jsaerospace.github.io/GeoNet-JSAerospace/mision.html">
     <meta property="og:title" content="Misión · J.S. Aerospace">
     <meta property="og:description" content="Ficha de misión de J.S. Aerospace: estado, vehículo, carga útil, recuperación y perfil de vuelo.">
+    <meta property="og:image" content="https://jsaerospace.github.io/GeoNet-JSAerospace/assets/social/site-card.png">
+    <meta property="og:image:alt" content="J.S. Aerospace · lanzadores reutilizables y conectividad orbital">
+    <meta property="og:locale" content="es_AR">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Misión · J.S. Aerospace">
+    <meta name="twitter:description" content="Ficha de misión de J.S. Aerospace: estado, vehículo, carga útil, recuperación y perfil de vuelo.">
+    <meta name="twitter:image" content="https://jsaerospace.github.io/GeoNet-JSAerospace/assets/social/site-card.png">
     <meta name="theme-color" content="#05070b">
     <link rel="icon" type="image/png" href="LOGO_JTT.png">
 
@@ -634,6 +641,17 @@
 
         .m-btn.ghost:hover { border-color: var(--m-accent); color: var(--m-accent); }
 
+        .m-btn[disabled] { opacity: 0.6; cursor: progress; }
+
+        .m-btn i { margin-right: 0.5em; }
+
+        .m-hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
         /* ===== FOOTER ===== */
         footer {
             position: relative;
@@ -764,6 +782,7 @@
 
     <script src="net.js"></script>
     <script src="boosters.js?v=4"></script>
+    <script src="share.js?v=1"></script>
     <script src="nav-mobile.js"></script>
     <script>
         (function () {
@@ -962,12 +981,15 @@
                 var heroImg = encodeURI(resolveImg(imgs[0] || null));
 
                 document.title = title + ' · J.S. Aerospace';
-                var md = document.querySelector('meta[name="description"]');
-                if (md) md.setAttribute('content', 'Ficha de la misión ' + title + ': estado, vehículo, carga útil, recuperación y perfil de vuelo.');
-                var ogT = document.querySelector('meta[property="og:title"]');
-                if (ogT) ogT.setAttribute('content', title + ' · J.S. Aerospace');
-                var ogI = document.querySelector('meta[property="og:image"]');
-                if (ogI) ogI.setAttribute('content', new URL(heroImg, location.href).href);
+                // En las copias de vista previa las metas ya vienen escritas: no se tocan
+                if (!window.__SHARE_STATIC__) {
+                    var md = document.querySelector('meta[name="description"]');
+                    if (md) md.setAttribute('content', 'Ficha de la misión ' + title + ': estado, vehículo, carga útil, recuperación y perfil de vuelo.');
+                    var ogT = document.querySelector('meta[property="og:title"]');
+                    if (ogT) ogT.setAttribute('content', title + ' · J.S. Aerospace');
+                    var ogI = document.querySelector('meta[property="og:image"]');
+                    if (ogI) ogI.setAttribute('content', new URL(heroImg, location.href).href);
+                }
 
                 var statusCard = function (k, v, note, isHtml) {
                     return '<article class="m-status-card">' +
@@ -1116,6 +1138,9 @@
                     '<span>' + esc(coarse ? ('NET · ' + netLabel) : (fmtDate(d) + ' · ' + fmtTime(d))) + '</span>' +
                     '</div>' +
                     countdown +
+                    '<div class="m-hero-actions">' +
+                    '<button type="button" class="m-btn ghost" id="mShare"><i class="fas fa-link"></i>Compartir</button>' +
+                    '</div>' +
                     '</div></div>' +
                     '</section>' +
 
@@ -1166,6 +1191,17 @@
                 content.innerHTML = html;
                 content.hidden = false;
                 el('m-loading').hidden = true;
+
+                // Botón de compartir: copia el enlace con vista previa enriquecida
+                if (window.JSShare) {
+                    window.JSShare.attach({
+                        kind: 'mission',
+                        id: m.__key,
+                        title: title + ' · J.S. Aerospace',
+                        text: intro,
+                        button: el('mShare')
+                    });
+                }
 
                 // Si la imagen de portada no existe, usar la de respaldo
                 var heroEl = content.querySelector('.m-hero-media');
@@ -1245,7 +1281,8 @@
 
             async function init() {
                 el('year').textContent = new Date().getFullYear();
-                var id = param('id');
+                // Las copias generadas por tools/build-share.py traen la clave embebida
+                var id = param('id') || window.__MISSION_ID__ || '';
                 if (!id) { fail('Falta el identificador de la misión en el enlace.'); return; }
 
                 try {

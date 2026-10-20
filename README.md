@@ -37,7 +37,7 @@ El workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) publi
 1. En **Settings → Pages → Build and deployment → Source**, seleccionar **GitHub Actions**.
 2. Hacer push a `main`. El sitio queda en `https://jsaerospace.github.io/GeoNet-JSAerospace/`.
 
-El workflow copia la raíz del repositorio a `_site` (excluyendo `.git`, `.github` y `.freebuff`) y la publica con las acciones oficiales `configure-pages`, `upload-pages-artifact` y `deploy-pages`. Si se usa un dominio propio, añadir un archivo `CNAME` en la raíz.
+Antes de publicar, el workflow ejecuta `tools/build-share.py` para escribir las páginas de vista previa de cada lanzamiento y propulsor. Después copia la raíz del repositorio a `_site` (excluyendo `.git`, `.github`, `.freebuff`, `tools` y `screenshots`) y la publica con las acciones oficiales `configure-pages`, `upload-pages-artifact` y `deploy-pages`. Si se usa un dominio propio, añadir un archivo `CNAME` en la raíz.
 
 ## Fechas NET (No Earlier Than)
 
@@ -67,6 +67,37 @@ Cada booster vive en el nodo `boosters` de Realtime Database. El registro guarda
 - Mientras no haya boosters Tomcat en la base, el sitio muestra un **catálogo de referencia** (`boosters.js`). El administrador puede publicarlo y después crear, editar o eliminar núcleos.
 - Si quedaron registros viejos del Astro-3, el panel muestra **Quitar boosters Astro-3**: elimina esos núcleos y libera sus lanzamientos.
 - La ficha `booster.html?b=NOMBRE` enlaza cada vuelo con su misión en el manifiesto.
+
+## Vistas previas de enlaces (foto y descripción)
+
+Discord, WhatsApp y Telegram **no ejecutan JavaScript**: leen las etiquetas `<meta>` del HTML que baja el servidor. Como las fichas arman esos datos en el navegador, un enlace directo a `mision.html?id=...` siempre mostraba la tarjeta genérica del sitio.
+
+Por eso cada ficha tiene una **copia estática con los metadatos ya escritos**:
+
+| Archivo generado | Abre la ficha | Contenido de la vista previa |
+| --- | --- | --- |
+| `m-<clave>.html` | `mision.html?id=<clave>` | Foto y descripción del lanzamiento |
+| `p-<nombre>.html` | `booster.html?b=<nombre>` | Foto y descripción del núcleo |
+
+- Las genera [`tools/build-share.py`](tools/build-share.py) leyendo los nodos `missions` y `boosters` de Realtime Database. Se ejecuta en el despliegue y además por **cron cada 6 h**, así un lanzamiento nuevo se comparte bien sin tocar código.
+- No se versionan (`.gitignore`); el workflow las escribe antes de publicar.
+- El precio a pagar: un lanzamiento recién creado tarda hasta 6 h en tener su página de vista previa. Hasta entonces el botón **Compartir** copia el enlace directo.
+- En `mision.html` y `booster.html`, el botón **Compartir** (y la barra de direcciones, que se reescribe a la URL canónica) usa la copia estática; en móvil abre la hoja nativa de compartir.
+- La tarjeta genérica del sitio es `assets/social/site-card.png` (1200×630), generada desde [`tools/social-card.html`](tools/social-card.html). Para regenerarla:
+
+```bash
+python3 -m http.server 8831 --bind 127.0.0.1 &
+google-chrome --headless=new --hide-scrollbars --window-size=1200,630 \
+  --virtual-time-budget=6000 --screenshot=assets/social/site-card.png \
+  http://127.0.0.1:8831/tools/social-card.html
+```
+
+Para probar los metadatos de una ficha:
+
+```bash
+python3 tools/build-share.py --check
+curl -s m-<clave>.html | grep -E 'og:(title|description|image)'
+```
 
 ## Autenticación y datos
 

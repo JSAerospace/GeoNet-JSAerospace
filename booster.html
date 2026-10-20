@@ -10,7 +10,14 @@
     <meta property="og:type" content="article">
     <meta property="og:title" content="Propulsor · J.S. Aerospace">
     <meta property="og:description" content="Ficha de propulsor de J.S. Aerospace: estado, historial de vuelos, recuperaciones y reutilización.">
+    <meta property="og:url" content="https://jsaerospace.github.io/GeoNet-JSAerospace/booster.html">
+    <meta property="og:image" content="https://jsaerospace.github.io/GeoNet-JSAerospace/assets/social/site-card.png">
+    <meta property="og:image:alt" content="J.S. Aerospace · propulsores reutilizables Tomcat">
+    <meta property="og:locale" content="es_AR">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Propulsor · J.S. Aerospace">
+    <meta name="twitter:description" content="Ficha de propulsor de J.S. Aerospace: estado, historial de vuelos, recuperaciones y reutilización.">
+    <meta name="twitter:image" content="https://jsaerospace.github.io/GeoNet-JSAerospace/assets/social/site-card.png">
     <meta name="theme-color" content="#05070b">
     <link rel="icon" type="image/png" href="LOGO_JTT.png">
 
@@ -694,6 +701,7 @@
     </footer>
 
     <script src="boosters.js?v=4"></script>
+    <script src="share.js?v=1"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -721,7 +729,7 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
         const params = new URLSearchParams(window.location.search);
-        const wanted = (params.get('b') || params.get('booster') || params.get('id') || '').trim();
+        const wanted = (params.get('b') || params.get('booster') || params.get('id') || window.__BOOSTER_NAME__ || '').trim();
         let current = null;
         let pool = [];
         let missions = [];
@@ -767,14 +775,17 @@
             const total = s.total;
 
             document.title = b.name + ' · Propulsor · J.S. Aerospace';
-            const md = document.querySelector('meta[name="description"]');
-            if (md) md.setAttribute('content', 'Ficha del propulsor ' + b.name + ' (' + b.vehicle + '): ' + s.total + ' vuelos, ' + s.landings + ' aterrizajes y estado ' + B.statusMeta(b.status).label.toLowerCase() + '.');
-            const ogT = document.querySelector('meta[property="og:title"]');
-            if (ogT) ogT.setAttribute('content', b.name + ' · Propulsor · J.S. Aerospace');
-            const ogD = document.querySelector('meta[property="og:description"]');
-            if (ogD) ogD.setAttribute('content', b.vehicle + ' · ' + s.total + ' vuelos · ' + s.landings + ' aterrizajes');
-            const ogI = document.querySelector('meta[property="og:image"]');
-            if (ogI) ogI.setAttribute('content', new URL(heroImg, location.href).href);
+            // En las copias de vista previa las metas ya vienen escritas: no se tocan
+            if (!window.__SHARE_STATIC__) {
+                const md = document.querySelector('meta[name="description"]');
+                if (md) md.setAttribute('content', 'Ficha del propulsor ' + b.name + ' (' + b.vehicle + '): ' + s.total + ' vuelos, ' + s.landings + ' aterrizajes y estado ' + B.statusMeta(b.status).label.toLowerCase() + '.');
+                const ogT = document.querySelector('meta[property="og:title"]');
+                if (ogT) ogT.setAttribute('content', b.name + ' · Propulsor · J.S. Aerospace');
+                const ogD = document.querySelector('meta[property="og:description"]');
+                if (ogD) ogD.setAttribute('content', b.vehicle + ' · ' + s.total + ' vuelos · ' + s.landings + ' aterrizajes');
+                const ogI = document.querySelector('meta[property="og:image"]');
+                if (ogI) ogI.setAttribute('content', new URL(heroImg, location.href).href);
+            }
 
             const intro = b.description || (
                 b.name + ' es un núcleo de primera etapa de ' + b.vehicle + ' operado por J.S. Aerospace desde ' + (b.base || 'LC-39B') + '. ' +
@@ -867,6 +878,7 @@
                         <div class="bh-actions">
                             <a class="m-btn" href="boosters.html">← Todos los propulsores</a>
                             <a class="m-btn ghost" href="misiones.html">Manifiesto de misiones</a>
+                            <button class="m-btn ghost" type="button" id="bShare"><i class="fas fa-link"></i>Compartir</button>
                             <a class="m-btn ghost" id="editBooster" href="boosters.html?edit=${encodeURIComponent(b.id)}" hidden>Editar núcleo</a>
                         </div>
                     </div>
@@ -957,6 +969,17 @@
             el('m-loading').hidden = true;
             el('m-error').hidden = true;
             el('m-content').hidden = false;
+
+            // Botón de compartir: copia el enlace con vista previa enriquecida
+            if (window.JSShare) {
+                window.JSShare.attach({
+                    kind: 'booster',
+                    id: b.name,
+                    title: b.name + ' · Propulsor · J.S. Aerospace',
+                    text: intro,
+                    button: el('bShare')
+                });
+            }
 
             document.querySelectorAll('.reveal').forEach(node => {
                 if (typeof IntersectionObserver === 'undefined') { node.classList.add('in'); return; }
