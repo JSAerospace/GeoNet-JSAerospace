@@ -1,8 +1,20 @@
 // J.S. Aerospace — Panel y listado de propulsores
 // El historial de cada núcleo sale del campo `booster` de las misiones.
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getDatabase, ref, set, get, update, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+//
+// Se carga como script clásico con el SDK compat de Firebase para que la página
+// funcione también abriendo boosters.html directo desde el disco (file://), donde
+// el navegador bloquea los módulos ES.
+(function () {
+'use strict';
+
+// Sin SDK (sin conexión o CDN bloqueado) la grilla no puede leer el registro.
+if (typeof firebase === 'undefined') {
+    document.addEventListener('DOMContentLoaded', function () {
+        var grid = document.getElementById('boosters-grid');
+        if (grid) grid.innerHTML = '<div class="b-empty" style="grid-column:1/-1;"><h3>No se pudo cargar Firebase</h3><p>Revisá la conexión a internet y recargá la página.</p></div>';
+    });
+    return;
+}
 
 const firebaseConfig = {
     apiKey: "AIzaSyC6eDNK7CLl_aXEYkwFV97k-2A1axzRAKg",
@@ -15,10 +27,27 @@ const firebaseConfig = {
     databaseURL: "https://j-saerospace-default-rtdb.firebaseio.com"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const database = getDatabase(app);
-const googleProvider = new GoogleAuthProvider();
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const database = firebase.database();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+// Adaptadores con la misma forma que usaba el SDK modular, para no tocar el resto.
+const ref = (db, path) => db.ref(path);
+const set = (r, value) => r.set(value);
+const get = (r) => r.get();
+const update = (r, value) => r.update(value);
+const push = (r, value) => r.push(value);
+const remove = (r) => r.remove();
+const onValue = (r, cb, onError) => r.on('value', cb, onError);
+const onAuthStateChanged = (a, cb) => a.onAuthStateChanged(cb);
+const signInWithEmailAndPassword = (a, email, password) => a.signInWithEmailAndPassword(email, password);
+const createUserWithEmailAndPassword = (a, email, password) => a.createUserWithEmailAndPassword(email, password);
+const signInWithPopup = (a, provider) => a.signInWithPopup(provider);
+const signOut = (a) => a.signOut();
+const updateProfile = (user, data) => user.updateProfile(data);
+const updatePassword = (user, password) => user.updatePassword(password);
+
 const B = window.JSBoosters;
 const ADMIN_EMAIL = 'olanoagus@gmail.com';
 const safeGet = (id) => document.getElementById(id);
@@ -38,6 +67,7 @@ let filterStatus = 'all';
 let sortMode = 'flights';
 let pendingEdit = '';
 let saving = false;
+let dataReady = false;
 
 function statusPill(status) {
     const meta = B.statusMeta(status);
@@ -98,6 +128,19 @@ function render() {
 
     renderStats(allBoosters);
 
+    // Récord de la flota: la barra de cada tarjeta se mide contra el núcleo
+    // con más vuelos, así se ve cuánto le falta a cada uno para alcanzarlo.
+    const record = allBoosters.reduce((n, b) => Math.max(n, b.stats.total), 0);
+    const recordHolders = allBoosters.filter(b => record > 0 && b.stats.total === record);
+    const recordName = recordHolders.length ? recordHolders[0].name : '';
+    const recordIsShared = recordHolders.length > 1;
+
+    // Antes del primer snapshot de Firebase no hay datos: no es "sin resultados".
+    if (!dataReady && !allBoosters.length) {
+        grid.innerHTML = '<div class="b-empty" style="grid-column:1/-1;"><h3>Sincronizando propulsores</h3><p>Leyendo el registro de vuelos…</p></div>';
+        return;
+    }
+
     if (!filtered.length) {
         grid.innerHTML = '<div class="b-empty" style="grid-column:1/-1;"><h3>Sin resultados</h3><p>No hay propulsores que coincidan con los filtros.</p></div>';
         return;
@@ -106,9 +149,28 @@ function render() {
     grid.innerHTML = sortBoosters(filtered).map(b => {
         const img = encodeURI(B.resolveImg(B.imageList(b)[0] || b.image));
         const last = b.stats.last;
-        const segments = Math.max(6, Math.min(10, b.stats.total + 2));
+        const total = b.stats.total;
+        const isRecord = record > 0 && total === record;
+        const gap = record - total;
+        const segments = Math.max(5, Math.min(12, record || 5));
+        const filled = record
+            ? (total ? Math.max(1, Math.round((total / record) * segments)) : 0)
+            : 0;
         let meter = '';
-        for (let i = 0; i < segments; i++) meter += '<i class="' + (i < b.stats.total ? 'on' : '') + '"></i>';
+        for (let i = 0; i < segments; i++) meter += '<i class="' + (i < filled ? 'on' : '') + '"></i>';
+
+        const meterNote = !record
+            ? 'Sin vuelos registrados'
+            : isRecord
+            ? (recordIsShared ? 'Récord compartido' : 'Récord de la flota')
+            : (gap === 1
+                ? (recordIsShared ? 'Falta 1 para el récord' : 'Falta 1 para el récord de ' + esc(recordName))
+                : (recordIsShared ? 'Faltan ' + gap + ' para el récord' : 'Faltan ' + gap + ' para el récord de ' + esc(recordName)));
+        const meterAria = !record
+            ? 'Sin vuelos registrados'
+            : (isRecord
+                ? total + (total === 1 ? ' vuelo, récord de la flota' : ' vuelos, récord de la flota')
+                : total + ' de ' + record + ' vuelos del núcleo con más vuelos');
 
         const editable = isAdmin && !b.seed;
         const topAdmin = editable ? `
@@ -124,8 +186,9 @@ function render() {
             </div>` : '';
 
         return `
-            <article class="booster-card" tabindex="0" role="link"
+            <article class="booster-card${isRecord ? ' is-record' : ''}" tabindex="0" role="link"
                 aria-label="Ver el historial de ${esc(b.name)}" data-open="${esc(b.name)}">
+                ${isRecord ? '<div class="bc-record"><i class="fas fa-trophy"></i>' + (recordIsShared ? 'Récord compartido' : 'Récord de vuelos') + '</div>' : ''}
                 ${topAdmin}
                 <div class="bc-figure"><img src="${img}" alt="" loading="lazy" onerror="this.remove()"></div>
                 <div class="bc-top">
@@ -135,8 +198,9 @@ function render() {
                 <div class="bc-body">
                     <h2 class="bc-name">${esc(b.name)}</h2>
                     <p class="bc-vehicle"><b>Tomcat</b>${b.block ? ' · ' + esc(b.block) : ''}</p>
-                    <div class="bc-meter" aria-hidden="true">${meter}</div>
-                    <div class="bc-meter-label"><span>Reutilizaciones</span><span>${b.stats.reuses}</span></div>
+                    <div class="bc-meter" role="img" aria-label="${esc(meterAria)}">${meter}</div>
+                    <div class="bc-meter-label"><span>Vuelos</span><span>${record ? total + ' / ' + record : '—'}</span></div>
+                    <div class="bc-meter-note${isRecord ? ' is-record' : ''}">${meterNote}</div>
                     <div class="bc-rows">
                         <div class="bc-row"><span class="l">Último vuelo</span><span class="r">${last ? esc(B.fmtShort(last.date)) : 'Sin vuelos'}</span></div>
                         <div class="bc-row"><span class="l">Aterrizajes</span><span class="r">${b.stats.landings} / ${b.stats.total || 0}</span></div>
@@ -198,15 +262,18 @@ function loadData() {
     onValue(ref(database, 'missions'), (snap) => {
         const data = snap.val() || {};
         missions = Object.entries(data).map(([id, m]) => Object.assign({ id }, m));
+        dataReady = true;
         applyData();
     }, (err) => console.warn('No se pudieron leer las misiones:', err.message));
 
     onValue(ref(database, 'boosters'), (snap) => {
         rawBoosters = snap.val() || {};
+        dataReady = true;
         applyData();
     }, (err) => {
         console.warn('No se pudieron leer los propulsores:', err.message);
         rawBoosters = {};
+        dataReady = true;
         applyData();
     });
 }
@@ -578,3 +645,4 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
     resolvePendingEdit();
 });
+})();

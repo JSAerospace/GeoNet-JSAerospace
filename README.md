@@ -20,7 +20,9 @@ Recursos compartidos: `style.css`, `nav-mobile.js`, `boosters.js` (datos), `boos
 
 ## Cómo verlo localmente
 
-Al usar módulos de ES y cargar modelos 3D, hay que servirlo por HTTP (no abrir el archivo directamente):
+Las páginas se pueden abrir directo desde el disco (`index.html`, `boosters.html`, …): los scripts son clásicos y `boosters.html` usa el SDK *compat* de Firebase, así que también funciona en `file://` (necesita internet para leer el registro).
+
+Para el visor 3D de Geonet, serví el sitio por HTTP:
 
 ```bash
 python3 -m http.server 8000 --bind 127.0.0.1
