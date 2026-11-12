@@ -34,6 +34,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <!-- Traducción ES/EN -->
+    <script src="lang/en-common.js"></script>
+    <script src="lang/en-cohetes.js"></script>
+    <script src="i18n.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -2876,6 +2880,7 @@ ASTRO-3_launch.png
         let viewer3d = null;
         let viewer3dLoading = false;
         let lastStage3D = null;
+        let currentStageName = 'Vehículo Completo';
 
         async function ensureViewer() {
             if (viewer3d || viewer3dLoading) return;
@@ -2896,6 +2901,7 @@ ASTRO-3_launch.png
         }
 
         function syncViewer(rocketKey, stageName) {
+            currentStageName = stageName;
             const mode = (rocketKey === 'tomcat') ? STAGE_3D[stageName] : null;
             lastStage3D = mode || lastStage3D;
             if (viewToggle) viewToggle.classList.toggle('show', !!mode);
@@ -2912,7 +2918,7 @@ ASTRO-3_launch.png
             want3D = v;
             safeGet('view2d')?.classList.toggle('active', !v);
             safeGet('view3d')?.classList.toggle('active', v);
-            syncViewer(currentRocketKey, document.querySelector('.rocket-tabs .tab-btn.active')?.textContent);
+            syncViewer(currentRocketKey, currentStageName);
         };
         safeGet('view2d')?.addEventListener('click', () => set3D(false));
         safeGet('view3d')?.addEventListener('click', () => set3D(true));
