@@ -21,6 +21,13 @@
     <meta name="twitter:description" content="El Tomcat reutilizable: 7 motores JS-4, metano/LOX, etapas y prestaciones del lanzador de J.S. Aerospace.">
     <meta name="twitter:image" content="https://jsaerospace.github.io/GeoNet-JSAerospace/assets/social/site-card.png">
     <link rel="icon" type="image/png" href="LOGO_JTT.png">
+    <!-- 3D (prueba local): Three.js para el visor del Tomcat -->
+    <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+    </script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1304,6 +1311,77 @@
                 transform: translateY(0);
             }
         }
+        /* ===== VISOR 3D TOMCAT (prueba local) ===== */
+        .view-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 12;
+            display: none;
+            gap: 6px;
+            background: rgba(10, 10, 15, 0.8);
+            padding: 6px;
+            border-radius: 50px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .view-toggle.show {
+            display: flex;
+        }
+
+        .view-toggle button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: var(--font-heading);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .view-toggle button.active {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.3);
+        }
+
+        #tomcat3d {
+            position: absolute;
+            inset: 0;
+            display: none;
+            z-index: 5;
+        }
+
+        .rocket-visual.is-3d #tomcat3d {
+            display: block;
+        }
+
+        .rocket-visual.is-3d > img,
+        .rocket-visual.is-3d .callout {
+            display: none !important;
+        }
+
+        #tomcat3d-status {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 6;
+            font-family: var(--font-heading);
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: var(--primary-color);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 10px;
+        }
+
+        #tomcat3d-status:empty {
+            display: none;
+        }
     </style>
 </head>
 
@@ -2009,6 +2087,13 @@
 
                 <div class="rocket-visual">
                     <img src="Imagenes/Tomcat-Completo.png" alt="Tomcat Technical Render">
+
+                    <!-- Visor 3D (prueba local) -->
+                    <div class="view-toggle" id="viewToggle">
+                        <button type="button" id="view2d" class="active">2D</button>
+                        <button type="button" id="view3d">3D</button>
+                    </div>
+                    <div id="tomcat3d"><div id="tomcat3d-status"></div></div>
 
                     <!-- Callouts -->
                     <div id="callout-engines" class="callout right active">
@@ -2774,7 +2859,63 @@ ASTRO-3_launch.png
                 tableHTML += `<tr><td class="spec-label">${spec[0]}</td><td class="spec-value">${spec[1]}${spec[2] ? `<span class="unit">${spec[2]}</span>` : ''}</td></tr>`;
             });
             if (specsTable) specsTable.innerHTML = tableHTML;
+            syncViewer(rocketKey, stageName);
         }
+
+        // ===== VISOR 3D TOMCAT (prueba local) =====
+        const STAGE_3D = {
+            'Vehículo Completo': 'both',
+            'Primera Etapa': 's1',
+            'Segunda Etapa (Desechable)': 's2'
+        };
+        const visualBox = document.querySelector('.rocket-visual');
+        const viewToggle = safeGet('viewToggle');
+        const viewer3dEl = safeGet('tomcat3d');
+        const viewer3dStatus = safeGet('tomcat3d-status');
+        let want3D = false;
+        let viewer3d = null;
+        let viewer3dLoading = false;
+        let lastStage3D = null;
+
+        async function ensureViewer() {
+            if (viewer3d || viewer3dLoading) return;
+            viewer3dLoading = true;
+            try {
+                const mod = await import('./tomcat-viewer.js');
+                viewer3d = mod.createTomcatViewer(viewer3dEl, {
+                    base: './modelos3d/',
+                    onStatus: (t) => { if (viewer3dStatus) viewer3dStatus.textContent = t; }
+                });
+                if (lastStage3D) viewer3d.setStage(lastStage3D);
+                if (want3D) viewer3d.start();
+            } catch (err) {
+                console.error(err);
+                if (viewer3dStatus) viewer3dStatus.textContent = 'No se pudo cargar el visor 3D (abrí la página con un servidor local)';
+            }
+            viewer3dLoading = false;
+        }
+
+        function syncViewer(rocketKey, stageName) {
+            const mode = (rocketKey === 'tomcat') ? STAGE_3D[stageName] : null;
+            lastStage3D = mode || lastStage3D;
+            if (viewToggle) viewToggle.classList.toggle('show', !!mode);
+            const on = !!mode && want3D;
+            if (visualBox) visualBox.classList.toggle('is-3d', on);
+            if (on) {
+                ensureViewer().then(() => { if (viewer3d) { viewer3d.setStage(mode); viewer3d.start(); } });
+            } else if (viewer3d) {
+                viewer3d.stop();
+            }
+        }
+
+        const set3D = (v) => {
+            want3D = v;
+            safeGet('view2d')?.classList.toggle('active', !v);
+            safeGet('view3d')?.classList.toggle('active', v);
+            syncViewer(currentRocketKey, document.querySelector('.rocket-tabs .tab-btn.active')?.textContent);
+        };
+        safeGet('view2d')?.addEventListener('click', () => set3D(false));
+        safeGet('view3d')?.addEventListener('click', () => set3D(true));
 
         function applyPositions(positions) {
             for (const [id, config] of Object.entries(positions)) {

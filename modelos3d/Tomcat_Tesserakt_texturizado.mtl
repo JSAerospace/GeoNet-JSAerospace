@@ -1,0 +1,29 @@
+newmtl pintura
+Kd 1 1 1
+Ka 0 0 0
+Ks 0.04 0.04 0.04
+Ns 20
+map_Kd Tomcat_pintura.png
+
+newmtl motor
+Kd 0.21 0.21 0.22
+Ks 0.2 0.2 0.2
+Ns 30
+
+newmtl tobera
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+
+newmtl aleta
+Kd 0.30 0.27 0.26
+Ks 0.1 0.1 0.1
+
+newmtl vaina
+Kd 0.80 0.80 0.78
+Ks 0.3 0.3 0.3
+Ns 40
+
+newmtl herraje
+Kd 0.62 0.62 0.64
+Ks 0.5 0.5 0.5
+Ns 60
