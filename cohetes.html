@@ -2876,7 +2876,9 @@ ASTRO-3_launch.png
         const viewToggle = safeGet('viewToggle');
         const viewer3dEl = safeGet('tomcat3d');
         const viewer3dStatus = safeGet('tomcat3d-status');
-        let want3D = false;
+        // PC (mouse/trackpad) -> 3D por defecto. Celular/tablet (táctil) -> 2D por defecto.
+        const isDesktopDevice = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        let want3D = isDesktopDevice;
         let viewer3d = null;
         let viewer3dLoading = false;
         let lastStage3D = null;
@@ -2896,6 +2898,11 @@ ASTRO-3_launch.png
             } catch (err) {
                 console.error(err);
                 if (viewer3dStatus) viewer3dStatus.textContent = 'No se pudo cargar el visor 3D (abrí la página con un servidor local)';
+                // Fallback: volver a la vista 2D si el 3D no carga
+                want3D = false;
+                safeGet('view2d')?.classList.add('active');
+                safeGet('view3d')?.classList.remove('active');
+                if (visualBox) visualBox.classList.remove('is-3d');
             }
             viewer3dLoading = false;
         }
@@ -2920,6 +2927,8 @@ ASTRO-3_launch.png
             safeGet('view3d')?.classList.toggle('active', v);
             syncViewer(currentRocketKey, currentStageName);
         };
+        safeGet('view2d')?.classList.toggle('active', !want3D);
+        safeGet('view3d')?.classList.toggle('active', want3D);
         safeGet('view2d')?.addEventListener('click', () => set3D(false));
         safeGet('view3d')?.addEventListener('click', () => set3D(true));
 
